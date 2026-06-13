@@ -3,59 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyWork Bantunala</title>
+<title>MyWork Pro Bantunala</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header class="navbar">
-  <div class="logo">MyWork Bantunala</div>
-  <nav>
-    <a href="#dashboard">Dashboard</a>
-    <a href="#tasks">Tasks</a>
-    <a href="#admin">Administrasi</a>
-    <a href="#contact">Catatan</a>
-  </nav>
+  <div class="logo">MyWork Pro</div>
 </header>
 
-<section class="hero" id="dashboard">
-  <h1>MyWork System</h1>
-  <p>Manajemen pekerjaan, administrasi, dan aktivitas pribadi dalam satu tempat</p>
-  <a class="btn" href="#tasks">Lihat Aktivitas</a>
+<section class="hero">
+  <h1>Work Management System</h1>
+  <p>Kelola pekerjaan, task, dan administrasi pribadi</p>
 </section>
 
-<section id="tasks" class="section">
-  <h2>Tasks</h2>
+<section class="section">
 
-  <div class="grid">
-    <div class="card">📌 Pekerjaan Harian</div>
-    <div class="card">📅 Jadwal Kegiatan</div>
-    <div class="card">📝 Catatan Tugas</div>
-    <div class="card">⏳ Deadline Project</div>
+  <div class="add-box">
+    <input type="text" id="taskInput" placeholder="Tulis task baru...">
+    <button onclick="addTask()">Tambah</button>
   </div>
+
+  <h2>Task List</h2>
+  <div id="taskList"></div>
+
 </section>
-
-<section id="admin" class="section">
-  <h2>Administrasi</h2>
-
-  <div class="grid">
-    <div class="card">📁 Data Dokumen</div>
-    <div class="card">📊 Laporan</div>
-    <div class="card">🧾 Arsip</div>
-    <div class="card">📂 File Management</div>
-  </div>
-</section>
-
-<section id="contact" class="section contact">
-  <h2>Catatan</h2>
-  <p>Sistem ini digunakan untuk manajemen kerja pribadi Bantunala</p>
-  <a class="btn" href="#">Tambah Catatan</a>
-</section>
-
-<footer>
-  © 2026 MyWork Bantunala
-</footer>
 
 <script src="script.js"></script>
 </body>
