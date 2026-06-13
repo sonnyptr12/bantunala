@@ -15,21 +15,36 @@
 
 <section class="hero">
   <h1>Work Management System</h1>
-  <p>Kelola pekerjaan, task, dan administrasi pribadi</p>
+  <p>Login untuk mengakses task management</p>
 </section>
 
-<section class="section">
+<!-- LOGIN -->
+<div id="authBox" class="auth">
+  <h2>Login MyWork</h2>
+
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;" class="section">
+
+  <h2>Dashboard Task</h2>
 
   <div class="add-box">
-    <input type="text" id="taskInput" placeholder="Tulis task baru...">
+    <input id="taskInput" placeholder="Tugas baru">
     <button onclick="addTask()">Tambah</button>
   </div>
 
-  <h2>Task List</h2>
   <div id="taskList"></div>
 
-</section>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>

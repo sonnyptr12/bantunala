@@ -62,3 +62,24 @@ button {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.auth {
+  text-align: center;
+  padding: 40px;
+}
+
+.auth input {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  width: 250px;
+}
+
+.auth button {
+  margin: 5px;
+  padding: 10px 15px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
