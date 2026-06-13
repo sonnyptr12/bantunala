@@ -3,54 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bantunala - IT Consultant</title>
+<title>MyWork Bantunala</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header class="navbar">
-  <div class="logo">Bantunala</div>
+  <div class="logo">MyWork Bantunala</div>
   <nav>
-    <a href="#services">Services</a>
-    <a href="#contact">Contact</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#tasks">Tasks</a>
+    <a href="#admin">Administrasi</a>
+    <a href="#contact">Catatan</a>
   </nav>
 </header>
 
-<section class="hero">
-  <div class="hero-content">
-    <h1 class="fade">IT Consultant & Web Developer</h1>
-    <p class="fade delay">
-      Solusi digital modern untuk website, sistem informasi, dan backend API
-    </p>
-    <a class="btn bounce" href="#contact">Hubungi Saya</a>
+<section class="hero" id="dashboard">
+  <h1>MyWork System</h1>
+  <p>Manajemen pekerjaan, administrasi, dan aktivitas pribadi dalam satu tempat</p>
+  <a class="btn" href="#tasks">Lihat Aktivitas</a>
+</section>
+
+<section id="tasks" class="section">
+  <h2>Tasks</h2>
+
+  <div class="grid">
+    <div class="card">📌 Pekerjaan Harian</div>
+    <div class="card">📅 Jadwal Kegiatan</div>
+    <div class="card">📝 Catatan Tugas</div>
+    <div class="card">⏳ Deadline Project</div>
   </div>
 </section>
 
-<section id="services" class="section">
-  <h2 class="slide">Layanan</h2>
+<section id="admin" class="section">
+  <h2>Administrasi</h2>
 
   <div class="grid">
-    <div class="card float">🌐 Website Development</div>
-    <div class="card float">⚙️ Backend API</div>
-    <div class="card float">🗄️ Database System</div>
-    <div class="card float">🚀 Deployment & Hosting</div>
+    <div class="card">📁 Data Dokumen</div>
+    <div class="card">📊 Laporan</div>
+    <div class="card">🧾 Arsip</div>
+    <div class="card">📂 File Management</div>
   </div>
 </section>
 
 <section id="contact" class="section contact">
-  <h2 class="slide">Kontak</h2>
-  <p>Butuh website atau sistem? Hubungi sekarang</p>
-
-  <a class="btn pulse" 
-     href="https://wa.me/6280000000000" 
-     target="_blank">
-     WhatsApp Saya
-  </a>
+  <h2>Catatan</h2>
+  <p>Sistem ini digunakan untuk manajemen kerja pribadi Bantunala</p>
+  <a class="btn" href="#">Tambah Catatan</a>
 </section>
 
 <footer>
-  © 2026 Bantunala - IT Consultant
+  © 2026 MyWork Bantunala
 </footer>
 
 <script src="script.js"></script>
