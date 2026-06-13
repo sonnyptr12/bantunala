@@ -1,85 +1,42 @@
 body {
-  margin: 0;
   font-family: Arial;
-  background: #0b1220;
-  color: white;
+  background: #f5f5f5;
+  margin: 0;
 }
 
-/* NAVBAR */
 .navbar {
+  background: #111;
+  color: white;
+  padding: 15px;
+}
+
+.auth, .app {
+  max-width: 500px;
+  margin: 50px auto;
+  background: white;
   padding: 20px;
-  background: #0f172a;
-  text-align: center;
-}
-
-/* HERO */
-.hero {
-  text-align: center;
-  padding: 60px 20px;
-  background: linear-gradient(135deg, #1e3a8a, #2563eb);
-}
-
-/* INPUT */
-.add-box {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 30px;
+  border-radius: 10px;
 }
 
 input {
+  width: 100%;
   padding: 10px;
-  width: 250px;
-  border-radius: 6px;
-  border: none;
+  margin: 5px 0;
 }
 
 button {
-  padding: 10px 15px;
-  border: none;
-  background: #3b82f6;
+  padding: 10px;
+  margin-top: 5px;
+  background: black;
   color: white;
-  border-radius: 6px;
+  border: none;
   cursor: pointer;
 }
 
-/* TASK */
 .task {
-  background: #111827;
-  margin: 10px auto;
+  background: #eee;
   padding: 10px;
-  width: 300px;
-  border-radius: 8px;
+  margin-top: 5px;
   display: flex;
   justify-content: space-between;
-}
-
-.delete {
-  background: red;
-  border: none;
-  color: white;
-  padding: 5px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.auth {
-  text-align: center;
-  padding: 40px;
-}
-
-.auth input {
-  display: block;
-  margin: 10px auto;
-  padding: 10px;
-  width: 250px;
-}
-
-.auth button {
-  margin: 5px;
-  padding: 10px 15px;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
 }

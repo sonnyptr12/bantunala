@@ -3,38 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyWork Pro Bantunala</title>
+<title>MyWork Bantunala</title>
+
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header class="navbar">
-  <div class="logo">MyWork Pro</div>
+  <div class="logo">MyWork</div>
 </header>
-
-<section class="hero">
-  <h1>Work Management System</h1>
-  <p>Login untuk mengakses task management</p>
-</section>
 
 <!-- LOGIN -->
 <div id="authBox" class="auth">
-  <h2>Login MyWork</h2>
+  <h2>Login</h2>
 
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
 
   <button onclick="login()">Login</button>
   <button onclick="logout()">Logout</button>
+
+  <p id="msg"></p>
 </div>
 
 <!-- APP -->
-<div id="app" style="display:none;" class="section">
+<div id="app" class="app" style="display:none;">
 
-  <h2>Dashboard Task</h2>
+  <h1>Dashboard MyWork</h1>
 
-  <div class="add-box">
+  <div class="task-box">
     <input id="taskInput" placeholder="Tugas baru">
     <button onclick="addTask()">Tambah</button>
   </div>
