@@ -1,65 +1,86 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f6f9;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f8fafc;
 }
 
 /* NAVBAR */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 50px;
-    background: #1e3a8a;
-    color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 40px;
+  background: #0f172a;
+  color: white;
 }
 
 .navbar a {
-    color: white;
-    margin-left: 15px;
-    text-decoration: none;
+  color: white;
+  margin-left: 15px;
+  text-decoration: none;
 }
 
 /* HERO */
 .hero {
-    text-align: center;
-    padding: 100px 20px;
-    background: linear-gradient(135deg, #1e3a8a, #2563eb);
-    color: white;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: white;
+  text-align: center;
+}
+
+.hero-box h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.hero-box p {
+  font-size: 18px;
+  opacity: 0.9;
 }
 
 .btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: white;
-    color: #1e3a8a;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background: white;
+  color: #1d4ed8;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
 }
 
-/* SERVICES */
-.services {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 50px;
-    flex-wrap: wrap;
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* FEATURES */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 50px;
 }
 
 .card {
-    background: white;
-    padding: 20px;
-    width: 250px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    text-align: center;
+  background: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
 }
 
 /* FOOTER */
 footer {
-    text-align: center;
-    padding: 20px;
-    background: #1e3a8a;
-    color: white;
+  text-align: center;
+  padding: 20px;
+  background: #0f172a;
+  color: white;
 }
