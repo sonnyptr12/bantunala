@@ -10,8 +10,8 @@ let pdfFiles = [];
 window.toggleMode = function(e){
   e.preventDefault();
   isLogin = !isLogin;
-  document.getElementById("authBtn").innerText = isLogin ? "Login" : "Register";
-  document.getElementById("fullName").style.display = isLogin ? "none" : "block";
+  authBtn.innerText = isLogin ? "Login" : "Register";
+  fullName.style.display = isLogin ? "none" : "block";
 };
 
 window.handleAuth = async function(){
@@ -20,7 +20,7 @@ window.handleAuth = async function(){
 
   if(isLogin){
     await supabaseClient.auth.signInWithPassword({email,password});
-  }else{
+  } else {
     await supabaseClient.auth.signUp({email,password});
   }
 
@@ -70,6 +70,8 @@ async function loadTasks(){
   totalTask.innerText = data.length;
   doneTask.innerText = data.filter(t=>t.done).length;
   pendingTask.innerText = data.filter(t=>!t.done).length;
+
+  renderCharts(data);
 }
 
 /* ================= NOTES ================= */
@@ -86,9 +88,32 @@ window.addAnnouncement = async function(){
   ]);
 };
 
-/* ================= PDF REAL MERGE ================= */
-pdfInput.onchange = (e)=>{
-  pdfFiles = Array.from(e.target.files);
+/* ================= CHART ================= */
+function renderCharts(tasks){
+
+  new Chart(chart1,{
+    type:"doughnut",
+    data:{
+      labels:["Done","Pending"],
+      datasets:[{data:[
+        tasks.filter(t=>t.done).length,
+        tasks.filter(t=>!t.done).length
+      ]}]
+    }
+  });
+
+  new Chart(chart2,{
+    type:"bar",
+    data:{
+      labels:["Mon","Tue","Wed","Thu","Fri"],
+      datasets:[{data:[5,8,3,6,9]}]
+    }
+  });
+}
+
+/* ================= PDF ================= */
+pdfInput.onchange = e=>{
+  pdfFiles = [...e.target.files];
 };
 
 window.mergePDF = async function(){
@@ -96,24 +121,23 @@ window.mergePDF = async function(){
   const {PDFDocument} = PDFLib;
   const merged = await PDFDocument.create();
 
-  for(const file of pdfFiles){
+  for(let file of pdfFiles){
     const bytes = await file.arrayBuffer();
     const doc = await PDFDocument.load(bytes);
 
-    const copied = await merged.copyPages(doc, doc.getPageIndices());
-    copied.forEach(p=>merged.addPage(p));
+    const pages = await merged.copyPages(doc, doc.getPageIndices());
+    pages.forEach(p=>merged.addPage(p));
   }
 
-  const pdfBytes = await merged.save();
-
-  const blob = new Blob([pdfBytes],{type:"application/pdf"});
+  const bytes = await merged.save();
+  const blob = new Blob([bytes],{type:"application/pdf"});
   const url = URL.createObjectURL(blob);
 
   window.open(url);
 };
 
 window.splitPDF = function(){
-  alert("Split ready upgrade next level (backend mode)");
+  alert("Split mode ready upgrade next backend");
 };
 
 window.addEventListener("load",checkUser);

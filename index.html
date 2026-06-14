@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MyWork ERP Pro</title>
+<title>MyWork ERP Ultra 2026</title>
 
 <link rel="stylesheet" href="style.css"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- PDF LIB (REAL ENGINE) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 </head>
 
@@ -21,7 +21,7 @@
     <h1>⚡ MyWork ERP</h1>
     <p id="authTitle">Login ke sistem</p>
 
-    <input id="fullName" placeholder="Nama Lengkap" style="display:none;"/>
+    <input id="fullName" placeholder="Nama Lengkap" style="display:none"/>
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
 
@@ -44,11 +44,11 @@
 
     <div class="brand">⚡ MyWork</div>
 
-    <button class="menu-item active" onclick="showPage('dashboard')">📊 Dashboard</button>
-    <button class="menu-item" onclick="showPage('tasks')">📋 Tasks</button>
-    <button class="menu-item" onclick="showPage('notes')">📝 Notes</button>
-    <button class="menu-item" onclick="showPage('announce')">📢 Announcement</button>
-    <button class="menu-item" onclick="showPage('pdf')">📄 PDF Tools</button>
+    <button class="menu active" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="menu" onclick="showPage('tasks')">📋 Tasks</button>
+    <button class="menu" onclick="showPage('notes')">📝 Notes</button>
+    <button class="menu" onclick="showPage('announce')">📢 Announcement</button>
+    <button class="menu" onclick="showPage('pdf')">📄 PDF Tools</button>
 
     <button class="logout" onclick="logout()">Logout</button>
 
@@ -59,25 +59,35 @@
 
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page">
-      <h1>Dashboard</h1>
+
+      <div class="hero">
+        <h1>Good Evening Admin ⚡</h1>
+        <p>Control Center Dashboard</p>
+      </div>
 
       <div class="grid">
 
-        <div class="card">Total Task <p id="totalTask">0</p></div>
-        <div class="card">Done <p id="doneTask">0</p></div>
-        <div class="card">Pending <p id="pendingTask">0</p></div>
-        <div class="card accent">Status <p>ONLINE ⚡</p></div>
+        <div class="card">Total Task <h2 id="totalTask">0</h2></div>
+        <div class="card">Done <h2 id="doneTask">0</h2></div>
+        <div class="card">Pending <h2 id="pendingTask">0</h2></div>
+        <div class="card accent">System <h2>ONLINE</h2></div>
 
       </div>
+
+      <div class="charts">
+        <canvas id="chart1"></canvas>
+        <canvas id="chart2"></canvas>
+      </div>
+
     </div>
 
     <!-- TASK -->
     <div id="page-tasks" class="page hidden">
       <h2>Tasks</h2>
 
-      <div class="task-input">
-        <input id="taskInput" placeholder="Tambah task"/>
-        <button onclick="addTask()">Tambah</button>
+      <div class="input">
+        <input id="taskInput"/>
+        <button onclick="addTask()">Add</button>
       </div>
 
       <div id="taskList"></div>
@@ -87,8 +97,8 @@
     <div id="page-notes" class="page hidden">
       <h2>Notes</h2>
 
-      <div class="task-input">
-        <input id="noteInput" placeholder="Catatan"/>
+      <div class="input">
+        <input id="noteInput"/>
         <button onclick="addNote()">Add</button>
       </div>
 
@@ -99,37 +109,35 @@
     <div id="page-announce" class="page hidden">
       <h2>Announcement</h2>
 
-      <div class="task-input">
-        <input id="announceInput" placeholder="Pengumuman"/>
+      <div class="input">
+        <input id="announceInput"/>
         <button onclick="addAnnouncement()">Post</button>
       </div>
 
       <div id="announceList"></div>
     </div>
 
-    <!-- PDF TOOLS -->
+    <!-- PDF -->
     <div id="page-pdf" class="page hidden">
       <h2>PDF Tools</h2>
 
-      <div class="pdf-box">
+      <input type="file" id="pdfInput" multiple accept="application/pdf"/>
 
-        <input type="file" id="pdfInput" multiple accept="application/pdf"/>
-
-        <div class="pdf-actions">
-          <button onclick="mergePDF()">Merge</button>
-          <button onclick="splitPDF()">Split</button>
-        </div>
-
-        <div id="pdfList"></div>
-
-        <div class="progress">
-          <div id="progressBar"></div>
-        </div>
-
+      <div class="pdf-actions">
+        <button onclick="mergePDF()">Merge PDF</button>
+        <button onclick="splitPDF()">Split PDF</button>
       </div>
+
+      <div id="pdfList"></div>
+
+      <div class="bar">
+        <div id="progress"></div>
+      </div>
+
     </div>
 
   </main>
+
 </section>
 
 <script src="script.js"></script>

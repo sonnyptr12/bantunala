@@ -5,7 +5,7 @@
 
 body{
   margin:0;
-  background:#070A12;
+  background:#050814;
   color:white;
 }
 
@@ -16,14 +16,15 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:#0b1220;
+  background:radial-gradient(circle,#0f172a,#050814);
 }
 
 .auth-card{
-  width:350px;
+  width:360px;
   padding:30px;
-  background:#111827;
   border-radius:16px;
+  background:rgba(15,23,42,0.8);
+  border:1px solid #1f2937;
 }
 
 /* APP */
@@ -35,99 +36,114 @@ body{
 /* SIDEBAR */
 .sidebar{
   width:240px;
-  background:#0f172a;
+  background:#0b1020;
   padding:20px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
 
-.menu-item{
-  background:transparent;
+.brand{
+  color:#38bdf8;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.menu{
+  background:none;
   border:none;
-  color:#aaa;
-  padding:10px;
+  color:#9ca3af;
   text-align:left;
+  padding:10px;
   cursor:pointer;
 }
 
-.menu-item:hover,
-.menu-item.active{
-  background:#1f2937;
+.menu:hover,.menu.active{
+  background:#111827;
   color:white;
 }
 
 .logout{
   margin-top:auto;
-  background:red;
+  background:#ef4444;
   border:none;
   padding:10px;
-  color:white;
   border-radius:10px;
+  color:white;
 }
 
 /* MAIN */
 .main{
   flex:1;
-  padding:20px;
+  padding:24px;
 }
 
+/* PAGE */
+.page{animation:fade .3s ease}
 .hidden{display:none}
+
+@keyframes fade{
+  from{opacity:0}
+  to{opacity:1}
+}
 
 /* GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:10px;
+  gap:12px;
 }
 
 .card{
-  background:#111827;
-  padding:20px;
-  border-radius:12px;
+  background:#0f172a;
+  padding:18px;
+  border-radius:14px;
+  border:1px solid #1f2937;
 }
 
-/* TASK */
-.task-input{
+.accent{
+  border-color:#38bdf8;
+}
+
+/* INPUT */
+.input{
   display:flex;
   gap:10px;
 }
 
-.task-input input{
+input{
   flex:1;
   padding:10px;
+  background:#0b1220;
+  border:1px solid #1f2937;
+  color:white;
 }
 
-.task{
-  background:#1f2937;
-  padding:10px;
+/* TASK */
+#taskList .task{
+  background:#111827;
+  padding:12px;
   margin-top:10px;
   border-radius:10px;
 }
 
 /* PDF */
-.pdf-box{
-  margin-top:20px;
-  padding:20px;
-  background:#111827;
-  border-radius:12px;
-}
-
 .pdf-actions button{
+  margin-top:10px;
   margin-right:10px;
   padding:10px;
   background:#38bdf8;
   border:none;
 }
 
-.progress{
-  height:8px;
-  background:#333;
+.bar{
+  height:6px;
+  background:#1f2937;
   margin-top:10px;
 }
 
-#progressBar{
-  height:8px;
+#progress{
+  height:6px;
   width:0%;
   background:#38bdf8;
 }
