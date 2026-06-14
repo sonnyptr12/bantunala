@@ -3,13 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MyWork Enterprise System</title>
+<title>MyWork SaaS Core</title>
 
-<!-- Supabase -->
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- Chart.js -->
+<!-- CHART -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- DRAG DROP (KANBAN) -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<!-- EXCEL -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<!-- PDF (JSPDF) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <link rel="stylesheet" href="style.css"/>
 </head>
@@ -18,10 +27,10 @@
 
 <!-- ================= AUTH ================= -->
 <section id="authBox" class="auth">
-  <div class="auth-card">
 
-    <h1>⚡ MyWork Enterprise</h1>
-    <p>Sign in to continue</p>
+  <div class="auth-card">
+    <h1>⚡ MyWork SaaS Core</h1>
+    <p>Enterprise Workspace System</p>
 
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
@@ -29,54 +38,35 @@
     <button onclick="login()">Login</button>
 
     <p id="msg"></p>
-
   </div>
+
 </section>
 
-<!-- ================= APP WRAPPER ================= -->
+<!-- ================= APP ================= -->
 <section id="app" class="app" style="display:none;">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
 
-  <div class="brand">
-    ⚡ MyWork
-  </div>
+  <div class="brand">⚡ SaaS Core</div>
 
-  <button class="menu active" onclick="openPage('dashboard',this)">
-    📊 Dashboard
-  </button>
+  <button class="menu active" onclick="openPage('dashboard',this)">📊 Dashboard</button>
+  <button class="menu" onclick="openPage('kanban',this)">📌 Kanban Tasks</button>
+  <button class="menu" onclick="openPage('broadcast',this)">📡 Broadcast Live</button>
+  <button class="menu" onclick="openPage('certificate',this)">🎓 Certificate AI</button>
+  <button class="menu" onclick="openPage('pdf',this)">📄 PDF Tools</button>
+  <button class="menu" onclick="openPage('excel',this)">📊 Excel Import</button>
+  <button class="menu" onclick="openPage('users',this)">👥 Online Users</button>
+  <button class="menu" onclick="openPage('files',this)">☁ Cloud Files</button>
 
-  <button class="menu" onclick="openPage('tasks',this)">
-    📋 Tasks
-  </button>
-
-  <button class="menu" onclick="openPage('certificate',this)">
-    🎓 Certificate
-  </button>
-
-  <button class="menu" onclick="openPage('pdf',this)">
-    📄 PDF Tools
-  </button>
-
-  <button class="menu" onclick="openPage('users',this)">
-    👥 Users
-  </button>
-
-  <button class="menu" onclick="openPage('broadcast',this)">
-    📢 Broadcast
-  </button>
-
-  <button class="logout" onclick="logout()">
-    🚪 Logout
-  </button>
+  <button class="logout" onclick="logout()">Logout</button>
 
 </aside>
 
 <!-- ================= MAIN ================= -->
 <main class="main">
 
-<!-- ================= TOPBAR ================= -->
+<!-- TOPBAR -->
 <header class="topbar">
   <div>
     <h2 id="greeting">Welcome</h2>
@@ -87,137 +77,123 @@
 <!-- ================= DASHBOARD ================= -->
 <section id="dashboard" class="page active">
 
-  <!-- SUMMARY CARDS -->
+  <!-- KPI -->
   <div class="grid">
 
-    <div class="card">
-      📋 Total Tasks
-      <h2 id="totalTask">0</h2>
-    </div>
-
-    <div class="card">
-      ✅ Done
-      <h2 id="doneTask">0</h2>
-    </div>
-
-    <div class="card">
-      ⏳ Pending
-      <h2 id="pendingTask">0</h2>
-    </div>
-
-    <div class="card">
-      👤 Online Users
-      <h2 id="onlineUsers">1</h2>
-    </div>
+    <div class="card">📌 Tasks <h2 id="taskCount">0</h2></div>
+    <div class="card">🔥 Active <h2 id="activeCount">0</h2></div>
+    <div class="card">✅ Done <h2 id="doneCount">0</h2></div>
+    <div class="card">👥 Online <h2 id="onlineCount">0</h2></div>
 
   </div>
 
-  <!-- BROADCAST -->
-  <div class="broadcast">
-    <input id="broadcastInput" placeholder="Broadcast message ke semua user..."/>
-    <button onclick="sendBroadcast()">Send</button>
-  </div>
-
-  <!-- CHARTS -->
+  <!-- CHART -->
   <div class="chart-grid">
 
     <div class="chart-card">
-      <h3>Task Overview</h3>
-      <div class="chart-wrap">
-        <canvas id="chart1"></canvas>
-      </div>
+      <h3>Task Distribution</h3>
+      <canvas id="chartDonut"></canvas>
     </div>
 
     <div class="chart-card">
-      <h3>Activity</h3>
-      <div class="chart-wrap">
-        <canvas id="chart2"></canvas>
-      </div>
+      <h3>Activity Flow</h3>
+      <canvas id="chartBar"></canvas>
     </div>
-
-  </div>
-
-  <!-- TABLE TASK -->
-  <div class="table-box">
-    <h3>Task Table</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Task</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="taskTable"></tbody>
-    </table>
 
   </div>
 
 </section>
 
-<!-- ================= TASK PAGE ================= -->
-<section id="tasks" class="page hidden">
-  <h2>Task Management</h2>
+<!-- ================= KANBAN ================= -->
+<section id="kanban" class="page hidden">
 
-  <div id="taskBoard" class="task-board"></div>
+  <h2>Kanban Board</h2>
+
+  <div class="kanban">
+
+    <div class="kanban-column">
+      <h3>To Do</h3>
+      <div id="todoList" class="kanban-list"></div>
+    </div>
+
+    <div class="kanban-column">
+      <h3>Doing</h3>
+      <div id="doingList" class="kanban-list"></div>
+    </div>
+
+    <div class="kanban-column">
+      <h3>Done</h3>
+      <div id="doneList" class="kanban-list"></div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= BROADCAST ================= -->
+<section id="broadcast" class="page hidden">
+
+  <h2>Live Broadcast</h2>
+
+  <input id="broadcastInput" placeholder="Message to all users"/>
+  <button onclick="sendBroadcast()">Send Live</button>
+
+  <div id="broadcastList"></div>
+
 </section>
 
 <!-- ================= CERTIFICATE ================= -->
 <section id="certificate" class="page hidden">
-  <h2>Certificate Generator</h2>
 
-  <div class="card">
-    <input placeholder="Nama Peserta"/>
-    <input placeholder="Nama Event"/>
-    <input placeholder="Template Style"/>
+  <h2>AI Certificate Generator</h2>
 
-    <button>Generate Certificate</button>
-  </div>
+  <input id="certName" placeholder="Name"/>
+  <input id="certEvent" placeholder="Event"/>
+
+  <button onclick="generateCertificate()">Generate PDF</button>
 
 </section>
 
-<!-- ================= PDF TOOLS ================= -->
+<!-- ================= PDF ================= -->
 <section id="pdf" class="page hidden">
+
   <h2>PDF Tools</h2>
 
-  <div class="tool-grid">
+  <button onclick="mergePDF()">Merge</button>
+  <button onclick="splitPDF()">Split</button>
+  <button onclick="exportPDF()">Export Task PDF</button>
 
-    <div class="tool">📎 Merge PDF</div>
-    <div class="tool">✂ Split PDF</div>
-    <div class="tool">🗜 Compress PDF</div>
-    <div class="tool">🔄 Convert Word to PDF</div>
-    <div class="tool">📑 Mail Merge PDF</div>
+</section>
 
-  </div>
+<!-- ================= EXCEL ================= -->
+<section id="excel" class="page hidden">
+
+  <h2>Excel Mail Merge</h2>
+
+  <input type="file" id="excelFile"/>
+
+  <button onclick="uploadExcel()">Upload</button>
 
 </section>
 
 <!-- ================= USERS ================= -->
 <section id="users" class="page hidden">
+
   <h2>Online Users</h2>
 
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="userList"></tbody>
-    </table>
-  </div>
+  <div id="userList"></div>
 
 </section>
 
-<!-- ================= BROADCAST PAGE ================= -->
-<section id="broadcast" class="page hidden">
-  <h2>Broadcast Panel</h2>
+<!-- ================= FILES ================= -->
+<section id="files" class="page hidden">
 
-  <div class="card">
-    <input id="broadcastMsg" placeholder="Message"/>
-    <button onclick="sendBroadcast()">Send to All Users</button>
-  </div>
+  <h2>Cloud Storage</h2>
+
+  <input type="file" id="fileUpload"/>
+  <button onclick="uploadFile()">Upload</button>
+
+  <div id="fileList"></div>
 
 </section>
 

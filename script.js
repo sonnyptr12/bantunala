@@ -1,20 +1,21 @@
 
 // ================= SUPABASE =================
-const supabaseUrl = "https://scefyffuqtpavzpolrvj.supabase.co";
-const supabaseKey = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
+const SUPABASE_URL = "https://scefyffuqtpavzpolrvj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
 
-const client = supabase.createClient(supabaseUrl, supabaseKey);
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ================= GLOBAL STATE =================
-let tasksData = [];
+// ================= STATE =================
+let tasks = [];
+let user = null;
 
-// ================= LOGIN =================
+// ================= AUTH =================
 async function login(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
 
-  const { error } = await client.auth.signInWithPassword({
+  const { data, error } = await client.auth.signInWithPassword({
     email,
     password
   });
@@ -24,6 +25,7 @@ async function login(){
     return;
   }
 
+  user = data.user;
   startApp();
 }
 
@@ -34,18 +36,19 @@ async function logout(){
 }
 
 // ================= INIT APP =================
-async function startApp(){
-
+function startApp(){
   document.getElementById("authBox").style.display = "none";
   document.getElementById("app").style.display = "flex";
 
   openPage("dashboard");
 
-  startClock();
+  initClock();
   loadTasks();
+  initRealtime();
+  initPresence();
 }
 
-// ================= SPA ROUTER =================
+// ================= SPA NAV =================
 function openPage(id,el){
 
   document.querySelectorAll(".page").forEach(p=>{
@@ -61,14 +64,13 @@ function openPage(id,el){
   if(el) el.classList.add("active");
 }
 
-// ================= CLOCK + GREETING =================
-function startClock(){
+// ================= CLOCK =================
+function initClock(){
   setInterval(()=>{
     const now = new Date();
     const hour = now.getHours();
 
     let greet = "Hello";
-
     if(hour < 12) greet = "Good Morning ☀️";
     else if(hour < 17) greet = "Good Afternoon 🌤";
     else greet = "Good Evening 🌙";
@@ -81,7 +83,7 @@ function startClock(){
   },1000);
 }
 
-// ================= LOAD TASKS =================
+// ================= TASK LOAD =================
 async function loadTasks(){
 
   const { data } = await client
@@ -89,58 +91,46 @@ async function loadTasks(){
     .select("*")
     .order("id",{ascending:false});
 
-  tasksData = data || [];
+  tasks = data || [];
 
   updateDashboard();
-  renderTable();
-  renderTaskBoard();
-  renderCharts();
+  renderKanban();
+  renderChart();
 }
 
-// ================= UPDATE DASHBOARD =================
+// ================= DASHBOARD UPDATE =================
 function updateDashboard(){
 
-  const total = tasksData.length;
-  const done = tasksData.filter(t=>t.done).length;
-  const pending = total - done;
+  const done = tasks.filter(t=>t.done).length;
+  const active = tasks.length - done;
 
-  document.getElementById("totalTask").innerText = total;
-  document.getElementById("doneTask").innerText = done;
-  document.getElementById("pendingTask").innerText = pending;
+  document.getElementById("taskCount").innerText = tasks.length;
+  document.getElementById("doneCount").innerText = done;
+  document.getElementById("activeCount").innerText = active;
 }
 
 // ================= TASK CRUD =================
-
-// ADD
-async function addTask(title){
+async function addTask(){
 
   const input = document.getElementById("taskInput");
-  const value = input?.value;
-
-  if(!value) return;
+  if(!input || !input.value) return;
 
   await client.from("tasks").insert([{
-    title:value,
-    done:false
+    title:input.value,
+    done:false,
+    status:"todo"
   }]);
 
   input.value="";
   loadTasks();
 }
 
-// DELETE
 async function deleteTask(id){
-
-  await client.from("tasks")
-    .delete()
-    .eq("id",id);
-
+  await client.from("tasks").delete().eq("id",id);
   loadTasks();
 }
 
-// TOGGLE DONE
 async function toggleTask(id,done){
-
   await client.from("tasks")
     .update({done:!done})
     .eq("id",id);
@@ -148,100 +138,117 @@ async function toggleTask(id,done){
   loadTasks();
 }
 
-// EDIT
-async function editTask(id,title){
+// ================= KANBAN RENDER =================
+function renderKanban(){
 
-  const newTitle = prompt("Edit task:",title);
+  const todo = document.getElementById("todoList");
+  const doing = document.getElementById("doingList");
+  const done = document.getElementById("doneList");
 
-  if(!newTitle) return;
+  if(!todo) return;
 
-  await client.from("tasks")
-    .update({title:newTitle})
-    .eq("id",id);
+  todo.innerHTML = "";
+  doing.innerHTML = "";
+  done.innerHTML = "";
 
-  loadTasks();
+  tasks.forEach(t=>{
+    const el = document.createElement("div");
+    el.className="kanban-card";
+    el.innerText = t.title;
+
+    if(t.status==="todo") todo.appendChild(el);
+    if(t.status==="doing") doing.appendChild(el);
+    if(t.status==="done") done.appendChild(el);
+  });
+
+  initDrag();
 }
 
-// ================= TABLE RENDER =================
-function renderTable(){
+// ================= DRAG & DROP =================
+function initDrag(){
 
-  const table = document.getElementById("taskTable");
-  table.innerHTML="";
+  ["todoList","doingList","doneList"].forEach(id=>{
+    new Sortable(document.getElementById(id),{
+      group:"tasks",
+      animation:200,
+      onEnd:async function(evt){
 
-  tasksData.forEach(t=>{
-    table.innerHTML += `
-      <tr>
-        <td>${t.title}</td>
-        <td>${t.done ? "✅ Done" : "⏳ Pending"}</td>
-      </tr>
-    `;
+        const taskName = evt.item.innerText;
+        const newStatus =
+          evt.to.id==="todoList" ? "todo" :
+          evt.to.id==="doingList" ? "doing" : "done";
+
+        const task = tasks.find(t=>t.title===taskName);
+        if(!task) return;
+
+        await client.from("tasks")
+          .update({status:newStatus})
+          .eq("id",task.id);
+
+        loadTasks();
+      }
+    });
   });
 }
 
-// ================= TASK BOARD (CARD UI) =================
-function renderTaskBoard(){
+// ================= CHART =================
+let chartDonut,chartBar;
 
-  const board = document.getElementById("taskBoard");
-  if(!board) return;
+function renderChart(){
 
-  board.innerHTML="";
+  const done = tasks.filter(t=>t.done).length;
+  const pending = tasks.length - done;
 
-  tasksData.forEach(t=>{
-    board.innerHTML += `
-      <div class="task-card">
-        <h4>${t.title}</h4>
-        <p>${t.done ? "Completed" : "In Progress"}</p>
+  if(chartDonut) chartDonut.destroy();
+  if(chartBar) chartBar.destroy();
 
-        <button onclick="toggleTask(${t.id},${t.done})">Toggle</button>
-        <button onclick="editTask(${t.id},'${t.title}')">Edit</button>
-        <button onclick="deleteTask(${t.id})">Delete</button>
-      </div>
-    `;
-  });
-}
-
-// ================= CHARTS =================
-let chart1,chart2;
-
-function renderCharts(){
-
-  const done = tasksData.filter(t=>t.done).length;
-  const pending = tasksData.length - done;
-
-  // destroy old chart
-  if(chart1) chart1.destroy();
-  if(chart2) chart2.destroy();
-
-  const ctx1 = document.getElementById("chart1");
-  const ctx2 = document.getElementById("chart2");
+  const ctx1 = document.getElementById("chartDonut");
+  const ctx2 = document.getElementById("chartBar");
 
   if(!ctx1 || !ctx2) return;
 
-  chart1 = new Chart(ctx1,{
+  chartDonut = new Chart(ctx1,{
     type:"doughnut",
     data:{
       labels:["Done","Pending"],
-      datasets:[{
-        data:[done,pending]
-      }]
+      datasets:[{data:[done,pending]}]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
-    }
+    options:{responsive:true,maintainAspectRatio:false}
   });
 
-  chart2 = new Chart(ctx2,{
+  chartBar = new Chart(ctx2,{
     type:"bar",
     data:{
       labels:["Tasks"],
-      datasets:[{
-        data:[tasksData.length]
-      }]
+      datasets:[{data:[tasks.length]}]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+}
+
+// ================= REALTIME =================
+function initRealtime(){
+
+  client
+    .channel("tasks-channel")
+    .on("postgres_changes",{event:"*"},payload=>{
+      loadTasks();
+    })
+    .subscribe();
+}
+
+// ================= PRESENCE (ONLINE USERS) =================
+function initPresence(){
+
+  const channel = client.channel("online-users");
+
+  channel.subscribe(async (status)=>{
+
+    if(status==="SUBSCRIBED"){
+      channel.track({
+        user:user?.email || "guest",
+        online:true
+      });
     }
   });
 }
@@ -249,19 +256,72 @@ function renderCharts(){
 // ================= BROADCAST =================
 async function sendBroadcast(){
 
-  const msg = document.getElementById("broadcastInput")?.value;
-
-  if(!msg) return;
+  const input = document.getElementById("broadcastInput");
+  if(!input || !input.value) return;
 
   await client.from("broadcast").insert([{
-    message:msg,
+    message:input.value,
     created_at:new Date()
   }]);
 
-  alert("Broadcast sent");
+  input.value="";
+}
+
+// ================= CERTIFICATE PDF =================
+async function generateCertificate(){
+
+  const { jsPDF } = window.jspdf;
+
+  const name = document.getElementById("certName").value;
+  const event = document.getElementById("certEvent").value;
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(22);
+  doc.text("CERTIFICATE", 70, 40);
+
+  doc.setFontSize(16);
+  doc.text("This is to certify", 20, 70);
+
+  doc.text(name || "NAME", 20, 90);
+  doc.text("for participating in", 20, 110);
+  doc.text(event || "EVENT", 20, 130);
+
+  doc.save("certificate.pdf");
+}
+
+// ================= EXCEL UPLOAD =================
+function uploadExcel(event){
+
+  const file = document.getElementById("excelFile").files[0];
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+
+    console.log(workbook);
+    alert("Excel loaded successfully");
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+// ================= FILE UPLOAD =================
+async function uploadFile(){
+
+  const file = document.getElementById("fileUpload").files[0];
+  if(!file) return;
+
+  await client.storage
+    .from("files")
+    .upload(file.name,file);
+
+  alert("Uploaded");
 }
 
 // ================= INIT =================
 window.addEventListener("load",()=>{
-  startClock();
+  initClock();
 });
