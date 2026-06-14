@@ -1,505 +1,1869 @@
-// ================= SUPABASE =================
-const SUPABASE_URL = "https://scefyffuqtpavzpolrvj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
+// =========================================================
+// SUPABASE CONFIG
+// =========================================================
 
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+  "https://scefyffuqtpavzpolrvj.supabase.co";
 
-// ================= STATE =================
-let tasks = [];
-let user = null;
-let certElements = [];
-let selectedElement = null;
-let excelData = [];
+const SUPABASE_KEY =
+  "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+const client =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 // =========================================================
-// ================= AUTH =================
+// GLOBAL STATE
+// =========================================================
+
+let user = null;
+let tasks = [];
+let chartDonut = null;
+let chartBar = null;
+
+let realtimeStarted = false;
+let presenceStarted = false;
+
+let excelData = [];
+
+let certElements = [];
+let selectedElement = null;
+
+// =========================================================
+// APP START
+// =========================================================
+
+window.addEventListener(
+  "load",
+  async () => {
+
+    initClock();
+
+    await restoreSession();
+
+    listenBroadcast();
+
+  }
+);
+
+// =========================================================
+// SESSION RESTORE
+// =========================================================
+
+async function restoreSession(){
+
+  try{
+
+    const {
+      data:{session}
+    } = await client.auth.getSession();
+
+    if(session){
+
+      user = session.user;
+
+      startApp();
+
+    }
+
+  }catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+// =========================================================
+// AUTH LOGIN
 // =========================================================
 
 async function login(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const msg = document.getElementById("msg");
 
-  const { data, error } = await client.auth.signInWithPassword({
+  const email =
+    document.getElementById("email").value;
+
+  const password =
+    document.getElementById("password").value;
+
+  const msg =
+    document.getElementById("msg");
+
+  if(!email || !password){
+
+    msg.innerText =
+      "❌ Email dan Password wajib diisi";
+
+    return;
+  }
+
+  msg.innerText = "Loading...";
+
+  const {
+    data,
+    error
+  } =
+  await client.auth.signInWithPassword({
+
     email,
     password
+
   });
 
   if(error){
-    msg.innerText = "❌ " + error.message;
+
+    msg.innerText =
+      "❌ " + error.message;
+
     return;
   }
 
   user = data.user;
-  startApp();
-}
 
-async function logout(){
-  await client.auth.signOut();
-  location.reload();
+  msg.innerText =
+    "✅ Login berhasil";
+
+  startApp();
+
 }
 
 // =========================================================
-// ================= INIT APP =================
+// LOGOUT
+// =========================================================
+
+async function logout(){
+
+  if(
+    !confirm(
+      "Yakin ingin logout?"
+    )
+  ) return;
+
+  await client.auth.signOut();
+
+  location.reload();
+
+}
+
+// =========================================================
+// START APP
 // =========================================================
 
 function startApp(){
-  document.getElementById("authBox").style.display = "none";
-  document.getElementById("app").style.display = "flex";
+
+  const auth =
+    document.getElementById("authBox");
+
+  const app =
+    document.getElementById("app");
+
+  if(auth)
+    auth.style.display = "none";
+
+  if(app)
+    app.style.display = "flex";
 
   openPage("dashboard");
 
-  initClock();
   loadTasks();
-  initRealtime();
-  initPresence();
+
+  if(!realtimeStarted){
+
+    initRealtime();
+    realtimeStarted = true;
+
+  }
+
+  if(!presenceStarted){
+
+    initPresence();
+    presenceStarted = true;
+
+  }
+
 }
 
 // =========================================================
-// ================= NAVIGATION =================
+// NAVIGATION SYSTEM
 // =========================================================
 
-function openPage(id, el){
+function openPage(
+  pageId,
+  menuBtn
+){
 
-  document.querySelectorAll(".page").forEach(p=>{
-    p.classList.remove("active");
-  });
+  document
+    .querySelectorAll(".page")
+    .forEach(page=>{
 
-  document.getElementById(id).classList.add("active");
+      page.classList.remove(
+        "active"
+      );
 
-  document.querySelectorAll(".menu").forEach(m=>{
-    m.classList.remove("active");
-  });
+    });
 
-  if(el) el.classList.add("active");
+  const target =
+    document.getElementById(
+      pageId
+    );
+
+  if(target){
+
+    target.classList.add(
+      "active"
+    );
+
+  }
+
+  document
+    .querySelectorAll(".menu")
+    .forEach(menu=>{
+
+      menu.classList.remove(
+        "active"
+      );
+
+    });
+
+  if(menuBtn){
+
+    menuBtn.classList.add(
+      "active"
+    );
+
+  }
+
 }
 
 // =========================================================
-// ================= CLOCK =================
+// CLOCK SYSTEM
 // =========================================================
 
 function initClock(){
 
-  setInterval(()=>{
-    const now = new Date();
-    const hour = now.getHours();
+  updateClock();
 
-    let greet = "Hello";
-    if(hour < 12) greet = "Good Morning ☀️";
-    else if(hour < 17) greet = "Good Afternoon 🌤";
-    else greet = "Good Evening 🌙";
+  setInterval(
+    updateClock,
+    60000
+  );
 
-    document.getElementById("greeting").innerText = greet;
+}
 
-    document.getElementById("time").innerText =
-      now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+function updateClock(){
 
-  },1000);
+  const now =
+    new Date();
+
+  const hour =
+    now.getHours();
+
+  let greeting =
+    "Welcome";
+
+  if(hour < 12){
+
+    greeting =
+      "Good Morning ☀️";
+
+  }
+  else if(hour < 17){
+
+    greeting =
+      "Good Afternoon 🌤";
+
+  }
+  else{
+
+    greeting =
+      "Good Evening 🌙";
+
+  }
+
+  const greetingEl =
+    document.getElementById(
+      "greeting"
+    );
+
+  const timeEl =
+    document.getElementById(
+      "time"
+    );
+
+  if(greetingEl){
+
+    greetingEl.innerText =
+      greeting;
+
+  }
+
+  if(timeEl){
+
+    timeEl.innerText =
+      now.toLocaleDateString(
+        "id-ID",
+        {
+          weekday:"long",
+          day:"numeric",
+          month:"long",
+          year:"numeric"
+        }
+      )
+      +
+      " • "
+      +
+      now.toLocaleTimeString(
+        "id-ID",
+        {
+          hour:"2-digit",
+          minute:"2-digit"
+        }
+      );
+
+  }
+
 }
 
 // =========================================================
-// ================= TASK SYSTEM =================
+// TASK SYSTEM
 // =========================================================
 
 async function loadTasks(){
 
-  const { data } = await client
-    .from("tasks")
-    .select("*")
-    .order("id",{ascending:false});
+  try{
 
-  tasks = data || [];
+    const {
+      data,
+      error
+    } =
+    await client
+      .from("tasks")
+      .select("*")
+      .order(
+        "id",
+        {
+          ascending:false
+        }
+      );
 
-  updateDashboard();
-  renderKanban();
-  renderChart();
+    if(error){
+
+      console.error(error);
+      return;
+
+    }
+
+    tasks =
+      data || [];
+
+    updateDashboard();
+
+    if(
+      typeof renderKanban
+      === "function"
+    ){
+
+      renderKanban();
+
+    }
+
+    if(
+      typeof renderChart
+      === "function"
+    ){
+
+      renderChart();
+
+    }
+
+  }
+  catch(err){
+
+    console.error(err);
+
+  }
+
 }
+
+// =========================================================
+// DASHBOARD KPI
+// =========================================================
 
 function updateDashboard(){
 
-  const done = tasks.filter(t=>t.done).length;
-  const active = tasks.length - done;
+  const total =
+    tasks.length;
 
-  document.getElementById("taskCount").innerText = tasks.length;
-  document.getElementById("doneCount").innerText = done;
-  document.getElementById("activeCount").innerText = active;
-}
+  const done =
+    tasks.filter(
+      t => t.done
+    ).length;
 
-async function addTask(){
+  const active =
+    total - done;
 
-  const input = document.getElementById("taskInput");
-  if(!input || !input.value) return;
+  updateText(
+    "taskCount",
+    total
+  );
 
-  await client.from("tasks").insert([{
-    title: input.value,
-    done: false,
-    status: "todo"
-  }]);
+  updateText(
+    "doneCount",
+    done
+  );
 
-  input.value = "";
-  loadTasks();
-}
+  updateText(
+    "activeCount",
+    active
+  );
 
-async function deleteTask(id){
-  await client.from("tasks").delete().eq("id",id);
-  loadTasks();
-}
-
-async function toggleTask(id,done){
-  await client.from("tasks")
-    .update({done:!done})
-    .eq("id",id);
-
-  loadTasks();
 }
 
 // =========================================================
-// ================= KANBAN =================
+// DOM HELPERS
 // =========================================================
 
-function renderKanban(){
+function updateText(
+  id,
+  value
+){
 
-  const todo = document.getElementById("todoList");
-  const doing = document.getElementById("doingList");
-  const done = document.getElementById("doneList");
+  const el =
+    document.getElementById(
+      id
+    );
 
-  if(!todo) return;
+  if(el){
 
-  todo.innerHTML = "";
-  doing.innerHTML = "";
-  done.innerHTML = "";
+    el.innerText =
+      value;
 
-  tasks.forEach(t=>{
-    const el = document.createElement("div");
-    el.className = "kanban-card";
-    el.innerText = t.title;
+  }
 
-    if(t.status === "todo") todo.appendChild(el);
-    if(t.status === "doing") doing.appendChild(el);
-    if(t.status === "done") done.appendChild(el);
-  });
-
-  initDrag();
 }
 
-function initDrag(){
+function showMessage(
+  id,
+  text
+){
 
-  ["todoList","doingList","doneList"].forEach(id=>{
-    new Sortable(document.getElementById(id),{
+  const el =
+    document.getElementById(
+      id
+    );
 
-      group:"tasks",
-      animation:200,
+  if(el){
 
-      onEnd: async function(evt){
+    el.innerText =
+      text;
 
-        const taskName = evt.item.innerText;
+  }
 
-        const newStatus =
-          evt.to.id === "todoList" ? "todo" :
-          evt.to.id === "doingList" ? "doing" : "done";
-
-        const task = tasks.find(t=>t.title === taskName);
-        if(!task) return;
-
-        await client.from("tasks")
-          .update({status:newStatus})
-          .eq("id",task.id);
-
-        loadTasks();
-      }
-    });
-  });
 }
 
 // =========================================================
-// ================= CHART =================
-// =========================================================
-
-let chartDonut, chartBar;
-
-function renderChart(){
-
-  const done = tasks.filter(t=>t.done).length;
-  const pending = tasks.length - done;
-
-  if(chartDonut) chartDonut.destroy();
-  if(chartBar) chartBar.destroy();
-
-  const ctx1 = document.getElementById("chartDonut");
-  const ctx2 = document.getElementById("chartBar");
-
-  if(!ctx1 || !ctx2) return;
-
-  chartDonut = new Chart(ctx1,{
-    type:"doughnut",
-    data:{
-      labels:["Done","Pending"],
-      datasets:[{data:[done,pending]}]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-
-  chartBar = new Chart(ctx2,{
-    type:"bar",
-    data:{
-      labels:["Tasks"],
-      datasets:[{data:[tasks.length]}]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
-
-// =========================================================
-// ================= REALTIME =================
+// REALTIME TASKS
 // =========================================================
 
 function initRealtime(){
 
   client
-    .channel("tasks-channel")
-    .on("postgres_changes",{event:"*"},()=>{
-      loadTasks();
-    })
+    .channel(
+      "tasks-realtime"
+    )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"tasks"
+      },
+      ()=>{
+        loadTasks();
+      }
+    )
     .subscribe();
+
 }
 
 // =========================================================
-// ================= PRESENCE =================
+// ONLINE PRESENCE
 // =========================================================
 
 function initPresence(){
 
-  const channel = client.channel("online-users");
+  const channel =
+    client.channel(
+      "online-users"
+    );
 
-  channel.subscribe(async (status)=>{
+  channel.subscribe(
+    async status => {
 
-    if(status === "SUBSCRIBED"){
-      channel.track({
-        user: user?.email || "guest",
-        online: true
-      });
+      if(
+        status ===
+        "SUBSCRIBED"
+      ){
+
+        await channel.track({
+
+          email:
+            user?.email ||
+            "guest",
+
+          online:true,
+
+          last_seen:
+            new Date()
+              .toISOString()
+
+        });
+
+      }
+
     }
-  });
+  );
+
 }
 
 // =========================================================
-// ================= BROADCAST =================
-// =========================================================
-
-async function sendBroadcast(){
-
-  const input = document.getElementById("broadcastInput");
-  if(!input || !input.value) return;
-
-  await client.from("broadcast").insert([{
-    message: input.value,
-    created_at: new Date()
-  }]);
-
-  input.value = "";
-}
-
-// =========================================================
-// ================= BROADCAST LISTENER =================
+// BROADCAST LISTENER
 // =========================================================
 
 function listenBroadcast(){
 
   client
-    .channel("broadcast-channel")
-    .on("postgres_changes",
-      {event:"INSERT",schema:"public",table:"broadcast"},
+    .channel(
+      "broadcast-live"
+    )
+    .on(
+      "postgres_changes",
+      {
+        event:"INSERT",
+        schema:"public",
+        table:"broadcast"
+      },
       payload=>{
 
-        const el = document.getElementById("broadcastList");
-        if(!el) return;
+        const list =
+          document.getElementById(
+            "broadcastList"
+          );
 
-        const div = document.createElement("div");
-        div.innerHTML = "📢 " + payload.new.message;
+        if(!list)
+          return;
 
-        el.prepend(div);
+        const item =
+          document.createElement(
+            "div"
+          );
+
+        item.className =
+          "broadcast-item";
+
+        item.innerHTML =
+          "📢 "
+          +
+          payload.new.message;
+
+        list.prepend(
+          item
+        );
+
       }
     )
     .subscribe();
+
 }
 
 // =========================================================
-// ================= FILE UPLOAD =================
+// ONLINE USER TABLE
 // =========================================================
 
-async function uploadFile(){
+function renderOnlineUsers(
+  users
+){
 
-  const file = document.getElementById("fileUpload").files[0];
+  const container =
+    document.getElementById(
+      "userList"
+    );
+
+  if(!container)
+    return;
+
+  container.innerHTML = "";
+
+  users.forEach(user=>{
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "user-row";
+
+    row.innerHTML =
+
+      `
+      <span>🟢</span>
+      <span>${user.email}</span>
+      `;
+
+    container.appendChild(
+      row
+    );
+
+  });
+
+}
+// =========================================================
+// TASK CRUD
+// =========================================================
+
+async function addTask(){
+
+  const input =
+    document.getElementById(
+      "taskInput"
+    );
+
+  if(
+    !input ||
+    !input.value.trim()
+  ){
+    return;
+  }
+
+  try{
+
+    const {
+      error
+    } =
+    await client
+      .from("tasks")
+      .insert([{
+
+        title:
+          input.value,
+
+        done:false,
+
+        status:"todo",
+
+        created_by:
+          user?.email ||
+
+          "system",
+
+        created_at:
+          new Date()
+            .toISOString()
+
+      }]);
+
+    if(error){
+
+      console.error(error);
+      return;
+
+    }
+
+    input.value = "";
+
+    loadTasks();
+
+  }
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+async function deleteTask(id){
+
+  if(
+    !confirm(
+      "Hapus task ini?"
+    )
+  ){
+    return;
+  }
+
+  try{
+
+    await client
+      .from("tasks")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+    loadTasks();
+
+  }
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+async function toggleTask(
+  id,
+  currentStatus
+){
+
+  try{
+
+    await client
+      .from("tasks")
+      .update({
+
+        done:
+          !currentStatus
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+    loadTasks();
+
+  }
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+// =========================================================
+// KANBAN RENDER
+// =========================================================
+
+function renderKanban(){
+
+  const todo =
+    document.getElementById(
+      "todoList"
+    );
+
+  const doing =
+    document.getElementById(
+      "doingList"
+    );
+
+  const done =
+    document.getElementById(
+      "doneList"
+    );
+
+  if(
+    !todo ||
+    !doing ||
+    !done
+  ){
+    return;
+  }
+
+  todo.innerHTML = "";
+  doing.innerHTML = "";
+  done.innerHTML = "";
+
+  tasks.forEach(task=>{
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+    card.className =
+      "kanban-card";
+
+    card.dataset.id =
+      task.id;
+
+    card.innerHTML =
+
+      `
+      <div class="kanban-title">
+        ${task.title}
+      </div>
+
+      <div class="kanban-footer">
+        ${task.created_by || ""}
+      </div>
+      `;
+
+    if(
+      task.status ===
+      "todo"
+    ){
+
+      todo.appendChild(
+        card
+      );
+
+    }
+
+    else if(
+      task.status ===
+      "doing"
+    ){
+
+      doing.appendChild(
+        card
+      );
+
+    }
+
+    else{
+
+      done.appendChild(
+        card
+      );
+
+    }
+
+  });
+
+  initDrag();
+
+}
+
+// =========================================================
+// SORTABLE KANBAN
+// =========================================================
+
+function initDrag(){
+
+  const lists = [
+
+    "todoList",
+    "doingList",
+    "doneList"
+
+  ];
+
+  lists.forEach(id=>{
+
+    const container =
+      document.getElementById(
+        id
+      );
+
+    if(!container){
+      return;
+    }
+
+    new Sortable(
+      container,
+      {
+
+        group:"kanban",
+
+        animation:250,
+
+        ghostClass:
+          "dragging",
+
+        onEnd:
+          async function(evt){
+
+            const taskId =
+              evt.item.dataset.id;
+
+            const newStatus =
+
+              evt.to.id ===
+              "todoList"
+
+              ? "todo"
+
+              :
+
+              evt.to.id ===
+              "doingList"
+
+              ? "doing"
+
+              :
+
+              "done";
+
+            try{
+
+              await client
+                .from("tasks")
+                .update({
+
+                  status:
+                    newStatus,
+
+                  done:
+                    newStatus ===
+                    "done"
+
+                })
+                .eq(
+                  "id",
+                  taskId
+                );
+
+            }
+            catch(err){
+
+              console.error(
+                err
+              );
+
+            }
+
+          }
+
+      }
+    );
+
+  });
+
+}
+
+// =========================================================
+// CHART SYSTEM
+// =========================================================
+
+function renderChart(){
+
+  const donutCanvas =
+    document.getElementById(
+      "chartDonut"
+    );
+
+  const barCanvas =
+    document.getElementById(
+      "chartBar"
+    );
+
+  if(
+    !donutCanvas ||
+    !barCanvas
+  ){
+    return;
+  }
+
+  const doneCount =
+    tasks.filter(
+      t => t.done
+    ).length;
+
+  const pendingCount =
+    tasks.length -
+    doneCount;
+
+  if(chartDonut){
+
+    chartDonut.destroy();
+
+  }
+
+  if(chartBar){
+
+    chartBar.destroy();
+
+  }
+
+  chartDonut =
+    new Chart(
+      donutCanvas,
+      {
+
+        type:"doughnut",
+
+        data:{
+
+          labels:[
+
+            "Done",
+            "Pending"
+
+          ],
+
+          datasets:[{
+
+            data:[
+
+              doneCount,
+              pendingCount
+
+            ],
+
+            backgroundColor:[
+
+              "#00E5FF",
+              "#7C3AED"
+
+            ],
+
+            borderWidth:0
+
+          }]
+
+        },
+
+        options:{
+
+          responsive:true,
+
+          maintainAspectRatio:
+            false,
+
+          cutout:"70%",
+
+          plugins:{
+
+            legend:{
+
+              position:
+                "bottom"
+
+            }
+
+          }
+
+        }
+
+      }
+    );
+
+  chartBar =
+    new Chart(
+      barCanvas,
+      {
+
+        type:"bar",
+
+        data:{
+
+          labels:[
+
+            "Tasks"
+
+          ],
+
+          datasets:[{
+
+            label:
+              "Total",
+
+            data:[
+
+              tasks.length
+
+            ],
+
+            backgroundColor:
+              "#00E5FF",
+
+            borderRadius:
+              10
+
+          }]
+
+        },
+
+        options:{
+
+          responsive:true,
+
+          maintainAspectRatio:
+            false,
+
+          plugins:{
+
+            legend:{
+
+              display:false
+
+            }
+
+          },
+
+          scales:{
+
+            y:{
+
+              beginAtZero:
+                true
+
+            }
+
+          }
+
+        }
+
+      }
+    );
+
+}
+
+// =========================================================
+// BROADCAST SYSTEM
+// =========================================================
+
+async function sendBroadcast(){
+
+  const input =
+    document.getElementById(
+      "broadcastInput"
+    );
+
+  if(
+    !input ||
+    !input.value.trim()
+  ){
+    return;
+  }
+
+  try{
+
+    await client
+      .from("broadcast")
+      .insert([{
+
+        message:
+          input.value,
+
+        sender:
+          user?.email,
+
+        created_at:
+          new Date()
+            .toISOString()
+
+      }]);
+
+    input.value = "";
+
+  }
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+async function loadBroadcastHistory(){
+
+  const list =
+    document.getElementById(
+      "broadcastList"
+    );
+
+  if(!list){
+    return;
+  }
+
+  const {
+    data
+  } =
+  await client
+    .from("broadcast")
+    .select("*")
+    .order(
+      "id",
+      {
+        ascending:false
+      }
+    );
+
+  list.innerHTML = "";
+
+  (data || [])
+  .forEach(item=>{
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "broadcast-item";
+
+    row.innerHTML =
+
+      `
+      📢 ${item.message}
+      `;
+
+    list.appendChild(
+      row
+    );
+
+  });
+
+}
+// =========================================================
+// CERTIFICATE STUDIO
+// =========================================================
+
+function initCertificateStudio(){
+
+  const canvas =
+    document.getElementById(
+      "certCanvas"
+    );
+
+  if(!canvas) return;
+
+  if(
+    canvas.dataset.loaded
+  ) return;
+
+  canvas.dataset.loaded = true;
+
+  addTextToCert(
+    "{{NAMA}}",
+    300,
+    240
+  );
+
+  addTextToCert(
+    "{{KELAS}}",
+    300,
+    300
+  );
+
+  addTextToCert(
+    "{{PRESTASI}}",
+    300,
+    360
+  );
+
+}
+
+// =========================================================
+// TEMPLATE BACKGROUND UPLOAD
+// =========================================================
+
+function uploadCertificateTemplate(){
+
+  const file =
+    document.getElementById(
+      "templateUpload"
+    )?.files?.[0];
+
   if(!file) return;
 
-  await client.storage
-    .from("files")
-    .upload(file.name,file);
+  const reader =
+    new FileReader();
 
-  alert("Uploaded");
+  reader.onload =
+    function(e){
+
+      const canvas =
+        document.getElementById(
+          "certCanvas"
+        );
+
+      if(!canvas) return;
+
+      canvas.style.backgroundImage =
+        `url(${e.target.result})`;
+
+      canvas.style.backgroundSize =
+        "cover";
+
+      canvas.style.backgroundPosition =
+        "center";
+
+      localStorage.setItem(
+        "certificate_template",
+        e.target.result
+      );
+
+    };
+
+  reader.readAsDataURL(
+    file
+  );
+
 }
 
 // =========================================================
-// ================= EXCEL =================
+// LOAD SAVED TEMPLATE
+// =========================================================
+
+function loadSavedTemplate(){
+
+  const template =
+    localStorage.getItem(
+      "certificate_template"
+    );
+
+  const canvas =
+    document.getElementById(
+      "certCanvas"
+    );
+
+  if(
+    template &&
+    canvas
+  ){
+
+    canvas.style.backgroundImage =
+      `url(${template})`;
+
+    canvas.style.backgroundSize =
+      "cover";
+
+  }
+
+}
+
+// =========================================================
+// DRAGGABLE TEXT SYSTEM
+// =========================================================
+
+function addTextToCert(
+  text,
+  x = 100,
+  y = 100
+){
+
+  const canvas =
+    document.getElementById(
+      "certCanvas"
+    );
+
+  if(!canvas) return;
+
+  const item =
+    document.createElement(
+      "div"
+    );
+
+  item.className =
+    "text-item";
+
+  item.innerText =
+    text;
+
+  item.style.left =
+    x + "px";
+
+  item.style.top =
+    y + "px";
+
+  item.onclick =
+    ()=>{
+
+      selectElement(
+        item
+      );
+
+    };
+
+  enableDrag(
+    item
+  );
+
+  canvas.appendChild(
+    item
+  );
+
+  certElements.push(
+    item
+  );
+
+}
+
+function selectElement(
+  el
+){
+
+  document
+    .querySelectorAll(
+      ".text-item"
+    )
+    .forEach(e=>{
+
+      e.classList.remove(
+        "active"
+      );
+
+    });
+
+  el.classList.add(
+    "active"
+  );
+
+  selectedElement =
+    el;
+
+}
+
+// =========================================================
+// DRAG ENGINE
+// =========================================================
+
+function enableDrag(el){
+
+  let dragging =
+    false;
+
+  let offsetX = 0;
+  let offsetY = 0;
+
+  el.addEventListener(
+    "mousedown",
+    e=>{
+
+      dragging = true;
+
+      offsetX =
+        e.offsetX;
+
+      offsetY =
+        e.offsetY;
+
+    }
+  );
+
+  document.addEventListener(
+    "mousemove",
+    e=>{
+
+      if(
+        !dragging
+      ) return;
+
+      const canvas =
+        document.getElementById(
+          "certCanvas"
+        );
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      el.style.left =
+        (
+          e.clientX -
+          rect.left -
+          offsetX
+        ) + "px";
+
+      el.style.top =
+        (
+          e.clientY -
+          rect.top -
+          offsetY
+        ) + "px";
+
+    }
+  );
+
+  document.addEventListener(
+    "mouseup",
+    ()=>{
+
+      dragging =
+        false;
+
+    }
+  );
+
+}
+
+// =========================================================
+// SAVE TEMPLATE LAYOUT
+// =========================================================
+
+function saveTemplateLayout(){
+
+  const layout =
+    certElements.map(
+      el => ({
+
+        text:
+          el.innerText,
+
+        left:
+          el.style.left,
+
+        top:
+          el.style.top
+
+      })
+    );
+
+  localStorage.setItem(
+    "cert_layout",
+    JSON.stringify(
+      layout
+    )
+  );
+
+  alert(
+    "Template saved"
+  );
+
+}
+
+// =========================================================
+// LOAD TEMPLATE LAYOUT
+// =========================================================
+
+function loadTemplateLayout(){
+
+  const layout =
+    JSON.parse(
+      localStorage.getItem(
+        "cert_layout"
+      ) || "[]"
+    );
+
+  const canvas =
+    document.getElementById(
+      "certCanvas"
+    );
+
+  if(!canvas) return;
+
+  canvas
+    .querySelectorAll(
+      ".text-item"
+    )
+    .forEach(
+      e=>e.remove()
+    );
+
+  certElements = [];
+
+  layout.forEach(
+    item=>{
+
+      addTextToCert(
+        item.text,
+        parseInt(
+          item.left
+        ),
+        parseInt(
+          item.top
+        )
+      );
+
+    }
+  );
+
+}
+
+// =========================================================
+// EXCEL IMPORT
 // =========================================================
 
 function uploadExcel(){
 
-  const file = document.getElementById("excelFile").files[0];
+  const file =
+    document.getElementById(
+      "excelFile"
+    )?.files?.[0];
+
   if(!file) return;
 
-  const reader = new FileReader();
+  const reader =
+    new FileReader();
 
-  reader.onload = function(e){
+  reader.onload =
+    function(e){
 
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data,{type:"array"});
+      const data =
+        new Uint8Array(
+          e.target.result
+        );
 
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    excelData = XLSX.utils.sheet_to_json(sheet);
+      const workbook =
+        XLSX.read(
+          data,
+          {
+            type:"array"
+          }
+        );
 
-    console.log("Excel Loaded:", excelData);
-    alert("Excel loaded: " + excelData.length + " rows");
-  };
+      const sheet =
+        workbook.Sheets[
+          workbook.SheetNames[0]
+        ];
 
-  reader.readAsArrayBuffer(file);
+      excelData =
+        XLSX.utils.sheet_to_json(
+          sheet
+        );
+
+      alert(
+        excelData.length +
+        " data berhasil dimuat"
+      );
+
+    };
+
+  reader.readAsArrayBuffer(
+    file
+  );
+
 }
 
 // =========================================================
-// ================= CERTIFICATE PDF =================
+// SINGLE CERTIFICATE PDF
 // =========================================================
 
 async function generateCertificate(){
 
-  const { jsPDF } = window.jspdf;
+  const {
+    jsPDF
+  } = window.jspdf;
 
-  const name = document.getElementById("certName").value;
-  const event = document.getElementById("certEvent").value;
+  const doc =
+    new jsPDF(
+      "landscape"
+    );
 
-  const doc = new jsPDF();
+  const nama =
+    document.getElementById(
+      "certName"
+    )?.value ||
+    "Nama Peserta";
 
-  doc.setFontSize(22);
-  doc.text("CERTIFICATE", 70, 40);
+  doc.setFontSize(
+    28
+  );
 
-  doc.setFontSize(16);
-  doc.text("This is to certify", 20, 70);
+  doc.text(
+    nama,
+    140,
+    90,
+    {
+      align:"center"
+    }
+  );
 
-  doc.text(name || "NAME", 20, 90);
-  doc.text("for participating in", 20, 110);
-  doc.text(event || "EVENT", 20, 130);
+  doc.save(
+    "certificate.pdf"
+  );
 
-  doc.save("certificate.pdf");
 }
 
 // =========================================================
-// ================= CERTIFICATE CANVAS =================
-// =========================================================
-
-function addTextToCert(text, x=50, y=50){
-
-  const canvas = document.getElementById("certCanvas");
-  if(!canvas) return;
-
-  const el = document.createElement("div");
-  el.className = "text-item";
-  el.innerText = text;
-  el.style.left = x + "px";
-  el.style.top = y + "px";
-
-  enableDrag(el);
-
-  el.onclick = ()=> selectElement(el);
-
-  canvas.appendChild(el);
-
-  certElements.push(el);
-}
-
-function selectElement(el){
-
-  document.querySelectorAll(".text-item")
-    .forEach(e=>e.classList.remove("active"));
-
-  selectedElement = el;
-  el.classList.add("active");
-}
-
-function enableDrag(el){
-
-  let isDown = false;
-  let offsetX, offsetY;
-
-  el.addEventListener("mousedown",(e)=>{
-    isDown = true;
-    offsetX = e.offsetX;
-    offsetY = e.offsetY;
-  });
-
-  document.addEventListener("mousemove",(e)=>{
-    if(!isDown) return;
-
-    const canvas = document.getElementById("certCanvas");
-    const rect = canvas.getBoundingClientRect();
-
-    el.style.left = (e.clientX - rect.left - offsetX) + "px";
-    el.style.top = (e.clientY - rect.top - offsetY) + "px";
-  });
-
-  document.addEventListener("mouseup",()=>{
-    isDown = false;
-  });
-}
-
-// =========================================================
-// ================= BATCH EXPORT =================
+// BATCH CERTIFICATE EXPORT
 // =========================================================
 
 async function exportAllCertificates(){
 
-  if(excelData.length === 0){
-    alert("No data");
+  if(
+    excelData.length === 0
+  ){
+
+    alert(
+      "Upload excel terlebih dahulu"
+    );
+
     return;
+
   }
 
-  const { jsPDF } = window.jspdf;
+  const {
+    jsPDF
+  } = window.jspdf;
 
-  for(let i=0;i<excelData.length;i++){
+  for(
 
-    const row = excelData[i];
-    const doc = new jsPDF();
+    let i = 0;
+    i < excelData.length;
+    i++
 
-    doc.text("CERTIFICATE", 70, 40);
-    doc.text(row.name || "", 20, 80);
+  ){
 
-    doc.save(`CERT_${row.name || i}.pdf`);
+    const row =
+      excelData[i];
+
+    const doc =
+      new jsPDF(
+        "landscape"
+      );
+
+    doc.setFontSize(
+      24
+    );
+
+    doc.text(
+      row.NAMA ||
+      row.nama ||
+      "PESERTA",
+      140,
+      90,
+      {
+        align:"center"
+      }
+    );
+
+    doc.save(
+      `CERTIFICATE_${
+        row.NAMA ||
+        row.nama ||
+        i
+      }.pdf`
+    );
+
   }
 
-  alert("Batch export done");
+  alert(
+    "Batch export selesai"
+  );
+
 }
 
 // =========================================================
-// ================= ONLINE USERS =================
+// CLOUD STORAGE
 // =========================================================
 
-function renderOnlineUsers(users){
+async function uploadFile(){
 
-  const el = document.getElementById("userList");
-  if(!el) return;
+  const file =
+    document.getElementById(
+      "fileUpload"
+    )?.files?.[0];
 
-  el.innerHTML = "";
+  if(!file) return;
 
-  users.forEach(u=>{
-    const div = document.createElement("div");
-    div.innerHTML = "🟢 " + u.user;
-    el.appendChild(div);
+  const path =
+    Date.now() +
+    "_" +
+    file.name;
+
+  const {
+    error
+  } =
+  await client.storage
+    .from("files")
+    .upload(
+      path,
+      file
+    );
+
+  if(error){
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  loadFiles();
+
+}
+
+// =========================================================
+// LOAD FILES
+// =========================================================
+
+async function loadFiles(){
+
+  const box =
+    document.getElementById(
+      "fileList"
+    );
+
+  if(!box) return;
+
+  const {
+    data
+  } =
+  await client.storage
+    .from("files")
+    .list();
+
+  box.innerHTML = "";
+
+  (data || [])
+  .forEach(file=>{
+
+    const item =
+      document.createElement(
+        "div"
+      );
+
+    item.className =
+      "file-card";
+
+    item.innerHTML =
+
+      `
+      📄 ${file.name}
+      `;
+
+    box.appendChild(
+      item
+    );
+
   });
+
 }
 
 // =========================================================
-// ================= INIT =================
+// PDF TOOLS PLACEHOLDER
 // =========================================================
 
-window.addEventListener("load",()=>{
-  initClock();
-  listenBroadcast();
-});
+function mergePDF(){
+
+  alert(
+    "Merge PDF Module"
+  );
+
+}
+
+function splitPDF(){
+
+  alert(
+    "Split PDF Module"
+  );
+
+}
+
+function exportPDF(){
+
+  window.print();
+
+}
+
+// =========================================================
+// INITIALIZE EXTRA MODULES
+// =========================================================
+
+window.addEventListener(
+  "load",
+  ()=>{
+
+    loadSavedTemplate();
+
+    loadTemplateLayout();
+
+    initCertificateStudio();
+
+    loadBroadcastHistory();
+
+    loadFiles();
+
+  }
+);

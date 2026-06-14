@@ -1,0 +1,1515 @@
+script awal JS
+// ================= SUPABASE =================
+const SUPABASE_URL = "https://scefyffuqtpavzpolrvj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ================= STATE =================
+let tasks = [];
+let user = null;
+let certElements = [];
+let selectedElement = null;
+let excelData = [];
+
+// =========================================================
+// ================= AUTH =================
+// =========================================================
+
+async function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    msg.innerText = "❌ " + error.message;
+    return;
+  }
+
+  user = data.user;
+  startApp();
+}
+
+async function logout(){
+  await client.auth.signOut();
+  location.reload();
+}
+
+// =========================================================
+// ================= INIT APP =================
+// =========================================================
+
+function startApp(){
+  document.getElementById("authBox").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  openPage("dashboard");
+
+  initClock();
+  loadTasks();
+  initRealtime();
+  initPresence();
+}
+
+// =========================================================
+// ================= NAVIGATION =================
+// =========================================================
+
+function openPage(id, el){
+
+  document.querySelectorAll(".page").forEach(p=>{
+    p.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll(".menu").forEach(m=>{
+    m.classList.remove("active");
+  });
+
+  if(el) el.classList.add("active");
+}
+
+// =========================================================
+// ================= CLOCK =================
+// =========================================================
+
+function initClock(){
+
+  setInterval(()=>{
+    const now = new Date();
+    const hour = now.getHours();
+
+    let greet = "Hello";
+    if(hour < 12) greet = "Good Morning ☀️";
+    else if(hour < 17) greet = "Good Afternoon 🌤";
+    else greet = "Good Evening 🌙";
+
+    document.getElementById("greeting").innerText = greet;
+
+    document.getElementById("time").innerText =
+      now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+
+  },1000);
+}
+
+// =========================================================
+// ================= TASK SYSTEM =================
+// =========================================================
+
+async function loadTasks(){
+
+  const { data } = await client
+    .from("tasks")
+    .select("*")
+    .order("id",{ascending:false});
+
+  tasks = data || [];
+
+  updateDashboard();
+  renderKanban();
+  renderChart();
+}
+
+function updateDashboard(){
+
+  const done = tasks.filter(t=>t.done).length;
+  const active = tasks.length - done;
+
+  document.getElementById("taskCount").innerText = tasks.length;
+  document.getElementById("doneCount").innerText = done;
+  document.getElementById("activeCount").innerText = active;
+}
+
+async function addTask(){
+
+  const input = document.getElementById("taskInput");
+  if(!input || !input.value) return;
+
+  await client.from("tasks").insert([{
+    title: input.value,
+    done: false,
+    status: "todo"
+  }]);
+
+  input.value = "";
+  loadTasks();
+}
+
+async function deleteTask(id){
+  await client.from("tasks").delete().eq("id",id);
+  loadTasks();
+}
+
+async function toggleTask(id,done){
+  await client.from("tasks")
+    .update({done:!done})
+    .eq("id",id);
+
+  loadTasks();
+}
+
+// =========================================================
+// ================= KANBAN =================
+// =========================================================
+
+function renderKanban(){
+
+  const todo = document.getElementById("todoList");
+  const doing = document.getElementById("doingList");
+  const done = document.getElementById("doneList");
+
+  if(!todo) return;
+
+  todo.innerHTML = "";
+  doing.innerHTML = "";
+  done.innerHTML = "";
+
+  tasks.forEach(t=>{
+    const el = document.createElement("div");
+    el.className = "kanban-card";
+    el.innerText = t.title;
+
+    if(t.status === "todo") todo.appendChild(el);
+    if(t.status === "doing") doing.appendChild(el);
+    if(t.status === "done") done.appendChild(el);
+  });
+
+  initDrag();
+}
+
+function initDrag(){
+
+  ["todoList","doingList","doneList"].forEach(id=>{
+    new Sortable(document.getElementById(id),{
+
+      group:"tasks",
+      animation:200,
+
+      onEnd: async function(evt){
+
+        const taskName = evt.item.innerText;
+
+        const newStatus =
+          evt.to.id === "todoList" ? "todo" :
+          evt.to.id === "doingList" ? "doing" : "done";
+
+        const task = tasks.find(t=>t.title === taskName);
+        if(!task) return;
+
+        await client.from("tasks")
+          .update({status:newStatus})
+          .eq("id",task.id);
+
+        loadTasks();
+      }
+    });
+  });
+}
+
+// =========================================================
+// ================= CHART =================
+// =========================================================
+
+let chartDonut, chartBar;
+
+function renderChart(){
+
+  const done = tasks.filter(t=>t.done).length;
+  const pending = tasks.length - done;
+
+  if(chartDonut) chartDonut.destroy();
+  if(chartBar) chartBar.destroy();
+
+  const ctx1 = document.getElementById("chartDonut");
+  const ctx2 = document.getElementById("chartBar");
+
+  if(!ctx1 || !ctx2) return;
+
+  chartDonut = new Chart(ctx1,{
+    type:"doughnut",
+    data:{
+      labels:["Done","Pending"],
+      datasets:[{data:[done,pending]}]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+
+  chartBar = new Chart(ctx2,{
+    type:"bar",
+    data:{
+      labels:["Tasks"],
+      datasets:[{data:[tasks.length]}]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+}
+
+// =========================================================
+// ================= REALTIME =================
+// =========================================================
+
+function initRealtime(){
+
+  client
+    .channel("tasks-channel")
+    .on("postgres_changes",{event:"*"},()=>{
+      loadTasks();
+    })
+    .subscribe();
+}
+
+// =========================================================
+// ================= PRESENCE =================
+// =========================================================
+
+function initPresence(){
+
+  const channel = client.channel("online-users");
+
+  channel.subscribe(async (status)=>{
+
+    if(status === "SUBSCRIBED"){
+      channel.track({
+        user: user?.email || "guest",
+        online: true
+      });
+    }
+  });
+}
+
+// =========================================================
+// ================= BROADCAST =================
+// =========================================================
+
+async function sendBroadcast(){
+
+  const input = document.getElementById("broadcastInput");
+  if(!input || !input.value) return;
+
+  await client.from("broadcast").insert([{
+    message: input.value,
+    created_at: new Date()
+  }]);
+
+  input.value = "";
+}
+
+// =========================================================
+// ================= BROADCAST LISTENER =================
+// =========================================================
+
+function listenBroadcast(){
+
+  client
+    .channel("broadcast-channel")
+    .on("postgres_changes",
+      {event:"INSERT",schema:"public",table:"broadcast"},
+      payload=>{
+
+        const el = document.getElementById("broadcastList");
+        if(!el) return;
+
+        const div = document.createElement("div");
+        div.innerHTML = "📢 " + payload.new.message;
+
+        el.prepend(div);
+      }
+    )
+    .subscribe();
+}
+
+// =========================================================
+// ================= FILE UPLOAD =================
+// =========================================================
+
+async function uploadFile(){
+
+  const file = document.getElementById("fileUpload").files[0];
+  if(!file) return;
+
+  await client.storage
+    .from("files")
+    .upload(file.name,file);
+
+  alert("Uploaded");
+}
+
+// =========================================================
+// ================= EXCEL =================
+// =========================================================
+
+function uploadExcel(){
+
+  const file = document.getElementById("excelFile").files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    excelData = XLSX.utils.sheet_to_json(sheet);
+
+    console.log("Excel Loaded:", excelData);
+    alert("Excel loaded: " + excelData.length + " rows");
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+// =========================================================
+// ================= CERTIFICATE PDF =================
+// =========================================================
+
+async function generateCertificate(){
+
+  const { jsPDF } = window.jspdf;
+
+  const name = document.getElementById("certName").value;
+  const event = document.getElementById("certEvent").value;
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(22);
+  doc.text("CERTIFICATE", 70, 40);
+
+  doc.setFontSize(16);
+  doc.text("This is to certify", 20, 70);
+
+  doc.text(name || "NAME", 20, 90);
+  doc.text("for participating in", 20, 110);
+  doc.text(event || "EVENT", 20, 130);
+
+  doc.save("certificate.pdf");
+}
+
+// =========================================================
+// ================= CERTIFICATE CANVAS =================
+// =========================================================
+
+function addTextToCert(text, x=50, y=50){
+
+  const canvas = document.getElementById("certCanvas");
+  if(!canvas) return;
+
+  const el = document.createElement("div");
+  el.className = "text-item";
+  el.innerText = text;
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+
+  enableDrag(el);
+
+  el.onclick = ()=> selectElement(el);
+
+  canvas.appendChild(el);
+
+  certElements.push(el);
+}
+
+function selectElement(el){
+
+  document.querySelectorAll(".text-item")
+    .forEach(e=>e.classList.remove("active"));
+
+  selectedElement = el;
+  el.classList.add("active");
+}
+
+function enableDrag(el){
+
+  let isDown = false;
+  let offsetX, offsetY;
+
+  el.addEventListener("mousedown",(e)=>{
+    isDown = true;
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+  });
+
+  document.addEventListener("mousemove",(e)=>{
+    if(!isDown) return;
+
+    const canvas = document.getElementById("certCanvas");
+    const rect = canvas.getBoundingClientRect();
+
+    el.style.left = (e.clientX - rect.left - offsetX) + "px";
+    el.style.top = (e.clientY - rect.top - offsetY) + "px";
+  });
+
+  document.addEventListener("mouseup",()=>{
+    isDown = false;
+  });
+}
+// ================= SUPABASE =================
+const SUPABASE_URL = "https://scefyffuqtpavzpolrvj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ================= STATE =================
+let tasks = [];
+let user = null;
+let certElements = [];
+let selectedElement = null;
+let excelData = [];
+
+// =========================================================
+// ================= AUTH =================
+// =========================================================
+
+async function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    msg.innerText = "❌ " + error.message;
+    return;
+  }
+
+  user = data.user;
+  startApp();
+}
+
+async function logout(){
+  await client.auth.signOut();
+  location.reload();
+}
+
+// =========================================================
+// ================= INIT APP =================
+// =========================================================
+
+function startApp(){
+  document.getElementById("authBox").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  openPage("dashboard");
+
+  initClock();
+  loadTasks();
+  initRealtime();
+  initPresence();
+}
+
+// =========================================================
+// ================= NAVIGATION =================
+// =========================================================
+
+function openPage(id, el){
+
+  document.querySelectorAll(".page").forEach(p=>{
+    p.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll(".menu").forEach(m=>{
+    m.classList.remove("active");
+  });
+
+  if(el) el.classList.add("active");
+}
+
+// =========================================================
+// ================= CLOCK =================
+// =========================================================
+
+function initClock(){
+
+  setInterval(()=>{
+    const now = new Date();
+    const hour = now.getHours();
+
+    let greet = "Hello";
+    if(hour < 12) greet = "Good Morning ☀️";
+    else if(hour < 17) greet = "Good Afternoon 🌤";
+    else greet = "Good Evening 🌙";
+
+    document.getElementById("greeting").innerText = greet;
+
+    document.getElementById("time").innerText =
+      now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+
+  },1000);
+}
+
+// =========================================================
+// ================= TASK SYSTEM =================
+// =========================================================
+
+async function loadTasks(){
+
+  const { data } = await client
+    .from("tasks")
+    .select("*")
+    .order("id",{ascending:false});
+
+  tasks = data || [];
+
+  updateDashboard();
+  renderKanban();
+  renderChart();
+}
+
+function updateDashboard(){
+
+  const done = tasks.filter(t=>t.done).length;
+  const active = tasks.length - done;
+
+  document.getElementById("taskCount").innerText = tasks.length;
+  document.getElementById("doneCount").innerText = done;
+  document.getElementById("activeCount").innerText = active;
+}
+
+async function addTask(){
+
+  const input = document.getElementById("taskInput");
+  if(!input || !input.value) return;
+
+  await client.from("tasks").insert([{
+    title: input.value,
+    done: false,
+    status: "todo"
+  }]);
+
+  input.value = "";
+  loadTasks();
+}
+
+async function deleteTask(id){
+  await client.from("tasks").delete().eq("id",id);
+  loadTasks();
+}
+
+async function toggleTask(id,done){
+  await client.from("tasks")
+    .update({done:!done})
+    .eq("id",id);
+
+  loadTasks();
+}
+
+// =========================================================
+// ================= KANBAN =================
+// =========================================================
+
+function renderKanban(){
+
+  const todo = document.getElementById("todoList");
+  const doing = document.getElementById("doingList");
+  const done = document.getElementById("doneList");
+
+  if(!todo) return;
+
+  todo.innerHTML = "";
+  doing.innerHTML = "";
+  done.innerHTML = "";
+
+  tasks.forEach(t=>{
+    const el = document.createElement("div");
+    el.className = "kanban-card";
+    el.innerText = t.title;
+
+    if(t.status === "todo") todo.appendChild(el);
+    if(t.status === "doing") doing.appendChild(el);
+    if(t.status === "done") done.appendChild(el);
+  });
+
+  initDrag();
+}
+
+function initDrag(){
+
+  ["todoList","doingList","doneList"].forEach(id=>{
+    new Sortable(document.getElementById(id),{
+
+      group:"tasks",
+      animation:200,
+
+      onEnd: async function(evt){
+
+        const taskName = evt.item.innerText;
+
+        const newStatus =
+          evt.to.id === "todoList" ? "todo" :
+          evt.to.id === "doingList" ? "doing" : "done";
+
+        const task = tasks.find(t=>t.title === taskName);
+        if(!task) return;
+
+        await client.from("tasks")
+          .update({status:newStatus})
+          .eq("id",task.id);
+
+        loadTasks();
+      }
+    });
+  });
+}
+
+// =========================================================
+// ================= CHART =================
+// =========================================================
+
+let chartDonut, chartBar;
+
+function renderChart(){
+
+  const done = tasks.filter(t=>t.done).length;
+  const pending = tasks.length - done;
+
+  if(chartDonut) chartDonut.destroy();
+  if(chartBar) chartBar.destroy();
+
+  const ctx1 = document.getElementById("chartDonut");
+  const ctx2 = document.getElementById("chartBar");
+
+  if(!ctx1 || !ctx2) return;
+
+  chartDonut = new Chart(ctx1,{
+    type:"doughnut",
+    data:{
+      labels:["Done","Pending"],
+      datasets:[{data:[done,pending]}]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+
+  chartBar = new Chart(ctx2,{
+    type:"bar",
+    data:{
+      labels:["Tasks"],
+      datasets:[{data:[tasks.length]}]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+}
+
+// =========================================================
+// ================= REALTIME =================
+// =========================================================
+
+function initRealtime(){
+
+  client
+    .channel("tasks-channel")
+    .on("postgres_changes",{event:"*"},()=>{
+      loadTasks();
+    })
+    .subscribe();
+}
+
+// =========================================================
+// ================= PRESENCE =================
+// =========================================================
+
+function initPresence(){
+
+  const channel = client.channel("online-users");
+
+  channel.subscribe(async (status)=>{
+
+    if(status === "SUBSCRIBED"){
+      channel.track({
+        user: user?.email || "guest",
+        online: true
+      });
+    }
+  });
+}
+
+// =========================================================
+// ================= BROADCAST =================
+// =========================================================
+
+async function sendBroadcast(){
+
+  const input = document.getElementById("broadcastInput");
+  if(!input || !input.value) return;
+
+  await client.from("broadcast").insert([{
+    message: input.value,
+    created_at: new Date()
+  }]);
+
+  input.value = "";
+}
+
+// =========================================================
+// ================= BROADCAST LISTENER =================
+// =========================================================
+
+function listenBroadcast(){
+
+  client
+    .channel("broadcast-channel")
+    .on("postgres_changes",
+      {event:"INSERT",schema:"public",table:"broadcast"},
+      payload=>{
+
+        const el = document.getElementById("broadcastList");
+        if(!el) return;
+
+        const div = document.createElement("div");
+        div.innerHTML = "📢 " + payload.new.message;
+
+        el.prepend(div);
+      }
+    )
+    .subscribe();
+}
+
+// =========================================================
+// ================= FILE UPLOAD =================
+// =========================================================
+
+async function uploadFile(){
+
+  const file = document.getElementById("fileUpload").files[0];
+  if(!file) return;
+
+  await client.storage
+    .from("files")
+    .upload(file.name,file);
+
+  alert("Uploaded");
+}
+
+// =========================================================
+// ================= EXCEL =================
+// =========================================================
+
+function uploadExcel(){
+
+  const file = document.getElementById("excelFile").files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    excelData = XLSX.utils.sheet_to_json(sheet);
+
+    console.log("Excel Loaded:", excelData);
+    alert("Excel loaded: " + excelData.length + " rows");
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+// =========================================================
+// ================= CERTIFICATE PDF =================
+// =========================================================
+
+async function generateCertificate(){
+
+  const { jsPDF } = window.jspdf;
+
+  const name = document.getElementById("certName").value;
+  const event = document.getElementById("certEvent").value;
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(22);
+  doc.text("CERTIFICATE", 70, 40);
+
+  doc.setFontSize(16);
+  doc.text("This is to certify", 20, 70);
+
+  doc.text(name || "NAME", 20, 90);
+  doc.text("for participating in", 20, 110);
+  doc.text(event || "EVENT", 20, 130);
+
+  doc.save("certificate.pdf");
+}
+
+// =========================================================
+// ================= CERTIFICATE CANVAS =================
+// =========================================================
+
+function addTextToCert(text, x=50, y=50){
+
+  const canvas = document.getElementById("certCanvas");
+  if(!canvas) return;
+
+  const el = document.createElement("div");
+  el.className = "text-item";
+  el.innerText = text;
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+
+  enableDrag(el);
+
+  el.onclick = ()=> selectElement(el);
+
+  canvas.appendChild(el);
+
+  certElements.push(el);
+}
+
+function selectElement(el){
+
+  document.querySelectorAll(".text-item")
+    .forEach(e=>e.classList.remove("active"));
+
+  selectedElement = el;
+  el.classList.add("active");
+}
+
+function enableDrag(el){
+
+  let isDown = false;
+  let offsetX, offsetY;
+
+  el.addEventListener("mousedown",(e)=>{
+    isDown = true;
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+  });
+
+  document.addEventListener("mousemove",(e)=>{
+    if(!isDown) return;
+
+    const canvas = document.getElementById("certCanvas");
+    const rect = canvas.getBoundingClientRect();
+
+    el.style.left = (e.clientX - rect.left - offsetX) + "px";
+    el.style.top = (e.clientY - rect.top - offsetY) + "px";
+  });
+
+  document.addEventListener("mouseup",()=>{
+    isDown = false;
+  });
+}
+// ================= SUPABASE =================
+const SUPABASE_URL = "https://scefyffuqtpavzpolrvj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ================= STATE =================
+let tasks = [];
+let user = null;
+let certElements = [];
+let selectedElement = null;
+let excelData = [];
+
+// =========================================================
+// ================= AUTH =================
+// =========================================================
+
+async function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    msg.innerText = "❌ " + error.message;
+    return;
+  }
+
+  user = data.user;
+  startApp();
+}
+
+async function logout(){
+  await client.auth.signOut();
+  location.reload();
+}
+
+// =========================================================
+// ================= INIT APP =================
+// =========================================================
+
+function startApp(){
+  document.getElementById("authBox").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  openPage("dashboard");
+
+  initClock();
+  loadTasks();
+  initRealtime();
+  initPresence();
+}
+
+// =========================================================
+// ================= NAVIGATION =================
+// =========================================================
+
+function openPage(id, el){
+
+  document.querySelectorAll(".page").forEach(p=>{
+    p.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll(".menu").forEach(m=>{
+    m.classList.remove("active");
+  });
+
+  if(el) el.classList.add("active");
+}
+
+// =========================================================
+// ================= CLOCK =================
+// =========================================================
+
+function initClock(){
+
+  setInterval(()=>{
+    const now = new Date();
+    const hour = now.getHours();
+
+    let greet = "Hello";
+    if(hour < 12) greet = "Good Morning ☀️";
+    else if(hour < 17) greet = "Good Afternoon 🌤";
+    else greet = "Good Evening 🌙";
+
+    document.getElementById("greeting").innerText = greet;
+
+    document.getElementById("time").innerText =
+      now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+
+  },1000);
+}
+
+// =========================================================
+// ================= TASK SYSTEM =================
+// =========================================================
+
+async function loadTasks(){
+
+  const { data } = await client
+    .from("tasks")
+    .select("*")
+    .order("id",{ascending:false});
+
+  tasks = data || [];
+
+  updateDashboard();
+  renderKanban();
+  renderChart();
+}
+
+function updateDashboard(){
+
+  const done = tasks.filter(t=>t.done).length;
+  const active = tasks.length - done;
+
+  document.getElementById("taskCount").innerText = tasks.length;
+  document.getElementById("doneCount").innerText = done;
+  document.getElementById("activeCount").innerText = active;
+}
+
+async function addTask(){
+
+  const input = document.getElementById("taskInput");
+  if(!input || !input.value) return;
+
+  await client.from("tasks").insert([{
+    title: input.value,
+    done: false,
+    status: "todo"
+  }]);
+
+  input.value = "";
+  loadTasks();
+}
+
+async function deleteTask(id){
+  await client.from("tasks").delete().eq("id",id);
+  loadTasks();
+}
+
+async function toggleTask(id,done){
+  await client.from("tasks")
+    .update({done:!done})
+    .eq("id",id);
+
+  loadTasks();
+}
+
+// =========================================================
+// ================= KANBAN =================
+// =========================================================
+
+function renderKanban(){
+
+  const todo = document.getElementById("todoList");
+  const doing = document.getElementById("doingList");
+  const done = document.getElementById("doneList");
+
+  if(!todo) return;
+
+  todo.innerHTML = "";
+  doing.innerHTML = "";
+  done.innerHTML = "";
+
+  tasks.forEach(t=>{
+    const el = document.createElement("div");
+    el.className = "kanban-card";
+    el.innerText = t.title;
+
+    if(t.status === "todo") todo.appendChild(el);
+    if(t.status === "doing") doing.appendChild(el);
+    if(t.status === "done") done.appendChild(el);
+  });
+
+  initDrag();
+}
+
+function initDrag(){
+
+  ["todoList","doingList","doneList"].forEach(id=>{
+    new Sortable(document.getElementById(id),{
+
+      group:"tasks",
+      animation:200,
+
+      onEnd: async function(evt){
+
+        const taskName = evt.item.innerText;
+
+        const newStatus =
+          evt.to.id === "todoList" ? "todo" :
+          evt.to.id === "doingList" ? "doing" : "done";
+
+        const task = tasks.find(t=>t.title === taskName);
+        if(!task) return;
+
+        await client.from("tasks")
+          .update({status:newStatus})
+          .eq("id",task.id);
+
+        loadTasks();
+      }
+    });
+  });
+}
+
+// =========================================================
+// ================= CHART =================
+// =========================================================
+
+let chartDonut, chartBar;
+
+function renderChart(){
+
+  const done = tasks.filter(t=>t.done).length;
+  const pending = tasks.length - done;
+
+  if(chartDonut) chartDonut.destroy();
+  if(chartBar) chartBar.destroy();
+
+  const ctx1 = document.getElementById("chartDonut");
+  const ctx2 = document.getElementById("chartBar");
+
+  if(!ctx1 || !ctx2) return;
+
+  chartDonut = new Chart(ctx1,{
+    type:"doughnut",
+    data:{
+      labels:["Done","Pending"],
+      datasets:[{data:[done,pending]}]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+
+  chartBar = new Chart(ctx2,{
+    type:"bar",
+    data:{
+      labels:["Tasks"],
+      datasets:[{data:[tasks.length]}]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+}
+
+// =========================================================
+// ================= REALTIME =================
+// =========================================================
+
+function initRealtime(){
+
+  client
+    .channel("tasks-channel")
+    .on("postgres_changes",{event:"*"},()=>{
+      loadTasks();
+    })
+    .subscribe();
+}
+
+// =========================================================
+// ================= PRESENCE =================
+// =========================================================
+
+function initPresence(){
+
+  const channel = client.channel("online-users");
+
+  channel.subscribe(async (status)=>{
+
+    if(status === "SUBSCRIBED"){
+      channel.track({
+        user: user?.email || "guest",
+        online: true
+      });
+    }
+  });
+}
+
+// =========================================================
+// ================= BROADCAST =================
+// =========================================================
+
+async function sendBroadcast(){
+
+  const input = document.getElementById("broadcastInput");
+  if(!input || !input.value) return;
+
+  await client.from("broadcast").insert([{
+    message: input.value,
+    created_at: new Date()
+  }]);
+
+  input.value = "";
+}
+
+// =========================================================
+// ================= BROADCAST LISTENER =================
+// =========================================================
+
+function listenBroadcast(){
+
+  client
+    .channel("broadcast-channel")
+    .on("postgres_changes",
+      {event:"INSERT",schema:"public",table:"broadcast"},
+      payload=>{
+
+        const el = document.getElementById("broadcastList");
+        if(!el) return;
+
+        const div = document.createElement("div");
+        div.innerHTML = "📢 " + payload.new.message;
+
+        el.prepend(div);
+      }
+    )
+    .subscribe();
+}
+
+// =========================================================
+// ================= FILE UPLOAD =================
+// =========================================================
+
+async function uploadFile(){
+
+  const file = document.getElementById("fileUpload").files[0];
+  if(!file) return;
+
+  await client.storage
+    .from("files")
+    .upload(file.name,file);
+
+  alert("Uploaded");
+}
+
+// =========================================================
+// ================= EXCEL =================
+// =========================================================
+
+function uploadExcel(){
+
+  const file = document.getElementById("excelFile").files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    excelData = XLSX.utils.sheet_to_json(sheet);
+
+    console.log("Excel Loaded:", excelData);
+    alert("Excel loaded: " + excelData.length + " rows");
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+// =========================================================
+// ================= CERTIFICATE PDF =================
+// =========================================================
+
+async function generateCertificate(){
+
+  const { jsPDF } = window.jspdf;
+
+  const name = document.getElementById("certName").value;
+  const event = document.getElementById("certEvent").value;
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(22);
+  doc.text("CERTIFICATE", 70, 40);
+
+  doc.setFontSize(16);
+  doc.text("This is to certify", 20, 70);
+
+  doc.text(name || "NAME", 20, 90);
+  doc.text("for participating in", 20, 110);
+  doc.text(event || "EVENT", 20, 130);
+
+  doc.save("certificate.pdf");
+}
+
+// =========================================================
+// ================= CERTIFICATE CANVAS =================
+// =========================================================
+
+function addTextToCert(text, x=50, y=50){
+
+  const canvas = document.getElementById("certCanvas");
+  if(!canvas) return;
+
+  const el = document.createElement("div");
+  el.className = "text-item";
+  el.innerText = text;
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+
+  enableDrag(el);
+
+  el.onclick = ()=> selectElement(el);
+
+  canvas.appendChild(el);
+
+  certElements.push(el);
+}
+
+function selectElement(el){
+
+  document.querySelectorAll(".text-item")
+    .forEach(e=>e.classList.remove("active"));
+
+  selectedElement = el;
+  el.classList.add("active");
+}
+
+function enableDrag(el){
+
+  let isDown = false;
+  let offsetX, offsetY;
+
+  el.addEventListener("mousedown",(e)=>{
+    isDown = true;
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+  });
+
+  document.addEventListener("mousemove",(e)=>{
+    if(!isDown) return;
+
+    const canvas = document.getElementById("certCanvas");
+    const rect = canvas.getBoundingClientRect();
+
+    el.style.left = (e.clientX - rect.left - offsetX) + "px";
+    el.style.top = (e.clientY - rect.top - offsetY) + "px";
+  });
+
+  document.addEventListener("mouseup",()=>{
+    isDown = false;
+  });
+}
+
+// =========================================================
+// ================= BATCH EXPORT =================
+// =========================================================
+
+async function exportAllCertificates(){
+
+  if(excelData.length === 0){
+    alert("No data");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  for(let i=0;i<excelData.length;i++){
+
+    const row = excelData[i];
+    const doc = new jsPDF();
+
+    doc.text("CERTIFICATE", 70, 40);
+    doc.text(row.name || "", 20, 80);
+
+    doc.save(`CERT_${row.name || i}.pdf`);
+  }
+
+  alert("Batch export done");
+}
+
+// =========================================================
+// ================= ONLINE USERS =================
+// =========================================================
+
+function renderOnlineUsers(users){
+
+  const el = document.getElementById("userList");
+  if(!el) return;
+
+  el.innerHTML = "";
+
+  users.forEach(u=>{
+    const div = document.createElement("div");
+    div.innerHTML = "🟢 " + u.user;
+    el.appendChild(div);
+  });
+}
+
+// =========================================================
+// ================= INIT =================
+// =========================================================
+
+window.addEventListener("load",()=>{
+  initClock();
+  listenBroadcast();
+});
+
+// =========================================================
+// ================= BATCH EXPORT =================
+// =========================================================
+
+async function exportAllCertificates(){
+
+  if(excelData.length === 0){
+    alert("No data");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  for(let i=0;i<excelData.length;i++){
+
+    const row = excelData[i];
+    const doc = new jsPDF();
+
+    doc.text("CERTIFICATE", 70, 40);
+    doc.text(row.name || "", 20, 80);
+
+    doc.save(`CERT_${row.name || i}.pdf`);
+  }
+
+  alert("Batch export done");
+}
+
+// =========================================================
+// ================= ONLINE USERS =================
+// =========================================================
+
+function renderOnlineUsers(users){
+
+  const el = document.getElementById("userList");
+  if(!el) return;
+
+  el.innerHTML = "";
+
+  users.forEach(u=>{
+    const div = document.createElement("div");
+    div.innerHTML = "🟢 " + u.user;
+    el.appendChild(div);
+  });
+}
+
+// =========================================================
+// ================= INIT =================
+// =========================================================
+
+window.addEventListener("load",()=>{
+  initClock();
+  listenBroadcast();
+});
+// =========================================================
+// ================= BATCH EXPORT =================
+// =========================================================
+
+async function exportAllCertificates(){
+
+  if(excelData.length === 0){
+    alert("No data");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  for(let i=0;i<excelData.length;i++){
+
+    const row = excelData[i];
+    const doc = new jsPDF();
+
+    doc.text("CERTIFICATE", 70, 40);
+    doc.text(row.name || "", 20, 80);
+
+    doc.save(`CERT_${row.name || i}.pdf`);
+  }
+
+  alert("Batch export done");
+}
+
+// =========================================================
+// ================= ONLINE USERS =================
+// =========================================================
+
+function renderOnlineUsers(users){
+
+  const el = document.getElementById("userList");
+  if(!el) return;
+
+  el.innerHTML = "";
+
+  users.forEach(u=>{
+    const div = document.createElement("div");
+    div.innerHTML = "🟢 " + u.user;
+    el.appendChild(div);
+  });
+}
+
+// =========================================================
+// ================= INIT =================
+// =========================================================
+
+window.addEventListener("load",()=>{
+  initClock();
+  listenBroadcast();
+});
