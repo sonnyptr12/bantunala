@@ -1,29 +1,29 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0b1220;
-  color: white;
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
 }
 
-/* ================= LOGIN MODERN ================= */
-.auth-container {
+body {
+  margin: 0;
+  background: #0b1220;
+  color: #e5e7eb;
+}
+
+/* ================= LOGIN ================= */
+.auth {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-
-  background: radial-gradient(circle at top, #1e293b, #0b1220);
+  background: radial-gradient(circle at top, #111827, #0b1220);
 }
 
 .auth-card {
-  width: 320px;
-  padding: 30px;
-  border-radius: 16px;
-
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-
+  width: 340px;
+  padding: 28px;
+  border-radius: 14px;
+  background: #111827;
+  border: 1px solid #1f2937;
   text-align: center;
 }
 
@@ -32,84 +32,72 @@ body {
   color: #38bdf8;
 }
 
-.subtitle {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-bottom: 20px;
+.auth-card p {
+  color: #9ca3af;
+  font-size: 14px;
 }
 
 .auth-card input {
   width: 100%;
+  margin-top: 10px;
   padding: 12px;
-  margin-bottom: 10px;
-
   border-radius: 10px;
-  border: none;
-  outline: none;
-
-  background: #1f2937;
+  border: 1px solid #1f2937;
+  background: #0f172a;
   color: white;
 }
 
 .auth-card button {
   width: 100%;
+  margin-top: 12px;
   padding: 12px;
-
-  border: none;
   border-radius: 10px;
-
+  border: none;
   background: #38bdf8;
   color: black;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
 }
 
-/* ================= LAYOUT ================= */
-.layout {
+/* ================= APP LAYOUT ================= */
+.app {
   display: flex;
   height: 100vh;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 220px;
+  width: 240px;
   background: #0f172a;
-  padding: 20px;
   border-right: 1px solid #1f2937;
+  padding: 20px;
 }
 
-.sidebar h2 {
-  margin: 0;
+.brand {
+  font-size: 18px;
+  font-weight: bold;
   color: #38bdf8;
+  margin-bottom: 20px;
 }
 
-.small {
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-.menu {
-  margin-top: 30px;
-}
-
-.menu-item {
+.nav-item {
   padding: 10px;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   cursor: pointer;
-  color: #cbd5e1;
+  color: #9ca3af;
 }
 
-.menu-item.active,
-.menu-item:hover {
-  background: #1e293b;
+.nav-item.active,
+.nav-item:hover {
+  background: #1f2937;
   color: white;
 }
 
 /* MAIN */
 .main {
   flex: 1;
-  padding: 25px;
+  padding: 24px;
 }
 
 /* TOPBAR */
@@ -120,7 +108,7 @@ body {
   margin-bottom: 20px;
 }
 
-.logout-btn {
+.logout {
   background: #ef4444;
   border: none;
   padding: 8px 12px;
@@ -129,29 +117,36 @@ body {
   cursor: pointer;
 }
 
-/* TASK INPUT */
-.task-box {
+/* INPUT */
+.task-input {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.task-box input {
+.task-input input {
   flex: 1;
   padding: 12px;
   border-radius: 10px;
-  border: none;
-  background: #1f2937;
+  border: 1px solid #1f2937;
+  background: #0f172a;
   color: white;
 }
 
-.task-box button {
-  background: #38bdf8;
-  border: none;
+.task-input button {
   padding: 12px 16px;
+  border: none;
   border-radius: 10px;
+  background: #38bdf8;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+}
+
+/* TASK LIST */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* TASK CARD */
@@ -159,19 +154,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  background: #111827;
   padding: 14px;
   border-radius: 12px;
-
-  margin-bottom: 10px;
+  background: #111827;
   border: 1px solid #1f2937;
-
-  transition: 0.2s;
-}
-
-.task:hover {
-  transform: translateY(-2px);
 }
 
 .task.done {
@@ -179,25 +165,11 @@ body {
   text-decoration: line-through;
 }
 
-.task-left {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.badge {
-  font-size: 10px;
-  background: #f59e0b;
-  padding: 3px 8px;
-  border-radius: 6px;
-  color: black;
-}
-
 .actions button {
-  margin-left: 5px;
+  margin-left: 6px;
   border: none;
   padding: 6px 8px;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   background: #1f2937;
   color: white;
