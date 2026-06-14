@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MyWork SaaS</title>
+<title>MyWork SaaS Pro</title>
 
 <link rel="stylesheet" href="style.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -35,10 +35,11 @@
 
   <button class="menu active" onclick="openPage('dashboard')">📊 Dashboard</button>
   <button class="menu" onclick="openPage('tasks')">📋 Tasks</button>
-  <button class="menu" onclick="openPage('pdf')">📄 PDF Tools</button>
   <button class="menu" onclick="openPage('users')">👥 Users</button>
+  <button class="menu" onclick="openPage('pdf')">📄 PDF Tools</button>
+  <button class="menu" onclick="openPage('certificate')">🎓 Sertifikat</button>
 
-  <button class="logout" onclick="logout()">Logout</button>
+  <button class="logout" onclick="logout()">🚪 Logout</button>
 </aside>
 
 <!-- MAIN -->
@@ -56,61 +57,53 @@
 <div id="dashboard" class="page">
 
   <div class="grid">
-    <div class="card accent" onclick="openPage('tasks')">
-      <h3>Tasks</h3>
-      <h2 id="totalTask">0</h2>
-    </div>
 
-    <div class="card" onclick="openPage('users')">
-      <h3>Online Users</h3>
-      <h2>Live</h2>
-    </div>
+    <div class="card" onclick="openPage('tasks')">📋 Tasks <h2 id="totalTask">0</h2></div>
+    <div class="card" onclick="openPage('users')">👥 Users <h2>Online</h2></div>
+    <div class="card">✅ Done <h2 id="doneTask">0</h2></div>
+    <div class="card">⏳ Pending <h2 id="pendingTask">0</h2></div>
 
-    <div class="card">
-      <h3>Completed</h3>
-      <h2 id="doneTask">0</h2>
-    </div>
-
-    <div class="card">
-      <h3>Pending</h3>
-      <h2 id="pendingTask">0</h2>
-    </div>
   </div>
 
-  <!-- CHARTS (2 KOLOM PERFECT BALANCE) -->
+  <!-- CHARTS -->
   <div class="chart-grid">
 
-    <div class="chart-card" onclick="openPage('tasks')">
-      <h3>Task Overview</h3>
-      <canvas id="chart1"></canvas>
+    <div class="chart-card">
+      <h3>📊 Task Overview</h3>
+      <div class="chart-wrapper">
+        <canvas id="chart1"></canvas>
+      </div>
     </div>
 
     <div class="chart-card">
-      <h3>Activity Flow</h3>
-      <canvas id="chart2"></canvas>
+      <h3>📈 Activity</h3>
+      <div class="chart-wrapper">
+        <canvas id="chart2"></canvas>
+      </div>
     </div>
 
   </div>
 
 </div>
 
-<!-- ================= TASK PAGE ================= -->
+<!-- TASK -->
 <div id="tasks" class="page hidden">
 
-  <h2>Tasks</h2>
+  <h2>📋 Task Manager</h2>
 
   <div class="input">
     <input id="taskInput" placeholder="Tambah task"/>
-    <button onclick="addTask()">Add</button>
+    <button onclick="addTask()">➕ Add</button>
   </div>
 
   <div id="taskList"></div>
+
 </div>
 
-<!-- ================= USERS ================= -->
+<!-- USERS -->
 <div id="users" class="page hidden">
 
-  <h2>Online Users</h2>
+  <h2>👥 Online Users</h2>
 
   <div class="table-card">
     <table>
@@ -127,15 +120,27 @@
 
 </div>
 
-<!-- ================= PDF ================= -->
+<!-- PDF -->
 <div id="pdf" class="page hidden">
-
-  <h2>PDF Tools</h2>
+  <h2>📄 PDF Tools</h2>
 
   <div class="card">
-    <button>Merge</button>
+    <button>Merge PDF</button>
     <button>Compress</button>
     <button>Convert</button>
+  </div>
+</div>
+
+<!-- CERTIFICATE -->
+<div id="certificate" class="page hidden">
+
+  <h2>🎓 Sertifikat Generator</h2>
+
+  <div class="card">
+    <input placeholder="Nama Peserta"/>
+    <input placeholder="Judul Sertifikat"/>
+
+    <button>Generate Sertifikat</button>
   </div>
 
 </div>

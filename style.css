@@ -25,19 +25,16 @@ html,body{
   padding:28px;
   border-radius:16px;
   background:#0f172acc;
-  border:1px solid #1f2937;
 }
 
 /* APP */
-.app{
-  display:flex;
-}
+.app{display:flex}
 
 /* SIDEBAR */
 .sidebar{
   width:240px;
-  height:100vh;
   position:fixed;
+  height:100vh;
   background:#0b1020;
   padding:20px;
   display:flex;
@@ -45,11 +42,7 @@ html,body{
   gap:10px;
 }
 
-.brand{
-  color:#38bdf8;
-  font-size:20px;
-  font-weight:bold;
-}
+.brand{color:#38bdf8;font-weight:bold}
 
 .menu{
   background:none;
@@ -58,7 +51,6 @@ html,body{
   text-align:left;
   padding:10px;
   border-radius:8px;
-  cursor:pointer;
 }
 
 .menu:hover,.menu.active{
@@ -72,7 +64,6 @@ html,body{
   border:none;
   padding:10px;
   border-radius:10px;
-  color:white;
 }
 
 /* MAIN */
@@ -80,11 +71,6 @@ html,body{
   margin-left:240px;
   padding:24px;
   width:100%;
-}
-
-/* TOPBAR */
-.topbar{
-  margin-bottom:20px;
 }
 
 /* GRID */
@@ -99,16 +85,9 @@ html,body{
   padding:16px;
   border-radius:14px;
   border:1px solid #1f2937;
-  cursor:pointer;
-  transition:.2s;
 }
 
-.card:hover{
-  border-color:#38bdf8;
-  transform:translateY(-2px);
-}
-
-/* CHART */
+/* CHART FIX FULL */
 .chart-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -117,12 +96,35 @@ html,body{
 }
 
 .chart-card{
+  height:300px;
+  background:#0f172a;
+  border-radius:14px;
+  padding:16px;
+  border:1px solid #1f2937;
+
+  display:flex;
+  flex-direction:column;
+}
+
+/* 🔥 INI FIX UTAMA DONUT CENTER + SIZE */
+.chart-wrapper{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+canvas{
+  max-width:220px !important;
+  max-height:220px !important;
+}
+
+/* TABLE */
+.table-card{
+  margin-top:20px;
   background:#0f172a;
   padding:16px;
   border-radius:14px;
-  border:1px solid #1f2937;
-  height:280px;
-  cursor:pointer;
 }
 
 /* TASK */
@@ -147,10 +149,11 @@ input{
   border-radius:10px;
 }
 
-/* TABLE */
-.table-card{
-  margin-top:20px;
-  background:#0f172a;
-  padding:16px;
-  border-radius:14px;
+/* PAGE SYSTEM */
+.page{animation:fade .2s}
+.hidden{display:none}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1}
 }

@@ -3,15 +3,15 @@ const supabaseClient = supabase.createClient(
 "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc"
 );
 
-/* PAGE NAV */
-function openPage(page){
+/* NAVIGATION FIX */
+function openPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-  document.getElementById(page).classList.remove("hidden");
+  document.getElementById(id).classList.remove("hidden");
 }
 
 /* LOGIN */
 async function login(){
-  const {error} = await supabaseClient.auth.signInWithPassword({
+  const {error}=await supabaseClient.auth.signInWithPassword({
     email:email.value,
     password:password.value
   });
@@ -23,35 +23,29 @@ async function login(){
   }
 }
 
-/* LOGOUT */
-async function logout(){
-  await supabaseClient.auth.signOut();
-  location.reload();
-}
-
 /* INIT */
 function init(){
-  updateTime();
+  clock();
   loadTasks();
   loadUsers();
 }
 
-/* TIME + GREETING */
-function updateTime(){
+/* CLOCK + GREETING */
+function clock(){
   setInterval(()=>{
     const h=new Date().getHours();
-    let greet="Hello";
+    let g="Hello";
 
-    if(h<12)greet="Good Morning ☀️";
-    else if(h<17)greet="Good Afternoon 🌤";
-    else greet="Good Evening 🌙";
+    if(h<12)g="Good Morning ☀️";
+    else if(h<17)g="Good Afternoon 🌤";
+    else g="Good Evening 🌙";
 
-    greeting.innerText=greet;
+    greeting.innerText=g;
     datetime.innerText=new Date().toLocaleString("id-ID");
   },1000);
 }
 
-/* TASKS */
+/* TASK */
 async function loadTasks(){
   const {data}=await supabaseClient.from("tasks").select("*");
 
@@ -62,29 +56,35 @@ async function loadTasks(){
   renderChart(data);
 }
 
-/* CHART */
-let c1,c2;
-
+/* CHART FIX (NO OVERFLOW) */
 function renderChart(data){
-  if(c1)c1.destroy();
-  if(c2)c2.destroy();
 
-  c1=new Chart(chart1,{
+  new Chart(chart1,{
     type:"doughnut",
     data:{
       labels:["Done","Pending"],
-      datasets:[{data:[
-        data.filter(t=>t.done).length,
-        data.filter(t=>!t.done).length
-      ]}]
+      datasets:[{
+        data:[
+          data.filter(t=>t.done).length,
+          data.filter(t=>!t.done).length
+        ]
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
     }
   });
 
-  c2=new Chart(chart2,{
+  new Chart(chart2,{
     type:"bar",
     data:{
       labels:["Mon","Tue","Wed","Thu","Fri"],
       datasets:[{data:[3,6,2,7,5]}]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
     }
   });
 }
