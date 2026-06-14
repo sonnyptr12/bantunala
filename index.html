@@ -14,7 +14,7 @@
 <!-- ================= LOGIN ================= -->
 <section id="authBox" class="auth">
   <div class="auth-card">
-    <h1>MyWork</h1>
+    <h1>⚡ MyWork</h1>
     <p>Sign in to continue</p>
 
     <input id="email" placeholder="Email"/>
@@ -26,35 +26,20 @@
   </div>
 </section>
 
-<!-- ================= APP ================= -->
+<!-- ================= APP (SIMPLE DASHBOARD) ================= -->
 <section id="app" class="app" style="display:none;">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="brand">⚡ MyWork</div>
+  <div class="topbar">
+    <h2>Dashboard</h2>
+    <button onclick="logout()" class="logout">Logout</button>
+  </div>
 
-    <nav>
-      <div class="nav-item active">📋 Tasks</div>
-      <div class="nav-item">📊 Overview</div>
-    </nav>
-  </aside>
+  <div class="task-input">
+    <input id="taskInput" placeholder="Tambah task baru..."/>
+    <button onclick="addTask()">Tambah</button>
+  </div>
 
-  <!-- MAIN -->
-  <main class="main">
-
-    <header class="topbar">
-      <h2>Tasks</h2>
-      <button onclick="logout()" class="logout">Logout</button>
-    </header>
-
-    <div class="task-input">
-      <input id="taskInput" placeholder="Tambah task baru..."/>
-      <button onclick="addTask()">Tambah</button>
-    </div>
-
-    <div id="taskList" class="task-list"></div>
-
-  </main>
+  <div id="taskList" class="task-list"></div>
 
 </section>
 
