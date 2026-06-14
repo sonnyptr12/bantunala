@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MyWork Pro</title>
+  <title>MyWork Ultimate</title>
 
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,7 +11,25 @@
 
 <body>
 
-<div class="layout">
+<!-- ================= LOGIN ================= -->
+<div id="authBox" class="auth-container">
+
+  <div class="auth-card">
+    <h1>⚡ MyWork</h1>
+    <p class="subtitle">Sign in to continue</p>
+
+    <input id="email" placeholder="Email"/>
+    <input id="password" type="password" placeholder="Password"/>
+
+    <button onclick="login()">Login</button>
+
+    <p id="msg"></p>
+  </div>
+
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" class="layout" style="display:none;">
 
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -27,36 +45,20 @@
   <!-- MAIN -->
   <div class="main">
 
-    <!-- LOGIN -->
-    <div id="authBox" class="auth">
-      <h2>Login</h2>
-
-      <input id="email" placeholder="Email"/>
-      <input id="password" type="password" placeholder="Password"/>
-
-      <button onclick="login()">Login</button>
-
-      <p id="msg"></p>
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
-    <!-- APP -->
-    <div id="app" class="app" style="display:none;">
-
-      <div class="topbar">
-        <h1>Dashboard</h1>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-      </div>
-
-      <div class="task-box">
-        <input id="taskInput" placeholder="Tulis task..."/>
-        <button onclick="addTask()">+ Add</button>
-      </div>
-
-      <div id="taskList"></div>
-
+    <div class="task-box">
+      <input id="taskInput" placeholder="Tulis task baru..."/>
+      <button onclick="addTask()">+ Add</button>
     </div>
+
+    <div id="taskList"></div>
 
   </div>
+
 </div>
 
 <script src="script.js"></script>
