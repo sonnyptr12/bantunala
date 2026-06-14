@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MyWork Pro</title>
+  <title>MyWork Ultimate</title>
 
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -36,20 +36,80 @@
   </div>
 </section>
 
-<!-- ================= DASHBOARD ================= -->
+<!-- ================= APP ================= -->
 <section id="app" class="app" style="display:none;">
 
-  <div class="topbar">
-    <h2>Dashboard MyWork</h2>
-    <button onclick="logout()" class="logout">Logout</button>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">⚡ MyWork</div>
 
-  <div class="task-input">
-    <input id="taskInput" placeholder="Tambah task baru..."/>
-    <button onclick="addTask()">Tambah</button>
-  </div>
+    <div class="menu">
+      <button class="menu-item active" onclick="showPage('tasks')">📋 Tasks</button>
+      <button class="menu-item" onclick="showPage('overview')">📊 Overview</button>
+      <button class="menu-item" onclick="showPage('settings')">⚙ Settings</button>
+    </div>
 
-  <div id="taskList" class="task-list"></div>
+    <button class="logout" onclick="logout()">Logout</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ================= TASK PAGE ================= -->
+    <div id="page-tasks" class="page">
+
+      <header class="topbar">
+        <h2>Tasks</h2>
+      </header>
+
+      <div class="task-input">
+        <input id="taskInput" placeholder="Tambah task baru..."/>
+        <button onclick="addTask()">Tambah</button>
+      </div>
+
+      <div class="filters">
+        <button onclick="setFilter('all')">All</button>
+        <button onclick="setFilter('done')">Done</button>
+        <button onclick="setFilter('pending')">Pending</button>
+      </div>
+
+      <div id="taskList" class="task-list"></div>
+
+    </div>
+
+    <!-- ================= OVERVIEW ================= -->
+    <div id="page-overview" class="page hidden">
+      <h2>Overview</h2>
+
+      <div class="cards">
+        <div class="card">
+          <h3 id="totalTask">0</h3>
+          <p>Total Task</p>
+        </div>
+
+        <div class="card">
+          <h3 id="doneTask">0</h3>
+          <p>Done</p>
+        </div>
+
+        <div class="card">
+          <h3 id="pendingTask">0</h3>
+          <p>Pending</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SETTINGS ================= -->
+    <div id="page-settings" class="page hidden">
+      <h2>Settings</h2>
+
+      <div class="settings-box">
+        <p>Theme: Dark Mode</p>
+        <p>Status: Active Session</p>
+      </div>
+    </div>
+
+  </main>
 
 </section>
 
