@@ -11,26 +11,33 @@
 
 <body>
 
-<!-- ================= LOGIN ================= -->
+<!-- ================= AUTH ================= -->
 <section id="authBox" class="auth">
   <div class="auth-card">
+
     <h1>⚡ MyWork</h1>
-    <p>Sign in to continue</p>
+    <p>Login / Register untuk lanjut</p>
 
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
 
     <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
+
+    <button onclick="logout()" style="background:#ef4444;color:white;margin-top:10px;">
+      Logout
+    </button>
 
     <p id="msg"></p>
+
   </div>
 </section>
 
-<!-- ================= APP (SIMPLE DASHBOARD) ================= -->
+<!-- ================= APP ================= -->
 <section id="app" class="app" style="display:none;">
 
   <div class="topbar">
-    <h2>Dashboard</h2>
+    <h2>Dashboard MyWork</h2>
     <button onclick="logout()" class="logout">Logout</button>
   </div>
 

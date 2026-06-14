@@ -4,21 +4,17 @@ const supabaseKey = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ================= INIT =================
-window.addEventListener("load", () => {
-  checkUser();
-});
+window.addEventListener("load", checkUser);
 
 // ================= LOGIN =================
 window.login = async function () {
-  const email = document.getElementById("email");
-  const password = document.getElementById("password");
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
 
-  msg.innerText = "Loading...";
-
   const { error } = await supabaseClient.auth.signInWithPassword({
-    email: email.value,
-    password: password.value
+    email,
+    password
   });
 
   if (error) {
@@ -27,18 +23,35 @@ window.login = async function () {
   }
 
   msg.innerText = "✔ Login sukses";
-
   await checkUser();
+};
+
+// ================= REGISTER =================
+window.register = async function () {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    msg.innerText = "❌ " + error.message;
+    return;
+  }
+
+  msg.innerText = "✔ Register sukses, silakan login";
 };
 
 // ================= LOGOUT =================
 window.logout = async function () {
   await supabaseClient.auth.signOut();
-
   await checkUser();
 };
 
-// ================= SESSION CONTROL (FIX CENTER BUG) =================
+// ================= SESSION =================
 async function checkUser() {
   const { data } = await supabaseClient.auth.getSession();
   const session = data?.session;
@@ -47,40 +60,28 @@ async function checkUser() {
   const app = document.getElementById("app");
 
   if (session) {
-    // 🔥 IMPORTANT: jangan pakai block untuk auth
     authBox.style.display = "none";
-
-    // dashboard bebas block/flex
-    app.style.display = "flex";
-
+    app.style.display = "block";
     loadTasks();
   } else {
-    // 🔥 INI YANG FIX BUG CENTER FLICK
     authBox.style.display = "flex";
     app.style.display = "none";
   }
 }
 
-// ================= LOAD TASK =================
+// ================= TASK =================
 async function loadTasks() {
-  const { data, error } = await supabaseClient
+  const { data } = await supabaseClient
     .from("tasks")
     .select("*")
     .order("id", { ascending: false });
 
   const list = document.getElementById("taskList");
-
-  if (error) {
-    console.log(error);
-    return;
-  }
-
   list.innerHTML = "";
 
   data.forEach(task => {
     list.innerHTML += `
       <div class="task ${task.done ? "done" : ""}">
-        
         <div class="task-left">
           <span>${task.title}</span>
           <span class="badge">${task.done ? "DONE" : "PENDING"}</span>
@@ -91,13 +92,12 @@ async function loadTasks() {
           <button onclick="editTask(${task.id}, '${task.title}')">✏</button>
           <button onclick="deleteTask(${task.id})">❌</button>
         </div>
-
       </div>
     `;
   });
 }
 
-// ================= ADD TASK =================
+// ================= ADD =================
 window.addTask = async function () {
   const input = document.getElementById("taskInput");
 
@@ -111,13 +111,9 @@ window.addTask = async function () {
   loadTasks();
 };
 
-// ================= DELETE TASK =================
+// ================= DELETE =================
 window.deleteTask = async function (id) {
-  await supabaseClient
-    .from("tasks")
-    .delete()
-    .eq("id", id);
-
+  await supabaseClient.from("tasks").delete().eq("id", id);
   loadTasks();
 };
 
@@ -131,10 +127,9 @@ window.toggleDone = async function (id, done) {
   loadTasks();
 };
 
-// ================= EDIT TASK =================
+// ================= EDIT =================
 window.editTask = async function (id, oldTitle) {
   const newTitle = prompt("Edit task:", oldTitle);
-
   if (!newTitle) return;
 
   await supabaseClient
