@@ -1,39 +1,43 @@
+// ================= SUPABASE CONFIG =================
 const supabaseUrl = "https://scefyffuqtpavzpolrvj.supabase.co";
 const supabaseKey = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
 
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+// IMPORTANT: pakai nama unik supaya TIDAK bentrok
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+// ================= ELEMENT =================
 const msg = document.getElementById("msg");
 
 // ================= LOGIN =================
-async function login() {
+window.login = async function () {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
     email,
     password
   });
 
   if (error) {
     msg.innerText = "❌ " + error.message;
-    console.log(error);
     return;
   }
 
-  msg.innerText = "Login sukses";
+  msg.innerText = "Login sukses ✔";
   checkUser();
-}
+};
 
 // ================= LOGOUT =================
-async function logout() {
-  await supabase.auth.signOut();
+window.logout = async function () {
+  await supabaseClient.auth.signOut();
   checkUser();
-}
+};
 
 // ================= CHECK SESSION =================
 async function checkUser() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data } = await supabaseClient.auth.getSession();
+
+  const session = data?.session;
 
   if (session) {
     document.getElementById("authBox").style.display = "none";
@@ -47,15 +51,18 @@ async function checkUser() {
 
 // ================= LOAD TASK =================
 async function loadTasks() {
-  const { data, error } = await supabase.from("tasks").select("*");
-
-  const list = document.getElementById("taskList");
-  list.innerHTML = "";
+  const { data, error } = await supabaseClient
+    .from("tasks")
+    .select("*")
+    .order("id", { ascending: false });
 
   if (error) {
     console.log(error);
     return;
   }
+
+  const list = document.getElementById("taskList");
+  list.innerHTML = "";
 
   data.forEach(task => {
     list.innerHTML += `
@@ -67,14 +74,14 @@ async function loadTasks() {
 }
 
 // ================= ADD TASK =================
-async function addTask() {
+window.addTask = async function () {
   const input = document.getElementById("taskInput");
 
-  if (!input.value) return;
+  if (!input.value.trim()) return;
 
-  const { error } = await supabase.from("tasks").insert([
-    { title: input.value }
-  ]);
+  const { error } = await supabaseClient
+    .from("tasks")
+    .insert([{ title: input.value }]);
 
   if (error) {
     console.log(error);
@@ -83,7 +90,7 @@ async function addTask() {
 
   input.value = "";
   loadTasks();
-}
+};
 
-// ================= AUTO CHECK =================
-checkUser();
+// ================= AUTO START =================
+window.addEventListener("load", checkUser);
