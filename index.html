@@ -19,7 +19,6 @@
     <p id="authTitle">Login ke akun kamu</p>
 
     <input id="fullName" placeholder="Nama Lengkap" style="display:none;"/>
-
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
 
@@ -27,15 +26,17 @@
 
     <p id="msg"></p>
 
-    <p style="margin-top:10px;font-size:12px;color:#9ca3af;">
+    <p class="toggle">
       <span id="toggleText">Belum punya akun?</span>
-      <a href="#" onclick="toggleMode(event)" style="color:#38bdf8;">Daftar</a>
+      <a href="#" onclick="toggleMode(event)">
+        <span id="toggleAction">Daftar</span>
+      </a>
     </p>
 
   </div>
 </section>
 
-<!-- ================= APP ================= -->
+<!-- ================= DASHBOARD ================= -->
 <section id="app" class="app" style="display:none;">
 
   <div class="topbar">
