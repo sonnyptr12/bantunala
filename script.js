@@ -3,15 +3,22 @@ const supabaseKey = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
 
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+// ================= INIT =================
+window.addEventListener("load", () => {
+  checkUser();
+});
+
 // ================= LOGIN =================
 window.login = async function () {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email");
+  const password = document.getElementById("password");
   const msg = document.getElementById("msg");
 
+  msg.innerText = "Loading...";
+
   const { error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
+    email: email.value,
+    password: password.value
   });
 
   if (error) {
@@ -20,38 +27,54 @@ window.login = async function () {
   }
 
   msg.innerText = "✔ Login sukses";
-  checkUser();
+
+  await checkUser();
 };
 
 // ================= LOGOUT =================
 window.logout = async function () {
   await supabaseClient.auth.signOut();
-  checkUser();
+
+  await checkUser();
 };
 
-// ================= SESSION =================
+// ================= SESSION CONTROL (FIX CENTER BUG) =================
 async function checkUser() {
   const { data } = await supabaseClient.auth.getSession();
   const session = data?.session;
 
+  const authBox = document.getElementById("authBox");
+  const app = document.getElementById("app");
+
   if (session) {
-    document.getElementById("authBox").style.display = "none";
-    document.getElementById("app").style.display = "block";
+    // 🔥 IMPORTANT: jangan pakai block untuk auth
+    authBox.style.display = "none";
+
+    // dashboard bebas block/flex
+    app.style.display = "flex";
+
     loadTasks();
   } else {
-    document.getElementById("authBox").style.display = "block";
-    document.getElementById("app").style.display = "none";
+    // 🔥 INI YANG FIX BUG CENTER FLICK
+    authBox.style.display = "flex";
+    app.style.display = "none";
   }
 }
 
 // ================= LOAD TASK =================
 async function loadTasks() {
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("tasks")
     .select("*")
     .order("id", { ascending: false });
 
   const list = document.getElementById("taskList");
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
   list.innerHTML = "";
 
   data.forEach(task => {
@@ -121,6 +144,3 @@ window.editTask = async function (id, oldTitle) {
 
   loadTasks();
 };
-
-// ================= INIT =================
-window.addEventListener("load", checkUser);
