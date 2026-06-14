@@ -1,143 +1,137 @@
 const supabaseUrl = "https://scefyffuqtpavzpolrvj.supabase.co";
 const supabaseKey = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
-
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
+/* ========== AUTH MODE ========== */
 let isLogin = true;
-let pdfFiles = [];
 
-/* ================= AUTH ================= */
-window.toggleMode = function(e){
+function toggleMode(e){
   e.preventDefault();
   isLogin = !isLogin;
-  authBtn.innerText = isLogin ? "Login" : "Register";
-  fullName.style.display = isLogin ? "none" : "block";
-};
 
-window.handleAuth = async function(){
+  document.getElementById("fullName").style.display = isLogin ? "none":"block";
+  document.getElementById("authBtn").innerText = isLogin ? "Login":"Register";
+  document.getElementById("toggleText").innerText = isLogin ? "Belum punya akun?" : "Sudah punya akun?";
+}
+
+/* ========== LOGIN / REGISTER ========== */
+async function handleAuth(){
   const email = email.value;
   const password = password.value;
 
   if(isLogin){
-    await supabaseClient.auth.signInWithPassword({email,password});
-  } else {
-    await supabaseClient.auth.signUp({email,password});
+    const { error } = await supabaseClient.auth.signInWithPassword({email,password});
+    if(error) return msg.innerText = error.message;
+  }else{
+    const fullName = document.getElementById("fullName").value;
+
+    const { error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options:{ data:{ fullName } }
+    });
+
+    if(error) return msg.innerText = error.message;
   }
 
   checkUser();
-};
+}
 
-window.logout = async function(){
+/* ========== LOGOUT ========== */
+async function logout(){
   await supabaseClient.auth.signOut();
-  checkUser();
-};
+  location.reload();
+}
 
-/* ================= SESSION ================= */
+/* ========== SESSION ========== */
 async function checkUser(){
-  const {data} = await supabaseClient.auth.getSession();
-
-  authBox.style.display = data.session ? "none" : "flex";
-  app.style.display = data.session ? "flex" : "none";
+  const { data } = await supabaseClient.auth.getSession();
 
   if(data.session){
+    authBox.style.display="none";
+    app.style.display="flex";
     loadTasks();
+    updateTime();
+    loadUsers();
   }
 }
 
-/* ================= NAV ================= */
-window.showPage = function(page){
-  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-  document.getElementById("page-"+page).classList.remove("hidden");
-};
-
-/* ================= TASK ================= */
-window.addTask = async function(){
-  await supabaseClient.from("tasks").insert([
-    {title:taskInput.value,done:false}
-  ]);
+/* ========== TASK SYSTEM ========== */
+async function addTask(){
+  await supabaseClient.from("tasks").insert({
+    title:taskInput.value,
+    done:false
+  });
 
   taskInput.value="";
   loadTasks();
-};
+}
 
 async function loadTasks(){
-  const {data} = await supabaseClient.from("tasks").select("*");
+  const {data}=await supabaseClient.from("tasks").select("*");
 
-  taskList.innerHTML = data.map(t=>`
+  totalTask.innerText=data.length;
+  doneTask.innerText=data.filter(t=>t.done).length;
+  pendingTask.innerText=data.filter(t=>!t.done).length;
+
+  taskList.innerHTML=data.map(t=>`
     <div class="task">${t.title}</div>
   `).join("");
-
-  totalTask.innerText = data.length;
-  doneTask.innerText = data.filter(t=>t.done).length;
-  pendingTask.innerText = data.filter(t=>!t.done).length;
 
   renderCharts(data);
 }
 
-/* ================= NOTES ================= */
-window.addNote = async function(){
-  await supabaseClient.from("notes").insert([
-    {content:noteInput.value}
-  ]);
-};
+/* ========== CHARTS ========== */
+let chart1,chart2;
 
-/* ================= ANNOUNCE ================= */
-window.addAnnouncement = async function(){
-  await supabaseClient.from("announcements").insert([
-    {content:announceInput.value}
-  ]);
-};
+function renderCharts(data){
+  if(chart1) chart1.destroy();
+  if(chart2) chart2.destroy();
 
-/* ================= CHART ================= */
-function renderCharts(tasks){
-
-  new Chart(chart1,{
+  chart1=new Chart(chart1Canvas,{
     type:"doughnut",
     data:{
       labels:["Done","Pending"],
       datasets:[{data:[
-        tasks.filter(t=>t.done).length,
-        tasks.filter(t=>!t.done).length
+        data.filter(t=>t.done).length,
+        data.filter(t=>!t.done).length
       ]}]
     }
   });
 
-  new Chart(chart2,{
+  chart2=new Chart(chart2Canvas,{
     type:"bar",
     data:{
       labels:["Mon","Tue","Wed","Thu","Fri"],
-      datasets:[{data:[5,8,3,6,9]}]
+      datasets:[{data:[3,6,2,8,5]}]
     }
   });
 }
 
-/* ================= PDF ================= */
-pdfInput.onchange = e=>{
-  pdfFiles = [...e.target.files];
-};
+/* ========== CLOCK + GREETING ========== */
+function updateTime(){
+  setInterval(()=>{
+    const now=new Date();
+    const h=now.getHours();
 
-window.mergePDF = async function(){
+    let greet="Hello";
+    if(h<12)greet="Good Morning ☀️";
+    else if(h<17)greet="Good Afternoon 🌤";
+    else greet="Good Evening 🌙";
 
-  const {PDFDocument} = PDFLib;
-  const merged = await PDFDocument.create();
+    greeting.innerText=greet;
+    datetime.innerText=now.toLocaleString("id-ID");
+  },1000);
+}
 
-  for(let file of pdfFiles){
-    const bytes = await file.arrayBuffer();
-    const doc = await PDFDocument.load(bytes);
+/* ========== USERS ========== */
+function loadUsers(){
+  userTable.innerHTML=`
+    <tr><td>Admin</td><td>Online</td><td>Now</td></tr>
+    <tr><td>User 1</td><td>Online</td><td>2m</td></tr>
+    <tr><td>User 2</td><td>Away</td><td>10m</td></tr>
+  `;
+}
 
-    const pages = await merged.copyPages(doc, doc.getPageIndices());
-    pages.forEach(p=>merged.addPage(p));
-  }
-
-  const bytes = await merged.save();
-  const blob = new Blob([bytes],{type:"application/pdf"});
-  const url = URL.createObjectURL(blob);
-
-  window.open(url);
-};
-
-window.splitPDF = function(){
-  alert("Split mode ready upgrade next backend");
-};
-
-window.addEventListener("load",checkUser);
+/* ========== INIT ========== */
+window.onload=checkUser;

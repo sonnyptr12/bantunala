@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MyWork ERP Ultra 2026</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyWork Ultimate SaaS</title>
 
-<link rel="stylesheet" href="style.css"/>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -18,19 +16,20 @@
 <section id="authBox" class="auth">
   <div class="auth-card">
 
-    <h1>⚡ MyWork ERP</h1>
-    <p id="authTitle">Login ke sistem</p>
+    <h1>⚡ MyWork</h1>
+    <p id="authTitle">Login ke akun kamu</p>
 
-    <input id="fullName" placeholder="Nama Lengkap" style="display:none"/>
+    <input id="fullName" placeholder="Nama Lengkap" style="display:none;"/>
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
 
-    <button onclick="handleAuth()" id="authBtn">Login</button>
+    <button id="authBtn" onclick="handleAuth()">Login</button>
 
     <p id="msg"></p>
 
-    <p class="toggle">
-      <a href="#" onclick="toggleMode(event)">Login / Register</a>
+    <p class="switch">
+      <span id="toggleText">Belum punya akun?</span>
+      <a href="#" onclick="toggleMode(event)">Daftar</a>
     </p>
 
   </div>
@@ -41,94 +40,88 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <div class="brand">⚡ MyWork</div>
 
     <button class="menu active" onclick="showPage('dashboard')">📊 Dashboard</button>
     <button class="menu" onclick="showPage('tasks')">📋 Tasks</button>
-    <button class="menu" onclick="showPage('notes')">📝 Notes</button>
-    <button class="menu" onclick="showPage('announce')">📢 Announcement</button>
     <button class="menu" onclick="showPage('pdf')">📄 PDF Tools</button>
 
     <button class="logout" onclick="logout()">Logout</button>
-
   </aside>
 
   <!-- MAIN -->
   <main class="main">
 
-    <!-- DASHBOARD -->
-    <div id="page-dashboard" class="page">
-
-      <div class="hero">
-        <h1>Good Evening Admin ⚡</h1>
-        <p>Control Center Dashboard</p>
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <h1 id="greeting">Hello</h1>
+        <p id="datetime"></p>
       </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="page">
 
       <div class="grid">
-
-        <div class="card">Total Task <h2 id="totalTask">0</h2></div>
+        <div class="card accent">Total Tasks <h2 id="totalTask">0</h2></div>
         <div class="card">Done <h2 id="doneTask">0</h2></div>
         <div class="card">Pending <h2 id="pendingTask">0</h2></div>
-        <div class="card accent">System <h2>ONLINE</h2></div>
-
+        <div class="card">Users <h2>4</h2></div>
       </div>
 
-      <div class="charts">
-        <canvas id="chart1"></canvas>
-        <canvas id="chart2"></canvas>
+      <!-- CHARTS -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Task Status</h3>
+          <canvas id="chart1"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h3>Activity</h3>
+          <canvas id="chart2"></canvas>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="table-card">
+        <h3>Online Users</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Last Active</th>
+            </tr>
+          </thead>
+          <tbody id="userTable"></tbody>
+        </table>
       </div>
 
     </div>
 
-    <!-- TASK -->
-    <div id="page-tasks" class="page hidden">
-      <h2>Tasks</h2>
+    <!-- TASKS -->
+    <div id="tasks" class="page hidden">
 
       <div class="input">
-        <input id="taskInput"/>
-        <button onclick="addTask()">Add</button>
+        <input id="taskInput" placeholder="Tambah task baru..."/>
+        <button onclick="addTask()">Tambah</button>
       </div>
 
       <div id="taskList"></div>
-    </div>
 
-    <!-- NOTES -->
-    <div id="page-notes" class="page hidden">
-      <h2>Notes</h2>
-
-      <div class="input">
-        <input id="noteInput"/>
-        <button onclick="addNote()">Add</button>
-      </div>
-
-      <div id="noteList"></div>
-    </div>
-
-    <!-- ANNOUNCE -->
-    <div id="page-announce" class="page hidden">
-      <h2>Announcement</h2>
-
-      <div class="input">
-        <input id="announceInput"/>
-        <button onclick="addAnnouncement()">Post</button>
-      </div>
-
-      <div id="announceList"></div>
     </div>
 
     <!-- PDF -->
-    <div id="page-pdf" class="page hidden">
+    <div id="pdf" class="page hidden">
+
       <h2>PDF Tools</h2>
 
-      <input type="file" id="pdfInput" multiple accept="application/pdf"/>
-
       <div class="pdf-actions">
-        <button onclick="mergePDF()">Merge PDF</button>
-        <button onclick="splitPDF()">Split PDF</button>
+        <button>Convert</button>
+        <button>Merge</button>
+        <button>Compress</button>
       </div>
-
-      <div id="pdfList"></div>
 
       <div class="bar">
         <div id="progress"></div>
@@ -137,7 +130,6 @@
     </div>
 
   </main>
-
 </section>
 
 <script src="script.js"></script>
