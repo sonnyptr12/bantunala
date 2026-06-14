@@ -1,13 +1,15 @@
 body {
   margin: 0;
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
+  font-family: Arial, sans-serif;
+  background: #0b1220;
+  color: #ffffff;
 }
 
+/* HEADER */
 .navbar {
   background: #111827;
-  padding: 15px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #1f2937;
 }
 
 .logo {
@@ -15,8 +17,9 @@ body {
   color: #38bdf8;
 }
 
+/* LOGIN BOX */
 .auth {
-  max-width: 300px;
+  max-width: 320px;
   margin: 80px auto;
   display: flex;
   flex-direction: column;
@@ -27,6 +30,9 @@ body {
   padding: 10px;
   border-radius: 8px;
   border: none;
+  outline: none;
+  background: #1f2937;
+  color: white;
 }
 
 .auth button {
@@ -34,28 +40,41 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  background: #38bdf8;
+  color: black;
+  font-weight: bold;
 }
 
+/* APP */
 .app {
+  max-width: 800px;
+  margin: auto;
   padding: 20px;
 }
 
+/* TOPBAR */
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+}
+
+.topbar h1 {
+  font-size: 20px;
+  margin: 0;
 }
 
 .logout-btn {
-  background: red;
+  background: #ef4444;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
 }
 
+/* TASK INPUT */
 .task-box {
   display: flex;
   gap: 10px;
@@ -64,27 +83,33 @@ body {
 
 .task-box input {
   flex: 1;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
+  outline: none;
+  background: #1f2937;
+  color: white;
 }
 
 .task-box button {
   background: #38bdf8;
   border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: bold;
 }
 
+/* TASK CARD */
 .task {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #1e293b;
-  padding: 12px;
-  border-radius: 10px;
+  background: #111827;
+  padding: 14px;
+  border-radius: 12px;
   margin-bottom: 10px;
+  border: 1px solid #1f2937;
 }
 
 .task.done {
@@ -100,15 +125,24 @@ body {
 
 .badge {
   font-size: 10px;
-  background: orange;
-  padding: 3px 6px;
+  padding: 3px 8px;
   border-radius: 6px;
+  background: #f59e0b;
+  color: black;
+  font-weight: bold;
 }
 
+/* ACTION BUTTONS */
 .actions button {
   margin-left: 5px;
   border: none;
   padding: 6px 8px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  background: #1f2937;
+  color: white;
+}
+
+.actions button:hover {
+  background: #374151;
 }
