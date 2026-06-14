@@ -7,13 +7,12 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 window.login = async function () {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
 
   const { error } = await supabaseClient.auth.signInWithPassword({
     email,
     password
   });
-
-  const msg = document.getElementById("msg");
 
   if (error) {
     msg.innerText = "❌ " + error.message;
@@ -30,7 +29,7 @@ window.logout = async function () {
   checkUser();
 };
 
-// ================= SESSION CHECK =================
+// ================= SESSION =================
 async function checkUser() {
   const { data } = await supabaseClient.auth.getSession();
   const session = data?.session;

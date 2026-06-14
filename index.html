@@ -25,7 +25,6 @@
   <input id="password" type="password" placeholder="Password"/>
 
   <button onclick="login()">Login</button>
-  <button onclick="logout()">Logout</button>
 
   <p id="msg"></p>
 </div>
@@ -33,7 +32,10 @@
 <!-- APP -->
 <div id="app" class="app" style="display:none;">
 
-  <h1>Dashboard</h1>
+  <div class="topbar">
+    <h1>Dashboard MyWork</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
 
   <div class="task-box">
     <input id="taskInput" placeholder="Tulis task baru..."/>
