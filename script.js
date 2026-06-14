@@ -1,139 +1,119 @@
 const supabaseUrl = "https://scefyffuqtpavzpolrvj.supabase.co";
 const supabaseKey = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
 
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 let isLogin = true;
+let pdfFiles = [];
 
-// ================= AUTH =================
-window.toggleMode = function(e) {
+/* ================= AUTH ================= */
+window.toggleMode = function(e){
   e.preventDefault();
   isLogin = !isLogin;
-
-  document.getElementById("authTitle").innerText =
-    isLogin ? "Login ke sistem" : "Buat akun baru";
-
-  document.getElementById("authBtn").innerText =
-    isLogin ? "Login" : "Register";
-
-  document.getElementById("fullName").style.display =
-    isLogin ? "none" : "block";
+  document.getElementById("authBtn").innerText = isLogin ? "Login" : "Register";
+  document.getElementById("fullName").style.display = isLogin ? "none" : "block";
 };
 
-window.handleAuth = async function() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const fullName = document.getElementById("fullName").value;
+window.handleAuth = async function(){
+  const email = email.value;
+  const password = password.value;
 
-  if (isLogin) {
-    await supabaseClient.auth.signInWithPassword({ email, password });
-  } else {
-    const { data } = await supabaseClient.auth.signUp({ email, password });
-
-    if (data.user) {
-      await supabaseClient.from("profiles").insert([
-        { id: data.user.id, full_name: fullName }
-      ]);
-    }
+  if(isLogin){
+    await supabaseClient.auth.signInWithPassword({email,password});
+  }else{
+    await supabaseClient.auth.signUp({email,password});
   }
 
   checkUser();
 };
 
-// ================= LOGOUT =================
-window.logout = async function() {
+window.logout = async function(){
   await supabaseClient.auth.signOut();
   checkUser();
 };
 
-// ================= SESSION =================
-async function checkUser() {
-  const { data } = await supabaseClient.auth.getSession();
+/* ================= SESSION ================= */
+async function checkUser(){
+  const {data} = await supabaseClient.auth.getSession();
 
-  document.getElementById("authBox").style.display =
-    data.session ? "none" : "flex";
+  authBox.style.display = data.session ? "none" : "flex";
+  app.style.display = data.session ? "flex" : "none";
 
-  document.getElementById("app").style.display =
-    data.session ? "flex" : "none";
-
-  if (data.session) {
+  if(data.session){
     loadTasks();
-    loadNotes();
-    loadAnnouncements();
   }
 }
 
-// ================= NAV =================
-window.showPage = function(page) {
-  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
-  document.getElementById("page-" + page).classList.remove("hidden");
+/* ================= NAV ================= */
+window.showPage = function(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  document.getElementById("page-"+page).classList.remove("hidden");
 };
 
-// ================= TASK =================
-window.addTask = async function() {
-  const input = document.getElementById("taskInput");
-
+/* ================= TASK ================= */
+window.addTask = async function(){
   await supabaseClient.from("tasks").insert([
-    { title: input.value, done: false }
+    {title:taskInput.value,done:false}
   ]);
 
-  input.value = "";
+  taskInput.value="";
   loadTasks();
 };
 
-async function loadTasks() {
-  const { data } = await supabaseClient.from("tasks").select("*");
+async function loadTasks(){
+  const {data} = await supabaseClient.from("tasks").select("*");
 
-  document.getElementById("taskList").innerHTML = data.map(t => `
-    <div class="task ${t.done ? "done" : ""}">
-      ${t.title}
-    </div>
+  taskList.innerHTML = data.map(t=>`
+    <div class="task">${t.title}</div>
   `).join("");
 
-  document.getElementById("totalTask").innerText = data.length;
-  document.getElementById("doneTask").innerText = data.filter(t => t.done).length;
-  document.getElementById("pendingTask").innerText = data.filter(t => !t.done).length;
+  totalTask.innerText = data.length;
+  doneTask.innerText = data.filter(t=>t.done).length;
+  pendingTask.innerText = data.filter(t=>!t.done).length;
 }
 
-// ================= NOTES =================
-window.addNote = async function() {
-  const input = document.getElementById("noteInput");
-
+/* ================= NOTES ================= */
+window.addNote = async function(){
   await supabaseClient.from("notes").insert([
-    { content: input.value }
+    {content:noteInput.value}
   ]);
-
-  input.value = "";
-  loadNotes();
 };
 
-async function loadNotes() {
-  const { data } = await supabaseClient.from("notes").select("*");
-
-  document.getElementById("noteList").innerHTML = data.map(n => `
-    <div class="task">📝 ${n.content}</div>
-  `).join("");
-}
-
-// ================= ANNOUNCEMENTS =================
-window.addAnnouncement = async function() {
-  const input = document.getElementById("announceInput");
-
+/* ================= ANNOUNCE ================= */
+window.addAnnouncement = async function(){
   await supabaseClient.from("announcements").insert([
-    { content: input.value }
+    {content:announceInput.value}
   ]);
-
-  input.value = "";
-  loadAnnouncements();
 };
 
-async function loadAnnouncements() {
-  const { data } = await supabaseClient.from("announcements").select("*");
+/* ================= PDF REAL MERGE ================= */
+pdfInput.onchange = (e)=>{
+  pdfFiles = Array.from(e.target.files);
+};
 
-  document.getElementById("announceList").innerHTML = data.map(a => `
-    <div class="task">📢 ${a.content}</div>
-  `).join("");
-}
+window.mergePDF = async function(){
 
-// ================= INIT =================
-window.addEventListener("load", checkUser);
+  const {PDFDocument} = PDFLib;
+  const merged = await PDFDocument.create();
+
+  for(const file of pdfFiles){
+    const bytes = await file.arrayBuffer();
+    const doc = await PDFDocument.load(bytes);
+
+    const copied = await merged.copyPages(doc, doc.getPageIndices());
+    copied.forEach(p=>merged.addPage(p));
+  }
+
+  const pdfBytes = await merged.save();
+
+  const blob = new Blob([pdfBytes],{type:"application/pdf"});
+  const url = URL.createObjectURL(blob);
+
+  window.open(url);
+};
+
+window.splitPDF = function(){
+  alert("Split ready upgrade next level (backend mode)");
+};
+
+window.addEventListener("load",checkUser);

@@ -1,197 +1,133 @@
-* {
-  box-sizing: border-box;
-  font-family: system-ui;
+*{
+  box-sizing:border-box;
+  font-family:system-ui;
 }
 
-body {
-  margin: 0;
-  background: #070A12;
-  color: #e5e7eb;
+body{
+  margin:0;
+  background:#070A12;
+  color:white;
 }
 
-/* ================= AUTH ================= */
-.auth {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: radial-gradient(circle at top, #0f172a, #070A12);
+/* AUTH */
+.auth{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#0b1220;
 }
 
-.auth-card {
-  width: 360px;
-  padding: 30px;
-  border-radius: 18px;
-
-  background: rgba(15,23,42,0.9);
-  border: 1px solid #1f2937;
-
-  text-align: center;
+.auth-card{
+  width:350px;
+  padding:30px;
+  background:#111827;
+  border-radius:16px;
 }
 
-.logo {
-  font-size: 22px;
-  font-weight: bold;
-  color: #38bdf8;
-}
-
-.auth-card input {
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-
-  border-radius: 10px;
-  border: 1px solid #1f2937;
-
-  background: #0b1220;
-  color: white;
-}
-
-.auth-card button {
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-
-  border-radius: 10px;
-  border: none;
-
-  background: linear-gradient(90deg,#38bdf8,#6366f1);
-  color: black;
-  font-weight: 600;
-}
-
-/* ================= APP ================= */
-.app {
-  display: flex;
-  height: 100vh;
+/* APP */
+.app{
+  display:flex;
+  height:100vh;
 }
 
 /* SIDEBAR */
-.sidebar {
-  width: 240px;
-  background: #0b1020;
-  border-right: 1px solid #1f2937;
-  padding: 20px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.sidebar{
+  width:240px;
+  background:#0f172a;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-.brand {
-  font-size: 20px;
-  font-weight: bold;
-  color: #38bdf8;
-  margin-bottom: 10px;
-}
-
-.menu-item {
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  text-align: left;
-  cursor: pointer;
+.menu-item{
+  background:transparent;
+  border:none;
+  color:#aaa;
+  padding:10px;
+  text-align:left;
+  cursor:pointer;
 }
 
 .menu-item:hover,
-.menu-item.active {
-  background: #111827;
-  color: white;
+.menu-item.active{
+  background:#1f2937;
+  color:white;
 }
 
-.logout {
-  margin-top: auto;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: #ef4444;
-  color: white;
-  cursor: pointer;
+.logout{
+  margin-top:auto;
+  background:red;
+  border:none;
+  padding:10px;
+  color:white;
+  border-radius:10px;
 }
 
 /* MAIN */
-.main {
-  flex: 1;
-  padding: 30px;
+.main{
+  flex:1;
+  padding:20px;
 }
+
+.hidden{display:none}
 
 /* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  margin-top: 20px;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
 }
 
-.card {
-  padding: 20px;
-  border-radius: 14px;
-  background: #0f172a;
-  border: 1px solid #1f2937;
-}
-
-.glow {
-  box-shadow: 0 0 20px rgba(56,189,248,0.2);
-}
-
-.accent {
-  border-color: #38bdf8;
+.card{
+  background:#111827;
+  padding:20px;
+  border-radius:12px;
 }
 
 /* TASK */
-.task-input {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+.task-input{
+  display:flex;
+  gap:10px;
 }
 
-.task-input input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #1f2937;
-  background: #0b1220;
-  color: white;
+.task-input input{
+  flex:1;
+  padding:10px;
 }
 
-.task-input button {
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: #38bdf8;
+.task{
+  background:#1f2937;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
 }
 
-.task-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* PDF */
+.pdf-box{
+  margin-top:20px;
+  padding:20px;
+  background:#111827;
+  border-radius:12px;
 }
 
-.task {
-  padding: 14px;
-  border-radius: 12px;
-  background: #111827;
-  border: 1px solid #1f2937;
+.pdf-actions button{
+  margin-right:10px;
+  padding:10px;
+  background:#38bdf8;
+  border:none;
 }
 
-.task.done {
-  opacity: 0.5;
-  text-decoration: line-through;
+.progress{
+  height:8px;
+  background:#333;
+  margin-top:10px;
 }
 
-/* PAGE */
-.page {
-  animation: fadeIn 0.3s ease;
-}
-
-.hidden {
-  display: none;
-}
-
-@keyframes fadeIn {
-  from {opacity:0;}
-  to {opacity:1;}
+#progressBar{
+  height:8px;
+  width:0%;
+  background:#38bdf8;
 }
