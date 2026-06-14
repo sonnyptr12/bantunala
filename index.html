@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MyWork Tech Dashboard</title>
+  <title>MyWork Office ERP</title>
 
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,19 +14,29 @@
 <!-- ================= AUTH ================= -->
 <section id="authBox" class="auth">
   <div class="auth-card">
-    <div class="logo">⚡ MyWork</div>
-    <p class="subtitle">Secure Tech Workspace</p>
 
+    <div class="logo">⚡ MyWork ERP</div>
+    <p id="authTitle">Login ke sistem</p>
+
+    <input id="fullName" placeholder="Nama Lengkap" style="display:none;"/>
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
 
-    <button onclick="handleAuth()">Continue</button>
+    <button onclick="handleAuth()" id="authBtn">Login</button>
 
     <p id="msg"></p>
+
+    <p class="toggle">
+      <span id="toggleText">Belum punya akun?</span>
+      <a href="#" onclick="toggleMode(event)">
+        <span id="toggleAction">Daftar</span>
+      </a>
+    </p>
+
   </div>
 </section>
 
-<!-- ================= DASHBOARD ================= -->
+<!-- ================= APP ================= -->
 <section id="app" class="app" style="display:none;">
 
   <!-- SIDEBAR -->
@@ -34,93 +44,92 @@
 
     <div class="brand">
       ⚡ MyWork
-      <span>v2.0</span>
     </div>
 
-    <div class="menu">
+    <button class="menu-item active" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="menu-item" onclick="showPage('tasks')">📋 Tasks</button>
+    <button class="menu-item" onclick="showPage('notes')">📝 Notes</button>
+    <button class="menu-item" onclick="showPage('announcements')">📢 Announcement</button>
 
-      <button class="menu-item active">
-        📊 Dashboard
-      </button>
-
-      <button class="menu-item">
-        📋 Tasks
-      </button>
-
-      <button class="menu-item">
-        📈 Analytics
-      </button>
-
-      <button class="menu-item">
-        ⚙ Settings
-      </button>
-
-    </div>
-
-    <div class="sidebar-footer">
-      <button onclick="logout()" class="logout">Logout</button>
-    </div>
+    <button class="logout" onclick="logout()">Logout</button>
 
   </aside>
 
   <!-- MAIN -->
   <main class="main">
 
-    <!-- TOPBAR -->
-    <header class="topbar">
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page">
 
-      <div>
-        <h1>Dashboard</h1>
-        <p>Welcome back, manage your workspace</p>
-      </div>
+      <h1>Office Dashboard</h1>
 
-      <div class="user-box">
-        <div class="avatar">U</div>
-      </div>
+      <div class="grid">
 
-    </header>
+        <div class="card glow">
+          <h3>Total Tasks</h3>
+          <p id="totalTask">0</p>
+        </div>
 
-    <!-- STATS -->
-    <section class="grid">
+        <div class="card">
+          <h3>Done</h3>
+          <p id="doneTask">0</p>
+        </div>
 
-      <div class="card glow">
-        <h3>Total Tasks</h3>
-        <p id="totalTask">0</p>
-      </div>
+        <div class="card">
+          <h3>Pending</h3>
+          <p id="pendingTask">0</p>
+        </div>
 
-      <div class="card">
-        <h3>Completed</h3>
-        <p id="doneTask">0</p>
-      </div>
-
-      <div class="card">
-        <h3>Pending</h3>
-        <p id="pendingTask">0</p>
-      </div>
-
-      <div class="card accent">
-        <h3>System</h3>
-        <p>Online ⚡</p>
-      </div>
-
-    </section>
-
-    <!-- TASK PANEL -->
-    <section class="panel">
-
-      <div class="panel-header">
-        <h2>Task Manager</h2>
-
-        <div class="actions">
-          <input id="taskInput" placeholder="Create new task..."/>
-          <button onclick="addTask()">Add</button>
+        <div class="card accent">
+          <h3>Status</h3>
+          <p>Online ⚡</p>
         </div>
 
       </div>
 
+    </div>
+
+    <!-- TASKS -->
+    <div id="page-tasks" class="page hidden">
+
+      <h2>Tasks</h2>
+
+      <div class="task-input">
+        <input id="taskInput" placeholder="Tambah task..."/>
+        <button onclick="addTask()">Tambah</button>
+      </div>
+
       <div id="taskList" class="task-list"></div>
 
-    </section>
+    </div>
+
+    <!-- NOTES -->
+    <div id="page-notes" class="page hidden">
+
+      <h2>Notes Kantor</h2>
+
+      <div class="task-input">
+        <input id="noteInput" placeholder="Tulis catatan..."/>
+        <button onclick="addNote()">Add</button>
+      </div>
+
+      <div id="noteList"></div>
+
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+    <div id="page-announcements" class="page hidden">
+
+      <h2>Announcement</h2>
+
+      <div class="task-input">
+        <input id="announceInput" placeholder="Pengumuman..."/>
+        <button onclick="addAnnouncement()">Publish</button>
+      </div>
+
+      <div id="announceList"></div>
+
+    </div>
 
   </main>
 

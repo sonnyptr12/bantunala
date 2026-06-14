@@ -6,8 +6,7 @@
 body {
   margin: 0;
   background: #070A12;
-  color: #E5E7EB;
-  overflow-x: hidden;
+  color: #e5e7eb;
 }
 
 /* ================= AUTH ================= */
@@ -25,9 +24,8 @@ body {
   padding: 30px;
   border-radius: 18px;
 
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15,23,42,0.9);
   border: 1px solid #1f2937;
-  backdrop-filter: blur(10px);
 
   text-align: center;
 }
@@ -36,12 +34,6 @@ body {
   font-size: 22px;
   font-weight: bold;
   color: #38bdf8;
-}
-
-.subtitle {
-  font-size: 12px;
-  color: #9ca3af;
-  margin-bottom: 15px;
 }
 
 .auth-card input {
@@ -75,131 +67,70 @@ body {
   height: 100vh;
 }
 
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 .sidebar {
-  width: 260px;
-  padding: 20px;
-
+  width: 240px;
   background: #0b1020;
   border-right: 1px solid #1f2937;
+  padding: 20px;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 10px;
 }
 
 .brand {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  display: flex;
-  justify-content: space-between;
   color: #38bdf8;
-}
-
-.menu {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .menu-item {
   padding: 12px;
   border-radius: 10px;
-
+  border: none;
   background: transparent;
-  border: 1px solid transparent;
   color: #9ca3af;
-
   text-align: left;
   cursor: pointer;
-
-  transition: 0.2s;
 }
 
-.menu-item:hover {
-  background: #111827;
-  color: white;
-  border-color: #1f2937;
-}
-
+.menu-item:hover,
 .menu-item.active {
-  background: linear-gradient(90deg,#1e293b,#0f172a);
-  border-color: #38bdf8;
+  background: #111827;
   color: white;
 }
 
 .logout {
-  width: 100%;
+  margin-top: auto;
   padding: 12px;
   border: none;
   border-radius: 10px;
-
   background: #ef4444;
   color: white;
   cursor: pointer;
 }
 
-/* ================= MAIN ================= */
+/* MAIN */
 .main {
   flex: 1;
   padding: 30px;
-  overflow-y: auto;
 }
 
-/* TOPBAR */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.topbar h1 {
-  margin: 0;
-}
-
-.topbar p {
-  margin: 5px 0 0;
-  color: #9ca3af;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #38bdf8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: black;
-  font-weight: bold;
-}
-
-/* ================= GRID ================= */
+/* GRID */
 .grid {
-  margin-top: 25px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
+  margin-top: 20px;
 }
 
 .card {
   padding: 20px;
   border-radius: 14px;
-
   background: #0f172a;
   border: 1px solid #1f2937;
-}
-
-.card h3 {
-  margin: 0;
-  font-size: 13px;
-  color: #9ca3af;
-}
-
-.card p {
-  font-size: 22px;
-  margin-top: 10px;
 }
 
 .glow {
@@ -210,40 +141,30 @@ body {
   border-color: #38bdf8;
 }
 
-/* ================= PANEL ================= */
-.panel {
-  margin-top: 30px;
-}
-
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.actions {
+/* TASK */
+.task-input {
   display: flex;
   gap: 10px;
+  margin-bottom: 15px;
 }
 
-.actions input {
-  padding: 10px;
+.task-input input {
+  flex: 1;
+  padding: 12px;
   border-radius: 10px;
   border: 1px solid #1f2937;
   background: #0b1220;
   color: white;
 }
 
-.actions button {
-  padding: 10px 14px;
-  border-radius: 10px;
+.task-input button {
+  padding: 12px;
   border: none;
+  border-radius: 10px;
   background: #38bdf8;
 }
 
-/* ================= TASK ================= */
 .task-list {
-  margin-top: 15px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -252,12 +173,25 @@ body {
 .task {
   padding: 14px;
   border-radius: 12px;
-
-  background: #0f172a;
+  background: #111827;
   border: 1px solid #1f2937;
 }
 
 .task.done {
   opacity: 0.5;
   text-decoration: line-through;
+}
+
+/* PAGE */
+.page {
+  animation: fadeIn 0.3s ease;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {opacity:0;}
+  to {opacity:1;}
 }
