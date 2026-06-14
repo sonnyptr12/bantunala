@@ -22,8 +22,8 @@ body{
 .auth-card{
   width:340px;
   padding:28px;
-  border-radius:16px;
   background:#0f172a;
+  border-radius:14px;
 }
 
 /* APP */
@@ -50,6 +50,7 @@ body{
   border-radius:8px;
 }
 
+.menu.active,
 .menu:hover{
   background:#111827;
   color:white;
@@ -59,6 +60,7 @@ body{
   margin-top:auto;
   background:#ef4444;
   padding:10px;
+  border:none;
   border-radius:10px;
 }
 
@@ -68,17 +70,18 @@ body{
   padding:24px;
 }
 
-/* BROADCAST */
-.broadcast{
-  display:flex;
-  gap:10px;
-  margin-bottom:15px;
+/* PAGE CONTROL */
+.page{
+  display:none;
 }
 
-.broadcast input{
-  flex:1;
-  padding:10px;
-  border-radius:8px;
+.page.active{
+  display:block;
+}
+
+/* TOPBAR */
+.topbar{
+  margin-bottom:15px;
 }
 
 /* GRID */
@@ -94,12 +97,18 @@ body{
   border-radius:12px;
 }
 
-/* CHART FIX SIZE */
+/* BROADCAST */
+.broadcast{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+/* CHART FIX */
 .chart-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:15px;
-  margin-top:15px;
 }
 
 .chart-card{
@@ -109,11 +118,16 @@ body{
   height:260px;
 }
 
-.chart-box{
+.chart-wrap{
   height:180px;
   display:flex;
   justify-content:center;
   align-items:center;
+}
+
+canvas{
+  max-width:200px !important;
+  max-height:200px !important;
 }
 
 /* TABLE */
@@ -124,46 +138,20 @@ body{
   border-radius:12px;
 }
 
-.table-box.small{
-  max-width:400px;
-}
-
-/* BOARD (CANVA STYLE TASK) */
-.board{
+/* TASK BOARD */
+.task-board{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:12px;
+  gap:10px;
 }
 
-.task-card{
-  background:#111827;
-  padding:16px;
-  border-radius:12px;
-}
-
-/* PDF TOOLS */
 .tool-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
 }
 
-.tool-card{
-  background:#0f172a;
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-  cursor:pointer;
-}
-
-/* CERT */
-.cert-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-
-.cert-card{
+.tool{
   background:#0f172a;
   padding:16px;
   border-radius:12px;

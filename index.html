@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MyWork Pro Office</title>
+<title>MyWork Enterprise</title>
 
 <link rel="stylesheet" href="style.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,7 +15,7 @@
 <!-- AUTH -->
 <section id="authBox" class="auth">
   <div class="auth-card">
-    <h1>⚡ MyWork Pro</h1>
+    <h1>⚡ MyWork</h1>
 
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
@@ -32,10 +32,11 @@
 <aside class="sidebar">
   <div class="brand">⚡ MyWork</div>
 
-  <button onclick="openPage('dashboard')" class="menu">📊 Dashboard</button>
-  <button onclick="openPage('tasks')" class="menu">📋 Tasks Board</button>
-  <button onclick="openPage('pdf')" class="menu">📄 PDF Tools</button>
-  <button onclick="openPage('certificate')" class="menu">🎓 Sertifikat</button>
+  <button class="menu active" onclick="openPage('dashboard',this)">📊 Dashboard</button>
+  <button class="menu" onclick="openPage('tasks',this)">📋 Tasks</button>
+  <button class="menu" onclick="openPage('certificate',this)">🎓 Certificate</button>
+  <button class="menu" onclick="openPage('pdf',this)">📄 PDF Tools</button>
+  <button class="menu" onclick="openPage('users',this)">👥 Users</button>
 
   <button class="logout" onclick="logout()">🚪 Logout</button>
 </aside>
@@ -52,117 +53,90 @@
 </div>
 
 <!-- ================= DASHBOARD ================= -->
-<div id="dashboard" class="page">
+<section id="dashboard" class="page active">
 
 <!-- BROADCAST -->
 <div class="broadcast">
-  📢 <input id="broadcastInput" placeholder="Kirim broadcast ke semua user..."/>
+  📢 <input id="broadcastInput" placeholder="Broadcast message..."/>
   <button onclick="sendBroadcast()">Send</button>
 </div>
 
 <!-- CARDS -->
 <div class="grid">
-  <div class="card" onclick="openPage('tasks')">📋 Tasks <h2 id="totalTask">0</h2></div>
-  <div class="card">👥 Online <h2>Live</h2></div>
+  <div class="card">📋 Tasks <h2 id="totalTask">0</h2></div>
   <div class="card">✅ Done <h2 id="doneTask">0</h2></div>
   <div class="card">⏳ Pending <h2 id="pendingTask">0</h2></div>
+  <div class="card">👥 Users <h2>Live</h2></div>
 </div>
 
 <!-- CHARTS -->
 <div class="chart-grid">
 
   <div class="chart-card">
-    <h3>📊 Task Overview</h3>
-    <div class="chart-box"><canvas id="chart1"></canvas></div>
+    <h3>Task Overview</h3>
+    <div class="chart-wrap">
+      <canvas id="chart1"></canvas>
+    </div>
   </div>
 
   <div class="chart-card">
-    <h3>📈 Activity</h3>
-    <div class="chart-box"><canvas id="chart2"></canvas></div>
+    <h3>Activity</h3>
+    <div class="chart-wrap">
+      <canvas id="chart2"></canvas>
+    </div>
   </div>
 
 </div>
 
 <!-- TASK TABLE -->
 <div class="table-box">
-  <h3>📋 Task Detail</h3>
+  <h3>Task List</h3>
   <table>
     <thead>
-      <tr><th>Title</th><th>Description</th><th>Status</th></tr>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+      </tr>
     </thead>
     <tbody id="taskTable"></tbody>
   </table>
 </div>
 
-<!-- ONLINE USERS -->
-<div class="table-box small">
-  <h3>👥 Online Users</h3>
-  <div id="userList"></div>
-</div>
+</section>
 
-</div>
-
-<!-- ================= TASK CANVA STYLE ================= -->
-<div id="tasks" class="page hidden">
-
-<h2>📋 Task Board</h2>
-
-<div class="board">
-
-  <div class="task-card">
-    <h3>Design UI</h3>
-    <p>Improve dashboard layout</p>
-  </div>
-
-  <div class="task-card">
-    <h3>API Integration</h3>
-    <p>Connect Supabase realtime</p>
-  </div>
-
-</div>
-
-</div>
-
-<!-- ================= PDF TOOLS ================= -->
-<div id="pdf" class="page hidden">
-
-<h2>📄 PDF Tools</h2>
-
-<div class="tool-grid">
-
-  <div class="tool-card">📎 Merge PDF</div>
-  <div class="tool-card">🗜 Compress</div>
-  <div class="tool-card">🔄 Convert</div>
-  <div class="tool-card">📑 Split PDF</div>
-
-</div>
-
-</div>
+<!-- ================= TASK PAGE ================= -->
+<section id="tasks" class="page hidden">
+  <h2>Tasks</h2>
+  <div class="task-board" id="taskBoard"></div>
+</section>
 
 <!-- ================= CERTIFICATE ================= -->
-<div id="certificate" class="page hidden">
+<section id="certificate" class="page hidden">
+  <h2>Certificate Generator</h2>
 
-<h2>🎓 Certificate Studio</h2>
-
-<div class="cert-grid">
-
-  <div class="cert-card">
-    <h3>Template Formal</h3>
-    <input placeholder="Nama"/>
-    <input placeholder="Keterangan"/>
-    <button>Generate</button>
-  </div>
-
-  <div class="cert-card">
-    <h3>Template Modern</h3>
+  <div class="card">
     <input placeholder="Nama"/>
     <input placeholder="Event"/>
     <button>Generate</button>
   </div>
+</section>
 
-</div>
+<!-- ================= PDF ================= -->
+<section id="pdf" class="page hidden">
+  <h2>PDF Tools</h2>
 
-</div>
+  <div class="tool-grid">
+    <div class="tool">Merge PDF</div>
+    <div class="tool">Split PDF</div>
+    <div class="tool">Compress</div>
+  </div>
+</section>
+
+<!-- ================= USERS ================= -->
+<section id="users" class="page hidden">
+  <h2>Online Users</h2>
+  <div id="userList"></div>
+</section>
 
 </main>
 </section>

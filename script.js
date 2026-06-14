@@ -3,10 +3,17 @@ const client = supabase.createClient(
 "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc"
 );
 
-/* NAV */
-function openPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
+/* NAVIGATION FIX */
+function openPage(id,el){
+
+  document.querySelectorAll(".page").forEach(p=>{
+    p.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll(".menu").forEach(m=>m.classList.remove("active"));
+  if(el) el.classList.add("active");
 }
 
 /* LOGIN */
@@ -25,12 +32,12 @@ async function login(){
 
 /* INIT */
 function init(){
-  clock();
+  startClock();
   loadTasks();
 }
 
 /* CLOCK (NO DETIK) */
-function clock(){
+function startClock(){
   setInterval(()=>{
     const h=new Date().getHours();
 
@@ -40,11 +47,11 @@ function clock(){
     else g="Good Evening 🌙";
 
     greeting.innerText=g;
-    time.innerText=new Date().toLocaleString("id-ID",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"short"});
+    time.innerText=new Date().toLocaleString("id-ID",{hour:"2-digit",minute:"2-digit"});
   },1000);
 }
 
-/* TASK LOAD */
+/* TASK */
 async function loadTasks(){
   const {data}=await client.from("tasks").select("*");
 
@@ -52,35 +59,20 @@ async function loadTasks(){
   doneTask.innerText=data.filter(t=>t.done).length;
   pendingTask.innerText=data.filter(t=>!t.done).length;
 
-  taskTable.innerHTML=data.map(t=>`
-    <tr>
-      <td>${t.title}</td>
-      <td>${t.desc || "-"}</td>
-      <td>${t.done ? "Done":"Pending"}</td>
-    </tr>
-  `).join("");
-
   renderChart(data);
-}
-
-/* BROADCAST (SIMULASI GLOBAL MESSAGE) */
-function sendBroadcast(){
-  alert("📢 Broadcast sent: " + broadcastInput.value);
-  broadcastInput.value="";
 }
 
 /* CHART FIX */
 function renderChart(data){
+
   new Chart(chart1,{
     type:"doughnut",
     data:{
       labels:["Done","Pending"],
-      datasets:[{
-        data:[
-          data.filter(t=>t.done).length,
-          data.filter(t=>!t.done).length
-        ]
-      }]
+      datasets:[{data:[
+        data.filter(t=>t.done).length,
+        data.filter(t=>!t.done).length
+      ]}]
     },
     options:{
       responsive:true,
@@ -92,7 +84,7 @@ function renderChart(data){
     type:"bar",
     data:{
       labels:["Mon","Tue","Wed","Thu","Fri"],
-      datasets:[{data:[2,4,6,3,5]}]
+      datasets:[{data:[3,2,5,4,6]}]
     },
     options:{
       responsive:true,
