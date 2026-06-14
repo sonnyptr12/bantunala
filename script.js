@@ -3,46 +3,93 @@ const supabaseKey = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
 
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+// ================= STATE =================
+let isLogin = true;
+
 // ================= INIT =================
 window.addEventListener("load", checkUser);
 
-// ================= LOGIN =================
-window.login = async function () {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const msg = document.getElementById("msg");
+// ================= TOGGLE LOGIN / REGISTER =================
+window.toggleMode = function (e) {
+  e.preventDefault();
 
-  const { error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
+  isLogin = !isLogin;
 
-  if (error) {
-    msg.innerText = "❌ " + error.message;
-    return;
+  const title = document.getElementById("authTitle");
+  const btn = document.getElementById("authBtn");
+  const toggleText = document.getElementById("toggleText");
+  const fullName = document.getElementById("fullName");
+
+  if (isLogin) {
+    title.innerText = "Login ke akun kamu";
+    btn.innerText = "Login";
+    toggleText.innerText = "Belum punya akun?";
+    fullName.style.display = "none";
+  } else {
+    title.innerText = "Buat akun baru";
+    btn.innerText = "Register";
+    toggleText.innerText = "Sudah punya akun?";
+    fullName.style.display = "block";
   }
-
-  msg.innerText = "✔ Login sukses";
-  await checkUser();
 };
 
-// ================= REGISTER =================
-window.register = async function () {
+// ================= AUTH =================
+window.handleAuth = async function () {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const fullName = document.getElementById("fullName").value;
   const msg = document.getElementById("msg");
 
-  const { error } = await supabaseClient.auth.signUp({
-    email,
-    password
-  });
+  msg.innerText = "Loading...";
 
-  if (error) {
-    msg.innerText = "❌ " + error.message;
-    return;
+  // LOGIN
+  if (isLogin) {
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      msg.innerText = "❌ " + error.message;
+      return;
+    }
+
+    msg.innerText = "✔ Login sukses";
   }
 
-  msg.innerText = "✔ Register sukses, silakan login";
+  // REGISTER
+  else {
+    if (!fullName) {
+      msg.innerText = "❌ Nama wajib diisi";
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) {
+      msg.innerText = "❌ " + error.message;
+      return;
+    }
+
+    const user = data.user;
+
+    if (user) {
+      await supabaseClient.from("profiles").insert([
+        {
+          id: user.id,
+          full_name: fullName,
+          email: email
+        }
+      ]);
+    }
+
+    msg.innerText = "✔ Register sukses, silakan login";
+  }
+
+  await checkUser();
 };
 
 // ================= LOGOUT =================
@@ -97,7 +144,7 @@ async function loadTasks() {
   });
 }
 
-// ================= ADD =================
+// ================= CRUD =================
 window.addTask = async function () {
   const input = document.getElementById("taskInput");
 
@@ -111,13 +158,11 @@ window.addTask = async function () {
   loadTasks();
 };
 
-// ================= DELETE =================
 window.deleteTask = async function (id) {
   await supabaseClient.from("tasks").delete().eq("id", id);
   loadTasks();
 };
 
-// ================= TOGGLE DONE =================
 window.toggleDone = async function (id, done) {
   await supabaseClient
     .from("tasks")
@@ -127,7 +172,6 @@ window.toggleDone = async function (id, done) {
   loadTasks();
 };
 
-// ================= EDIT =================
 window.editTask = async function (id, oldTitle) {
   const newTitle = prompt("Edit task:", oldTitle);
   if (!newTitle) return;
