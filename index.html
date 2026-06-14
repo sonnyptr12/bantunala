@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyWork Bantunala</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyWork Ultimate</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
 <header class="navbar">
-  <div class="logo">MyWork</div>
+  <div class="logo">⚡ MyWork Ultimate</div>
 </header>
 
 <!-- LOGIN -->
 <div id="authBox" class="auth">
   <h2>Login</h2>
 
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+  <input id="email" placeholder="Email"/>
+  <input id="password" type="password" placeholder="Password"/>
 
   <button onclick="login()">Login</button>
   <button onclick="logout()">Logout</button>
@@ -29,20 +32,18 @@
 
 <!-- APP -->
 <div id="app" class="app" style="display:none;">
-  <h1>Dashboard MyWork</h1>
+
+  <h1>Dashboard</h1>
 
   <div class="task-box">
-    <input id="taskInput" placeholder="Tugas baru">
-    <button onclick="addTask()">Tambah</button>
+    <input id="taskInput" placeholder="Tulis task baru..."/>
+    <button onclick="addTask()">+ Tambah</button>
   </div>
 
   <div id="taskList"></div>
+
 </div>
 
-<!-- Supabase CDN (WAJIB hanya ini) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- script utama -->
 <script src="script.js"></script>
 
 </body>
