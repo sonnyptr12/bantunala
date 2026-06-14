@@ -8,7 +8,6 @@ html,body{
   height:100%;
   background:#050814;
   color:white;
-  overflow:hidden;
 }
 
 /* AUTH */
@@ -22,26 +21,23 @@ html,body{
 }
 
 .auth-card{
-  width:360px;
-  padding:30px;
+  width:340px;
+  padding:28px;
   border-radius:16px;
-  background:rgba(15,23,42,0.85);
+  background:#0f172acc;
   border:1px solid #1f2937;
 }
 
 /* APP */
 .app{
   display:flex;
-  height:100vh;
 }
 
 /* SIDEBAR */
 .sidebar{
   width:240px;
-  position:fixed;
   height:100vh;
-  left:0;
-  top:0;
+  position:fixed;
   background:#0b1020;
   padding:20px;
   display:flex;
@@ -82,15 +78,12 @@ html,body{
 /* MAIN */
 .main{
   margin-left:240px;
-  flex:1;
   padding:24px;
-  overflow-y:auto;
+  width:100%;
 }
 
 /* TOPBAR */
 .topbar{
-  display:flex;
-  justify-content:space-between;
   margin-bottom:20px;
 }
 
@@ -106,9 +99,14 @@ html,body{
   padding:16px;
   border-radius:14px;
   border:1px solid #1f2937;
+  cursor:pointer;
+  transition:.2s;
 }
 
-.accent{border-color:#38bdf8}
+.card:hover{
+  border-color:#38bdf8;
+  transform:translateY(-2px);
+}
 
 /* CHART */
 .chart-grid{
@@ -124,29 +122,7 @@ html,body{
   border-radius:14px;
   border:1px solid #1f2937;
   height:280px;
-}
-
-.chart-card canvas{
-  height:220px !important;
-}
-
-/* TABLE */
-.table-card{
-  margin-top:20px;
-  background:#0f172a;
-  padding:16px;
-  border-radius:14px;
-  border:1px solid #1f2937;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-th,td{
-  padding:12px;
-  border-bottom:1px solid #1f2937;
+  cursor:pointer;
 }
 
 /* TASK */
@@ -158,10 +134,10 @@ th,td{
 input{
   flex:1;
   padding:12px;
-  border-radius:10px;
-  border:1px solid #1f2937;
   background:#0b1220;
+  border:1px solid #1f2937;
   color:white;
+  border-radius:10px;
 }
 
 #taskList .task{
@@ -169,4 +145,12 @@ input{
   padding:12px;
   background:#111827;
   border-radius:10px;
+}
+
+/* TABLE */
+.table-card{
+  margin-top:20px;
+  background:#0f172a;
+  padding:16px;
+  border-radius:14px;
 }

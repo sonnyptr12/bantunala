@@ -1,135 +1,146 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MyWork Ultimate SaaS</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MyWork SaaS</title>
 
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-<!-- ================= AUTH ================= -->
+<!-- AUTH -->
 <section id="authBox" class="auth">
   <div class="auth-card">
-
     <h1>⚡ MyWork</h1>
-    <p id="authTitle">Login ke akun kamu</p>
 
-    <input id="fullName" placeholder="Nama Lengkap" style="display:none;"/>
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
 
-    <button id="authBtn" onclick="handleAuth()">Login</button>
+    <button onclick="login()">Login</button>
 
     <p id="msg"></p>
-
-    <p class="switch">
-      <span id="toggleText">Belum punya akun?</span>
-      <a href="#" onclick="toggleMode(event)">Daftar</a>
-    </p>
-
   </div>
 </section>
 
-<!-- ================= APP ================= -->
+<!-- APP -->
 <section id="app" class="app" style="display:none;">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="brand">⚡ MyWork</div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">⚡ MyWork</div>
 
-    <button class="menu active" onclick="showPage('dashboard')">📊 Dashboard</button>
-    <button class="menu" onclick="showPage('tasks')">📋 Tasks</button>
-    <button class="menu" onclick="showPage('pdf')">📄 PDF Tools</button>
+  <button class="menu active" onclick="openPage('dashboard')">📊 Dashboard</button>
+  <button class="menu" onclick="openPage('tasks')">📋 Tasks</button>
+  <button class="menu" onclick="openPage('pdf')">📄 PDF Tools</button>
+  <button class="menu" onclick="openPage('users')">👥 Users</button>
 
-    <button class="logout" onclick="logout()">Logout</button>
-  </aside>
+  <button class="logout" onclick="logout()">Logout</button>
+</aside>
 
-  <!-- MAIN -->
-  <main class="main">
+<!-- MAIN -->
+<main class="main">
 
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div>
-        <h1 id="greeting">Hello</h1>
-        <p id="datetime"></p>
-      </div>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <h1 id="greeting">Hello</h1>
+    <p id="datetime"></p>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="dashboard" class="page">
+
+  <div class="grid">
+    <div class="card accent" onclick="openPage('tasks')">
+      <h3>Tasks</h3>
+      <h2 id="totalTask">0</h2>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="page">
-
-      <div class="grid">
-        <div class="card accent">Total Tasks <h2 id="totalTask">0</h2></div>
-        <div class="card">Done <h2 id="doneTask">0</h2></div>
-        <div class="card">Pending <h2 id="pendingTask">0</h2></div>
-        <div class="card">Users <h2>4</h2></div>
-      </div>
-
-      <!-- CHARTS -->
-      <div class="chart-grid">
-        <div class="chart-card">
-          <h3>Task Status</h3>
-          <canvas id="chart1"></canvas>
-        </div>
-
-        <div class="chart-card">
-          <h3>Activity</h3>
-          <canvas id="chart2"></canvas>
-        </div>
-      </div>
-
-      <!-- USERS -->
-      <div class="table-card">
-        <h3>Online Users</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Last Active</th>
-            </tr>
-          </thead>
-          <tbody id="userTable"></tbody>
-        </table>
-      </div>
-
+    <div class="card" onclick="openPage('users')">
+      <h3>Online Users</h3>
+      <h2>Live</h2>
     </div>
 
-    <!-- TASKS -->
-    <div id="tasks" class="page hidden">
-
-      <div class="input">
-        <input id="taskInput" placeholder="Tambah task baru..."/>
-        <button onclick="addTask()">Tambah</button>
-      </div>
-
-      <div id="taskList"></div>
-
+    <div class="card">
+      <h3>Completed</h3>
+      <h2 id="doneTask">0</h2>
     </div>
 
-    <!-- PDF -->
-    <div id="pdf" class="page hidden">
+    <div class="card">
+      <h3>Pending</h3>
+      <h2 id="pendingTask">0</h2>
+    </div>
+  </div>
 
-      <h2>PDF Tools</h2>
+  <!-- CHARTS (2 KOLOM PERFECT BALANCE) -->
+  <div class="chart-grid">
 
-      <div class="pdf-actions">
-        <button>Convert</button>
-        <button>Merge</button>
-        <button>Compress</button>
-      </div>
-
-      <div class="bar">
-        <div id="progress"></div>
-      </div>
-
+    <div class="chart-card" onclick="openPage('tasks')">
+      <h3>Task Overview</h3>
+      <canvas id="chart1"></canvas>
     </div>
 
-  </main>
+    <div class="chart-card">
+      <h3>Activity Flow</h3>
+      <canvas id="chart2"></canvas>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= TASK PAGE ================= -->
+<div id="tasks" class="page hidden">
+
+  <h2>Tasks</h2>
+
+  <div class="input">
+    <input id="taskInput" placeholder="Tambah task"/>
+    <button onclick="addTask()">Add</button>
+  </div>
+
+  <div id="taskList"></div>
+</div>
+
+<!-- ================= USERS ================= -->
+<div id="users" class="page hidden">
+
+  <h2>Online Users</h2>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Status</th>
+          <th>Last Active</th>
+        </tr>
+      </thead>
+      <tbody id="userTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ================= PDF ================= -->
+<div id="pdf" class="page hidden">
+
+  <h2>PDF Tools</h2>
+
+  <div class="card">
+    <button>Merge</button>
+    <button>Compress</button>
+    <button>Convert</button>
+  </div>
+
+</div>
+
+</main>
 </section>
 
 <script src="script.js"></script>
