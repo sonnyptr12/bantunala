@@ -54,6 +54,7 @@
   <button class="menu" onclick="openPage('kanban',this)">📌 Kanban Tasks</button>
   <button class="menu" onclick="openPage('broadcast',this)">📡 Broadcast Live</button>
   <button class="menu" onclick="openPage('certificate',this)">🎓 Certificate AI</button>
+  <button class="menu" onclick="openPage('certificateStudio',this)">🧾 Certificate Studio</button>
   <button class="menu" onclick="openPage('pdf',this)">📄 PDF Tools</button>
   <button class="menu" onclick="openPage('excel',this)">📊 Excel Import</button>
   <button class="menu" onclick="openPage('users',this)">👥 Online Users</button>
@@ -77,7 +78,6 @@
 <!-- ================= DASHBOARD ================= -->
 <section id="dashboard" class="page active">
 
-  <!-- KPI -->
   <div class="grid">
 
     <div class="card">📌 Tasks <h2 id="taskCount">0</h2></div>
@@ -87,7 +87,6 @@
 
   </div>
 
-  <!-- CHART -->
   <div class="chart-grid">
 
     <div class="chart-card">
@@ -154,6 +153,66 @@
 
 </section>
 
+<!-- ================= CERTIFICATE STUDIO (CANVA + MAIL MERGE) ================= -->
+<section id="certificateStudio" class="page hidden">
+
+  <h2>🧾 Certificate Studio Pro</h2>
+
+  <div class="grid">
+
+    <div class="card">
+
+      <h3>Template Tools</h3>
+
+      <input type="file" id="certBgUpload"/>
+
+      <button onclick="addTextField('nama')">+ Nama</button>
+      <button onclick="addTextField('kelas')">+ Kelas</button>
+      <button onclick="addTextField('event')">+ Event</button>
+      <button onclick="addTextField('tanggal')">+ Tanggal</button>
+
+      <hr>
+
+      <button onclick="saveCertTemplate()">💾 Save Template</button>
+      <button onclick="exportSingleCertificate()">📄 Export PDF</button>
+      <button onclick="generateBatchCertificates()">📦 Batch Generate</button>
+
+    </div>
+
+    <div class="card">
+
+      <h3>Mail Merge Fields</h3>
+
+      <p style="font-size:12px;color:#9ca3af;">
+        {{nama}}<br>
+        {{kelas}}<br>
+        {{event}}<br>
+        {{tanggal}}
+      </p>
+
+      <hr>
+
+      <input id="editText" placeholder="Edit text"/>
+      <input id="editSize" type="number" placeholder="Font size"/>
+      <button onclick="updateSelectedText()">Update</button>
+
+    </div>
+
+  </div>
+
+  <div style="
+    margin-top:15px;
+    width:900px;
+    height:550px;
+    background:white;
+    position:relative;
+    border-radius:12px;
+    overflow:hidden;
+  " id="certCanvas">
+  </div>
+
+</section>
+
 <!-- ================= PDF ================= -->
 <section id="pdf" class="page hidden">
 
@@ -171,7 +230,6 @@
   <h2>Excel Mail Merge</h2>
 
   <input type="file" id="excelFile"/>
-
   <button onclick="uploadExcel()">Upload</button>
 
 </section>

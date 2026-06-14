@@ -1,4 +1,3 @@
-
 // ================= SUPABASE =================
 const SUPABASE_URL = "https://scefyffuqtpavzpolrvj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
@@ -8,8 +7,14 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ================= STATE =================
 let tasks = [];
 let user = null;
+let certElements = [];
+let selectedElement = null;
+let excelData = [];
 
+// =========================================================
 // ================= AUTH =================
+// =========================================================
+
 async function login(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -29,13 +34,15 @@ async function login(){
   startApp();
 }
 
-// ================= LOGOUT =================
 async function logout(){
   await client.auth.signOut();
   location.reload();
 }
 
+// =========================================================
 // ================= INIT APP =================
+// =========================================================
+
 function startApp(){
   document.getElementById("authBox").style.display = "none";
   document.getElementById("app").style.display = "flex";
@@ -48,8 +55,11 @@ function startApp(){
   initPresence();
 }
 
-// ================= SPA NAV =================
-function openPage(id,el){
+// =========================================================
+// ================= NAVIGATION =================
+// =========================================================
+
+function openPage(id, el){
 
   document.querySelectorAll(".page").forEach(p=>{
     p.classList.remove("active");
@@ -64,8 +74,12 @@ function openPage(id,el){
   if(el) el.classList.add("active");
 }
 
+// =========================================================
 // ================= CLOCK =================
+// =========================================================
+
 function initClock(){
+
   setInterval(()=>{
     const now = new Date();
     const hour = now.getHours();
@@ -83,7 +97,10 @@ function initClock(){
   },1000);
 }
 
-// ================= TASK LOAD =================
+// =========================================================
+// ================= TASK SYSTEM =================
+// =========================================================
+
 async function loadTasks(){
 
   const { data } = await client
@@ -98,7 +115,6 @@ async function loadTasks(){
   renderChart();
 }
 
-// ================= DASHBOARD UPDATE =================
 function updateDashboard(){
 
   const done = tasks.filter(t=>t.done).length;
@@ -109,19 +125,18 @@ function updateDashboard(){
   document.getElementById("activeCount").innerText = active;
 }
 
-// ================= TASK CRUD =================
 async function addTask(){
 
   const input = document.getElementById("taskInput");
   if(!input || !input.value) return;
 
   await client.from("tasks").insert([{
-    title:input.value,
-    done:false,
-    status:"todo"
+    title: input.value,
+    done: false,
+    status: "todo"
   }]);
 
-  input.value="";
+  input.value = "";
   loadTasks();
 }
 
@@ -138,7 +153,10 @@ async function toggleTask(id,done){
   loadTasks();
 }
 
-// ================= KANBAN RENDER =================
+// =========================================================
+// ================= KANBAN =================
+// =========================================================
+
 function renderKanban(){
 
   const todo = document.getElementById("todoList");
@@ -153,32 +171,34 @@ function renderKanban(){
 
   tasks.forEach(t=>{
     const el = document.createElement("div");
-    el.className="kanban-card";
+    el.className = "kanban-card";
     el.innerText = t.title;
 
-    if(t.status==="todo") todo.appendChild(el);
-    if(t.status==="doing") doing.appendChild(el);
-    if(t.status==="done") done.appendChild(el);
+    if(t.status === "todo") todo.appendChild(el);
+    if(t.status === "doing") doing.appendChild(el);
+    if(t.status === "done") done.appendChild(el);
   });
 
   initDrag();
 }
 
-// ================= DRAG & DROP =================
 function initDrag(){
 
   ["todoList","doingList","doneList"].forEach(id=>{
     new Sortable(document.getElementById(id),{
+
       group:"tasks",
       animation:200,
-      onEnd:async function(evt){
+
+      onEnd: async function(evt){
 
         const taskName = evt.item.innerText;
-        const newStatus =
-          evt.to.id==="todoList" ? "todo" :
-          evt.to.id==="doingList" ? "doing" : "done";
 
-        const task = tasks.find(t=>t.title===taskName);
+        const newStatus =
+          evt.to.id === "todoList" ? "todo" :
+          evt.to.id === "doingList" ? "doing" : "done";
+
+        const task = tasks.find(t=>t.title === taskName);
         if(!task) return;
 
         await client.from("tasks")
@@ -191,8 +211,11 @@ function initDrag(){
   });
 }
 
+// =========================================================
 // ================= CHART =================
-let chartDonut,chartBar;
+// =========================================================
+
+let chartDonut, chartBar;
 
 function renderChart(){
 
@@ -226,48 +249,126 @@ function renderChart(){
   });
 }
 
+// =========================================================
 // ================= REALTIME =================
+// =========================================================
+
 function initRealtime(){
 
   client
     .channel("tasks-channel")
-    .on("postgres_changes",{event:"*"},payload=>{
+    .on("postgres_changes",{event:"*"},()=>{
       loadTasks();
     })
     .subscribe();
 }
 
-// ================= PRESENCE (ONLINE USERS) =================
+// =========================================================
+// ================= PRESENCE =================
+// =========================================================
+
 function initPresence(){
 
   const channel = client.channel("online-users");
 
   channel.subscribe(async (status)=>{
 
-    if(status==="SUBSCRIBED"){
+    if(status === "SUBSCRIBED"){
       channel.track({
-        user:user?.email || "guest",
-        online:true
+        user: user?.email || "guest",
+        online: true
       });
     }
   });
 }
 
+// =========================================================
 // ================= BROADCAST =================
+// =========================================================
+
 async function sendBroadcast(){
 
   const input = document.getElementById("broadcastInput");
   if(!input || !input.value) return;
 
   await client.from("broadcast").insert([{
-    message:input.value,
-    created_at:new Date()
+    message: input.value,
+    created_at: new Date()
   }]);
 
-  input.value="";
+  input.value = "";
 }
 
+// =========================================================
+// ================= BROADCAST LISTENER =================
+// =========================================================
+
+function listenBroadcast(){
+
+  client
+    .channel("broadcast-channel")
+    .on("postgres_changes",
+      {event:"INSERT",schema:"public",table:"broadcast"},
+      payload=>{
+
+        const el = document.getElementById("broadcastList");
+        if(!el) return;
+
+        const div = document.createElement("div");
+        div.innerHTML = "📢 " + payload.new.message;
+
+        el.prepend(div);
+      }
+    )
+    .subscribe();
+}
+
+// =========================================================
+// ================= FILE UPLOAD =================
+// =========================================================
+
+async function uploadFile(){
+
+  const file = document.getElementById("fileUpload").files[0];
+  if(!file) return;
+
+  await client.storage
+    .from("files")
+    .upload(file.name,file);
+
+  alert("Uploaded");
+}
+
+// =========================================================
+// ================= EXCEL =================
+// =========================================================
+
+function uploadExcel(){
+
+  const file = document.getElementById("excelFile").files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    excelData = XLSX.utils.sheet_to_json(sheet);
+
+    console.log("Excel Loaded:", excelData);
+    alert("Excel loaded: " + excelData.length + " rows");
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+// =========================================================
 // ================= CERTIFICATE PDF =================
+// =========================================================
+
 async function generateCertificate(){
 
   const { jsPDF } = window.jspdf;
@@ -290,38 +391,115 @@ async function generateCertificate(){
   doc.save("certificate.pdf");
 }
 
-// ================= EXCEL UPLOAD =================
-function uploadExcel(event){
+// =========================================================
+// ================= CERTIFICATE CANVAS =================
+// =========================================================
 
-  const file = document.getElementById("excelFile").files[0];
+function addTextToCert(text, x=50, y=50){
 
-  const reader = new FileReader();
+  const canvas = document.getElementById("certCanvas");
+  if(!canvas) return;
 
-  reader.onload = function(e){
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data,{type:"array"});
+  const el = document.createElement("div");
+  el.className = "text-item";
+  el.innerText = text;
+  el.style.left = x + "px";
+  el.style.top = y + "px";
 
-    console.log(workbook);
-    alert("Excel loaded successfully");
-  };
+  enableDrag(el);
 
-  reader.readAsArrayBuffer(file);
+  el.onclick = ()=> selectElement(el);
+
+  canvas.appendChild(el);
+
+  certElements.push(el);
 }
 
-// ================= FILE UPLOAD =================
-async function uploadFile(){
+function selectElement(el){
 
-  const file = document.getElementById("fileUpload").files[0];
-  if(!file) return;
+  document.querySelectorAll(".text-item")
+    .forEach(e=>e.classList.remove("active"));
 
-  await client.storage
-    .from("files")
-    .upload(file.name,file);
-
-  alert("Uploaded");
+  selectedElement = el;
+  el.classList.add("active");
 }
 
+function enableDrag(el){
+
+  let isDown = false;
+  let offsetX, offsetY;
+
+  el.addEventListener("mousedown",(e)=>{
+    isDown = true;
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+  });
+
+  document.addEventListener("mousemove",(e)=>{
+    if(!isDown) return;
+
+    const canvas = document.getElementById("certCanvas");
+    const rect = canvas.getBoundingClientRect();
+
+    el.style.left = (e.clientX - rect.left - offsetX) + "px";
+    el.style.top = (e.clientY - rect.top - offsetY) + "px";
+  });
+
+  document.addEventListener("mouseup",()=>{
+    isDown = false;
+  });
+}
+
+// =========================================================
+// ================= BATCH EXPORT =================
+// =========================================================
+
+async function exportAllCertificates(){
+
+  if(excelData.length === 0){
+    alert("No data");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  for(let i=0;i<excelData.length;i++){
+
+    const row = excelData[i];
+    const doc = new jsPDF();
+
+    doc.text("CERTIFICATE", 70, 40);
+    doc.text(row.name || "", 20, 80);
+
+    doc.save(`CERT_${row.name || i}.pdf`);
+  }
+
+  alert("Batch export done");
+}
+
+// =========================================================
+// ================= ONLINE USERS =================
+// =========================================================
+
+function renderOnlineUsers(users){
+
+  const el = document.getElementById("userList");
+  if(!el) return;
+
+  el.innerHTML = "";
+
+  users.forEach(u=>{
+    const div = document.createElement("div");
+    div.innerHTML = "🟢 " + u.user;
+    el.appendChild(div);
+  });
+}
+
+// =========================================================
 // ================= INIT =================
+// =========================================================
+
 window.addEventListener("load",()=>{
   initClock();
+  listenBroadcast();
 });

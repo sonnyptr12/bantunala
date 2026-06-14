@@ -315,3 +315,139 @@ input[type="file"]{
     width:100%;
   }
 }
+
+/* ================= CERTIFICATE STUDIO ADD-ON ================= */
+
+/* container canvas certificate */
+#certCanvas{
+  position:relative;
+  width:100%;
+  height:520px;
+  background:white;
+  border-radius:14px;
+  border:1px solid #1f2937;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+/* draggable text object */
+.text-item{
+  position:absolute;
+  cursor:move;
+  user-select:none;
+  padding:4px 6px;
+  border-radius:6px;
+  color:black;
+  font-size:16px;
+  font-weight:500;
+}
+
+/* active selected text */
+.text-item.active{
+  outline:2px dashed #38bdf8;
+  background:rgba(56,189,248,0.1);
+}
+
+/* certificate toolbar section */
+.cert-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+/* small tool button */
+.cert-toolbar button{
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #1f2937;
+  background:#0f172a;
+  color:#e5e7eb;
+  font-size:12px;
+}
+
+.cert-toolbar button:hover{
+  background:#111827;
+}
+
+/* certificate side editor panel */
+.cert-panel{
+  background:#0f172a;
+  border:1px solid #1f2937;
+  padding:12px;
+  border-radius:14px;
+  margin-top:10px;
+}
+
+/* field inputs inside certificate module */
+.cert-panel input,
+.cert-panel select{
+  width:100%;
+  margin-top:8px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #1f2937;
+  background:#0b1220;
+  color:white;
+}
+
+/* update button special */
+.cert-panel button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  background:#38bdf8;
+  color:black;
+  font-weight:600;
+}
+
+/* mail merge preview box */
+.merge-preview{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  border:1px dashed #1f2937;
+  font-size:12px;
+  color:#9ca3af;
+}
+
+/* certificate layout wrapper (if later export preview) */
+.cert-wrapper{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+
+/* canvas shadow glow (tech feel) */
+#certCanvas{
+  box-shadow:0 0 25px rgba(56,189,248,0.08);
+}
+
+/* draggable hover effect */
+.text-item:hover{
+  transform:scale(1.02);
+}
+
+/* small badge tag (mail merge field) */
+.merge-tag{
+  display:inline-block;
+  padding:3px 6px;
+  font-size:11px;
+  border-radius:6px;
+  background:#1f2937;
+  color:#38bdf8;
+  margin:2px 2px 0 0;
+}
+
+/* batch status box */
+.batch-status{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:#0b1220;
+  border:1px solid #1f2937;
+  font-size:12px;
+  color:#9ca3af;
+}
