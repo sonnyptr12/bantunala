@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MyWork Ultimate</title>
+  <title>MyWork Tech Dashboard</title>
 
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,100 +14,113 @@
 <!-- ================= AUTH ================= -->
 <section id="authBox" class="auth">
   <div class="auth-card">
+    <div class="logo">⚡ MyWork</div>
+    <p class="subtitle">Secure Tech Workspace</p>
 
-    <h1>⚡ MyWork</h1>
-    <p id="authTitle">Login ke akun kamu</p>
-
-    <input id="fullName" placeholder="Nama Lengkap" style="display:none;"/>
     <input id="email" placeholder="Email"/>
     <input id="password" type="password" placeholder="Password"/>
 
-    <button onclick="handleAuth()" id="authBtn">Login</button>
+    <button onclick="handleAuth()">Continue</button>
 
     <p id="msg"></p>
-
-    <p class="toggle">
-      <span id="toggleText">Belum punya akun?</span>
-      <a href="#" onclick="toggleMode(event)">
-        <span id="toggleAction">Daftar</span>
-      </a>
-    </p>
-
   </div>
 </section>
 
-<!-- ================= APP ================= -->
+<!-- ================= DASHBOARD ================= -->
 <section id="app" class="app" style="display:none;">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="brand">⚡ MyWork</div>
 
-    <div class="menu">
-      <button class="menu-item active" onclick="showPage('tasks')">📋 Tasks</button>
-      <button class="menu-item" onclick="showPage('overview')">📊 Overview</button>
-      <button class="menu-item" onclick="showPage('settings')">⚙ Settings</button>
+    <div class="brand">
+      ⚡ MyWork
+      <span>v2.0</span>
     </div>
 
-    <button class="logout" onclick="logout()">Logout</button>
+    <div class="menu">
+
+      <button class="menu-item active">
+        📊 Dashboard
+      </button>
+
+      <button class="menu-item">
+        📋 Tasks
+      </button>
+
+      <button class="menu-item">
+        📈 Analytics
+      </button>
+
+      <button class="menu-item">
+        ⚙ Settings
+      </button>
+
+    </div>
+
+    <div class="sidebar-footer">
+      <button onclick="logout()" class="logout">Logout</button>
+    </div>
+
   </aside>
 
   <!-- MAIN -->
   <main class="main">
 
-    <!-- ================= TASK PAGE ================= -->
-    <div id="page-tasks" class="page">
+    <!-- TOPBAR -->
+    <header class="topbar">
 
-      <header class="topbar">
-        <h2>Tasks</h2>
-      </header>
-
-      <div class="task-input">
-        <input id="taskInput" placeholder="Tambah task baru..."/>
-        <button onclick="addTask()">Tambah</button>
+      <div>
+        <h1>Dashboard</h1>
+        <p>Welcome back, manage your workspace</p>
       </div>
 
-      <div class="filters">
-        <button onclick="setFilter('all')">All</button>
-        <button onclick="setFilter('done')">Done</button>
-        <button onclick="setFilter('pending')">Pending</button>
+      <div class="user-box">
+        <div class="avatar">U</div>
+      </div>
+
+    </header>
+
+    <!-- STATS -->
+    <section class="grid">
+
+      <div class="card glow">
+        <h3>Total Tasks</h3>
+        <p id="totalTask">0</p>
+      </div>
+
+      <div class="card">
+        <h3>Completed</h3>
+        <p id="doneTask">0</p>
+      </div>
+
+      <div class="card">
+        <h3>Pending</h3>
+        <p id="pendingTask">0</p>
+      </div>
+
+      <div class="card accent">
+        <h3>System</h3>
+        <p>Online ⚡</p>
+      </div>
+
+    </section>
+
+    <!-- TASK PANEL -->
+    <section class="panel">
+
+      <div class="panel-header">
+        <h2>Task Manager</h2>
+
+        <div class="actions">
+          <input id="taskInput" placeholder="Create new task..."/>
+          <button onclick="addTask()">Add</button>
+        </div>
+
       </div>
 
       <div id="taskList" class="task-list"></div>
 
-    </div>
-
-    <!-- ================= OVERVIEW ================= -->
-    <div id="page-overview" class="page hidden">
-      <h2>Overview</h2>
-
-      <div class="cards">
-        <div class="card">
-          <h3 id="totalTask">0</h3>
-          <p>Total Task</p>
-        </div>
-
-        <div class="card">
-          <h3 id="doneTask">0</h3>
-          <p>Done</p>
-        </div>
-
-        <div class="card">
-          <h3 id="pendingTask">0</h3>
-          <p>Pending</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ================= SETTINGS ================= -->
-    <div id="page-settings" class="page hidden">
-      <h2>Settings</h2>
-
-      <div class="settings-box">
-        <p>Theme: Dark Mode</p>
-        <p>Status: Active Session</p>
-      </div>
-    </div>
+    </section>
 
   </main>
 
