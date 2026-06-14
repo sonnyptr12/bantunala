@@ -1,26 +1,62 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #0b1220;
-  color: #ffffff;
+  background: #0a0f1c;
+  color: white;
 }
 
-/* HEADER */
-.navbar {
-  background: #111827;
-  padding: 14px 20px;
-  border-bottom: 1px solid #1f2937;
+/* LAYOUT */
+.layout {
+  display: flex;
+  height: 100vh;
 }
 
-.logo {
-  font-weight: bold;
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: #0f172a;
+  padding: 20px;
+  border-right: 1px solid #1f2937;
+}
+
+.sidebar h2 {
+  margin: 0;
   color: #38bdf8;
 }
 
-/* LOGIN BOX */
+.small {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.menu {
+  margin-top: 30px;
+}
+
+.menu-item {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  color: #cbd5e1;
+}
+
+.menu-item.active,
+.menu-item:hover {
+  background: #1e293b;
+  color: white;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 25px;
+}
+
+/* LOGIN */
 .auth {
   max-width: 320px;
-  margin: 80px auto;
+  margin: 100px auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -30,7 +66,6 @@ body {
   padding: 10px;
   border-radius: 8px;
   border: none;
-  outline: none;
   background: #1f2937;
   color: white;
 }
@@ -39,17 +74,9 @@ body {
   padding: 10px;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
   background: #38bdf8;
-  color: black;
   font-weight: bold;
-}
-
-/* APP */
-.app {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
+  cursor: pointer;
 }
 
 /* TOPBAR */
@@ -57,24 +84,19 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
-}
-
-.topbar h1 {
-  font-size: 20px;
-  margin: 0;
+  margin-bottom: 20px;
 }
 
 .logout-btn {
   background: #ef4444;
-  color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
+  color: white;
   cursor: pointer;
 }
 
-/* TASK INPUT */
+/* TASK BOX */
 .task-box {
   display: flex;
   gap: 10px;
@@ -86,7 +108,6 @@ body {
   padding: 12px;
   border-radius: 10px;
   border: none;
-  outline: none;
   background: #1f2937;
   color: white;
 }
@@ -110,10 +131,17 @@ body {
   border-radius: 12px;
   margin-bottom: 10px;
   border: 1px solid #1f2937;
+
+  transition: 0.2s;
+}
+
+.task:hover {
+  transform: translateY(-2px);
+  background: #0f172a;
 }
 
 .task.done {
-  opacity: 0.6;
+  opacity: 0.5;
   text-decoration: line-through;
 }
 
@@ -125,11 +153,10 @@ body {
 
 .badge {
   font-size: 10px;
+  background: #f59e0b;
   padding: 3px 8px;
   border-radius: 6px;
-  background: #f59e0b;
   color: black;
-  font-weight: bold;
 }
 
 /* ACTION BUTTONS */
