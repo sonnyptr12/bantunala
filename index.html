@@ -31,38 +31,39 @@
 <!-- ================= AUTH ================= -->
 <section id="authBox" class="auth">
 
-  <div class="auth-card">
+  <div class="auth-card fade-in">
 
     <header class="auth-header">
       <h1>⚡ MyWork SaaS Core</h1>
       <p>Enterprise Workspace System</p>
     </header>
 
+    <!-- TAB BUTTON -->
     <div class="auth-tabs">
       <button id="loginTab" class="tab active" onclick="showLogin()">Login</button>
       <button id="registerTab" class="tab" onclick="showRegister()">Register</button>
     </div>
 
-    <!-- LOGIN -->
-    <div id="loginForm">
-      <input id="loginEmail" type="email" placeholder="Email" autocomplete="email"/>
-      <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password"/>
-      <button onclick="login()">Login</button>
+    <!-- LOGIN FORM -->
+    <div id="loginForm" class="auth-form">
+      <input id="loginEmail" type="email" placeholder="Email" />
+      <input id="loginPassword" type="password" placeholder="Password" />
+      <button class="btn-primary" onclick="login()">Login</button>
     </div>
 
-    <!-- REGISTER -->
-    <div id="registerForm" style="display:none">
-      <input id="regName" type="text" placeholder="Nama Lengkap"/>
-      <input id="regEmail" type="email" placeholder="Email"/>
-      <input id="regPhone" type="text" placeholder="Nomor HP"/>
-      <input id="regInstitution" type="text" placeholder="Instansi"/>
-      <input id="regPassword" type="password" placeholder="Password"/>
-      <button onclick="registerUser()">Daftar Akun</button>
+    <!-- REGISTER FORM -->
+    <div id="registerForm" class="auth-form hidden">
+      <input id="regName" type="text" placeholder="Nama Lengkap" />
+      <input id="regEmail" type="email" placeholder="Email" />
+      <input id="regWhatsapp" type="text" placeholder="WhatsApp (08xxx)" />
+      <input id="regPassword" type="password" placeholder="Password" />
+      <button class="btn-success" onclick="registerUser()">Daftar Akun</button>
     </div>
 
-    <p id="msg"></p>
+    <p id="msg" class="text-muted"></p>
 
   </div>
+
 </section>
 
 <!-- ================= MAIN APP ================= -->
@@ -96,6 +97,9 @@
     <button class="menu" onclick="openPage('users',this)">👥 Online Users</button>
     <button class="menu" onclick="openPage('files',this)">☁ Cloud Files</button>
 
+    <button class="menu" onclick="openPage('settings', this)">
+  ⚙️ Settings
+</button>
   </nav>
 
   <button class="logout" onclick="logout()">Logout</button>
@@ -1235,6 +1239,53 @@
 
 </main>
 <!-- END MAIN -->
+
+<section id="settings" class="page hidden">
+
+  <h2>⚙️ Account Settings</h2>
+
+  <div class="settings-grid">
+
+    <div class="card settings-card">
+      <h3>Profile</h3>
+
+      <div class="avatar-box">
+        <img id="avatarPreview" src="https://i.pravatar.cc/150" />
+        <input type="file" id="avatarInput" />
+      </div>
+
+      <input id="updateName" type="text" placeholder="Nama" />
+      <input id="updateWhatsapp" type="text" placeholder="WhatsApp" />
+
+      <button class="btn-primary" onclick="updateProfile()">
+        Save Profile
+      </button>
+    </div>
+
+    <div class="card settings-card">
+      <h3>Security</h3>
+
+      <input id="newPassword" type="password" placeholder="Password baru" />
+
+      <button class="btn-danger" onclick="changePassword()">
+        Change Password
+      </button>
+    </div>
+
+    <div class="card settings-card">
+      <h3>Account Info</h3>
+
+      <p id="settingsEmail"></p>
+      <p id="settingsName"></p>
+
+      <button class="btn" onclick="logout()">
+        Logout
+      </button>
+    </div>
+
+  </div>
+
+</section>
 
 </section>
 <!-- END APP -->

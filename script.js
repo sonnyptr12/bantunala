@@ -201,6 +201,9 @@ function openPage(pageId, menuBtn) {
 
   if (menuBtn) menuBtn.classList.add("active");
 
+  if (pageId === "settings") {
+  loadSettings();
+}
 }
 
 // =========================================================
@@ -223,7 +226,13 @@ function updateClock() {
   else if (hour < 17) greet = "Good Afternoon 🌤";
   else greet = "Good Evening 🌙";
 
-  setText("greeting", greet);
+  // 👇 AMBIL NAMA USER DARI SUPABASE METADATA
+  const name =
+    state.user?.user_metadata?.name ||
+    state.user?.email?.split("@")[0] ||
+    "User";
+
+  setText("greeting", `${greet}, ${name}`);
 
   setText(
     "time",
@@ -236,7 +245,6 @@ function updateClock() {
     " • " +
     now.toLocaleTimeString("id-ID")
   );
-
 }
 
 // =========================================================
@@ -1490,4 +1498,175 @@ async function registerUser() {
   }
 
   showToast("Akun berhasil dibuat, cek email / login langsung");
+}
+async function logout() {
+
+  const { error } = await client.auth.signOut();
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  state.user = null;
+  exitApp();
+
+  showToast("Logout berhasil");
+}
+
+function showLogin() {
+  document.getElementById("loginForm").classList.remove("hidden");
+  document.getElementById("registerForm").classList.add("hidden");
+
+  document.getElementById("loginTab").classList.add("active");
+  document.getElementById("registerTab").classList.remove("active");
+}
+
+function showRegister() {
+  document.getElementById("loginForm").classList.add("hidden");
+  document.getElementById("registerForm").classList.remove("hidden");
+
+  document.getElementById("registerTab").classList.add("active");
+  document.getElementById("loginTab").classList.remove("active");
+}
+async function login() {
+
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  if (!email || !password) {
+    showToast("Email & password wajib diisi");
+    return;
+  }
+
+  const { error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast("Login berhasil");
+}
+async function registerUser() {
+
+  const name = document.getElementById("regName").value;
+  const email = document.getElementById("regEmail").value;
+  const whatsapp = document.getElementById("regWhatsapp").value;
+  const password = document.getElementById("regPassword").value;
+
+  if (!name || !email || !whatsapp || !password) {
+    showToast("Semua field wajib diisi");
+    return;
+  }
+
+  const { data, error } = await client.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        name,
+        whatsapp
+      }
+    }
+  });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast("Registrasi berhasil, cek email untuk konfirmasi");
+  showLogin();
+}
+window.addEventListener("load", () => {
+  console.log("✅ MyWork v3 Fully Loaded");
+});
+function loadSettings() {
+
+  if (!state.user) return;
+
+  const name = state.user.user_metadata?.name || "";
+  const whatsapp = state.user.user_metadata?.whatsapp || "";
+  const email = state.user.email || "";
+
+  setText("settingsEmail", "Email: " + email);
+  setText("settingsName", "Nama: " + name);
+
+  document.getElementById("updateName").value = name;
+  document.getElementById("updateWhatsapp").value = whatsapp;
+}
+async function updateProfile() {
+
+  const name = document.getElementById("updateName").value;
+  const whatsapp = document.getElementById("updateWhatsapp").value;
+
+  let avatarUrl = state.user.user_metadata?.avatar || null;
+
+  const file = document.getElementById("avatarInput")?.files?.[0];
+
+  if (file) {
+
+    const path = "avatars/" + state.user.id + "_" + file.name;
+
+    const { error } = await client.storage
+      .from("files")
+      .upload(path, file, { upsert: true });
+
+    if (!error) {
+      const { data } = client.storage.from("files").getPublicUrl(path);
+      avatarUrl = data.publicUrl;
+    }
+  }
+
+  const { error } = await client.auth.updateUser({
+    data: { name, whatsapp, avatar: avatarUrl }
+  });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast("Profile updated");
+
+  const { data } = await client.auth.getUser();
+  state.user = data.user;
+
+  loadSettings();
+  loadProfile();
+  updateClock();
+}
+async function changePassword() {
+
+  const password = document.getElementById("newPassword").value;
+
+  if (!password) {
+    showToast("Password tidak boleh kosong");
+    return;
+  }
+
+  const { error } = await client.auth.updateUser({
+    password
+  });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast("Password updated");
+}
+async function logout() {
+
+  await client.auth.signOut();
+
+  state.user = null;
+
+  exitApp();
+
+  showToast("Logged out");
 }

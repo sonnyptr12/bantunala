@@ -46,6 +46,61 @@
 }
 
 /* ================= GLOBAL RESET ================= */
+.auth-card{
+  width: 340px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(15,23,42,0.8);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-header h1{
+  font-size: 18px;
+  margin: 0;
+}
+
+.auth-header p{
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.auth-tabs{
+  display: flex;
+  gap: 8px;
+}
+
+.tab{
+  flex: 1;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.tab.active{
+  background: var(--grad-blue);
+  color: white;
+}
+
+.auth-form{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form input{
+  width: 100%;
+}
+
+.full{
+  width: 100%;
+}
+
 *{
   box-sizing:border-box;
   font-family: "Inter", system-ui, sans-serif;
@@ -1254,6 +1309,102 @@ body {
 /* ================= MICRO INTERACTION ================= */
 button, .menu, .card {
   transition: all .2s ease;
+}
+
+/* ================= AUTH CARD ================= */
+.auth-card{
+  width:340px;
+  padding:20px;
+  border-radius:16px;
+  background: rgba(15,23,42,0.9);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+/* HEADER */
+.auth-header{
+  text-align:center;
+  margin-bottom:14px;
+}
+
+.auth-header h1{
+  font-size:18px;
+  color: var(--blue);
+}
+
+.auth-header p{
+  font-size:12px;
+  color: var(--muted);
+}
+
+/* TAB */
+.auth-tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.tab{
+  flex:1;
+  padding:8px;
+  border-radius:10px;
+  background: transparent;
+  border:1px solid var(--border);
+  color: var(--muted);
+}
+
+.tab.active{
+  background: rgba(56,189,248,0.15);
+  color: white;
+  border-color: var(--blue);
+}
+
+/* FORM */
+.auth-form{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* HIDDEN */
+.hidden{
+  display:none !important;
+}
+
+/* ================= SETTINGS PAGE ================= */
+
+.settings-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-top:15px;
+}
+
+.settings-card{
+  padding:16px;
+}
+
+.avatar-box{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.avatar-box img{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  border:2px solid var(--blue);
+  object-fit:cover;
+  box-shadow: var(--glow-blue);
+}
+
+@media(max-width:900px){
+  .settings-grid{
+    grid-template-columns:1fr;
+  }
 }
 
 /* ================= END SYSTEM ================= */
