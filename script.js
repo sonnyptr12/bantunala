@@ -1438,3 +1438,56 @@ window.addEventListener("load", () => {
   console.log("✅ MyWork v3 Fully Loaded");
 
 });
+async function login() {
+
+  const email = document.getElementById("loginEmail")?.value?.trim();
+  const password = document.getElementById("loginPassword")?.value?.trim();
+
+  if (!email || !password) {
+    showToast("Email dan password wajib diisi");
+    return;
+  }
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    console.error(error);
+    showToast(error.message);
+    return;
+  }
+
+  state.user = data.user;
+  enterApp();
+
+  showToast("Login berhasil");
+}
+async function registerUser() {
+
+  const name = document.getElementById("regName")?.value;
+  const email = document.getElementById("regEmail")?.value;
+  const phone = document.getElementById("regPhone")?.value;
+  const institution = document.getElementById("regInstitution")?.value;
+  const password = document.getElementById("regPassword")?.value;
+
+  const { data, error } = await client.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        name,
+        phone,
+        institution
+      }
+    }
+  });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast("Akun berhasil dibuat, cek email / login langsung");
+}
