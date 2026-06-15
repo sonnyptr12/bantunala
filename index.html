@@ -5,19 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MyWork SaaS Core</title>
 
-<!-- SUPABASE -->
+<!-- ================= LIBRARIES ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- CHART -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- DRAG DROP (KANBAN) -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
-<!-- EXCEL -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
-<!-- PDF -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <link rel="stylesheet" href="style.css"/>
@@ -25,632 +17,554 @@
 
 <body>
 
-<!-- ================= GLOBAL APP WRAPPER ================= -->
+<!-- =========================================================
+  ROOT APP CONTAINER
+========================================================= -->
 <div id="appRoot">
 
-<!-- ================= AUTH ================= -->
-<section id="authBox" class="auth">
+<!-- =========================================================
+  AUTH SCREEN (LOGIN / REGISTER)
+========================================================= -->
+<section id="authScreen" class="auth">
 
   <div class="auth-card fade-in">
 
-    <header class="auth-header">
+    <!-- HEADER -->
+    <div class="auth-header">
       <h1>⚡ MyWork SaaS Core</h1>
       <p>Enterprise Workspace System</p>
-    </header>
+    </div>
 
-    <!-- TAB BUTTON -->
+    <!-- TAB SWITCH -->
     <div class="auth-tabs">
-      <button id="loginTab" class="tab active" onclick="showLogin()">Login</button>
-      <button id="registerTab" class="tab" onclick="showRegister()">Register</button>
+      <button id="tabLogin" class="tab active" onclick="showLogin()">Login</button>
+      <button id="tabRegister" class="tab" onclick="showRegister()">Register</button>
     </div>
 
     <!-- LOGIN FORM -->
     <div id="loginForm" class="auth-form">
       <input id="loginEmail" type="email" placeholder="Email" />
       <input id="loginPassword" type="password" placeholder="Password" />
-      <button class="btn-primary" onclick="login()">Login</button>
+
+      <button class="btn btn-primary" onclick="login()">
+        Login
+      </button>
     </div>
 
     <!-- REGISTER FORM -->
     <div id="registerForm" class="auth-form hidden">
       <input id="regName" type="text" placeholder="Nama Lengkap" />
       <input id="regEmail" type="email" placeholder="Email" />
-      <input id="regWhatsapp" type="text" placeholder="WhatsApp (08xxx)" />
+      <input id="regWhatsapp" type="text" placeholder="WhatsApp" />
       <input id="regPassword" type="password" placeholder="Password" />
-      <button class="btn-success" onclick="registerUser()">Daftar Akun</button>
+
+      <button class="btn btn-success" onclick="registerUser()">
+        Daftar Akun
+      </button>
     </div>
 
-    <p id="msg" class="text-muted"></p>
+    <p id="authMsg" class="text-muted"></p>
 
   </div>
 
 </section>
 
-<!-- ================= MAIN APP ================= -->
+<!-- =========================================================
+  MAIN APPLICATION (HIDDEN UNTIL LOGIN)
+========================================================= -->
 <section id="app" class="app" style="display:none;">
 
 <!-- ================= SIDEBAR ================= -->
 <aside class="sidebar">
 
+  <!-- BRAND -->
   <div class="brand">
-    ⚡ SaaS Core
+    ⚡ MyWork
   </div>
 
+  <!-- MENU GROUP -->
   <nav class="menu-group">
 
-    <button class="menu active" onclick="openPage('dashboard',this)">📊 Dashboard</button>
-    <button class="menu" onclick="openPage('kanban',this)">📌 Kanban Tasks</button>
-    <button class="menu" onclick="openPage('broadcast',this)">📡 Broadcast Live</button>
+    <button class="menu active" onclick="openPage('dashboard',this)">
+      📊 Dashboard
+    </button>
+
+    <button class="menu" onclick="openPage('kanban',this)">
+      📌 Kanban Tasks
+    </button>
+
+    <button class="menu" onclick="openPage('broadcast',this)">
+      📡 Broadcast
+    </button>
 
     <hr/>
 
-    <button class="menu" onclick="openPage('certificate',this)">🎓 Certificate AI</button>
-    <button class="menu" onclick="openPage('certificateStudio',this)">🧾 Certificate Studio</button>
+    <button class="menu" onclick="openPage('certificate',this)">
+      🎓 Certificate AI
+    </button>
+
+    <button class="menu" onclick="openPage('certificateStudio',this)">
+      🧾 Certificate Studio
+    </button>
 
     <hr/>
 
-    <button class="menu" onclick="openPage('pdf',this)">📄 PDF Tools</button>
-    <button class="menu" onclick="openPage('excel',this)">📊 Excel Import</button>
+    <button class="menu" onclick="openPage('pdf',this)">
+      📄 PDF Tools
+    </button>
+
+    <button class="menu" onclick="openPage('excel',this)">
+      📊 Excel Import
+    </button>
 
     <hr/>
 
-    <button class="menu" onclick="openPage('users',this)">👥 Online Users</button>
-    <button class="menu" onclick="openPage('files',this)">☁ Cloud Files</button>
+    <button class="menu" onclick="openPage('users',this)">
+      👥 Online Users
+    </button>
 
-    <button class="menu" onclick="openPage('settings', this)">
-  ⚙️ Settings
-</button>
+    <button class="menu" onclick="openPage('files',this)">
+      ☁ Cloud Files
+    </button>
+
+    <button class="menu" onclick="openPage('settings',this)">
+      ⚙️ Settings
+    </button>
+
   </nav>
 
-  <button class="logout" onclick="logout()">Logout</button>
+  <!-- LOGOUT -->
+  <button class="logout" onclick="logout()">
+    Logout
+  </button>
 
 </aside>
 
-<!-- ================= MAIN ================= -->
+<!-- ================= MAIN CONTENT ================= -->
 <main class="main">
 
 <!-- ================= TOPBAR ================= -->
 <header class="topbar">
 
-  <div class="topbar-left">
+  <div>
     <h2 id="greeting">Welcome</h2>
     <p id="time">--:--</p>
   </div>
 
-  <!-- placeholder future: notif / profile -->
   <div class="topbar-right">
-    <div id="notifBell">🔔</div>
+    <span id="notifBell">🔔</span>
   </div>
 
 </header>
 
-<!-- ================= DASHBOARD ================= -->
-<section id="dashboard" class="page active">
+<!-- ================= PAGE CONTAINER (ROUTER SYSTEM) ================= -->
+<div id="pageContainer">
 
-  <div class="grid">
+  <!-- DASHBOARD START -->
+  <section id="dashboard" class="page active">
 
-    <div class="card">
-      📌 Tasks
-      <h2 id="taskCount">0</h2>
-    </div>
+<!-- ================= DASHBOARD HEADER ================= -->
+<div class="page-header">
 
-    <div class="card">
-      🔥 Active
-      <h2 id="activeCount">0</h2>
-    </div>
+  <h2>📊 Dashboard Overview</h2>
+  <p>Ringkasan aktivitas, task, dan performa sistem</p>
 
-    <div class="card">
-      ✅ Done
-      <h2 id="doneCount">0</h2>
-    </div>
+</div>
 
-    <div class="card">
-      👥 Online
-      <h2 id="onlineCount">0</h2>
+<!-- ================= KPI GRID ================= -->
+<div class="grid">
+
+  <div class="card">
+    <div class="kpi-label">📌 Total Tasks</div>
+    <div id="taskCount" class="kpi-value">0</div>
+  </div>
+
+  <div class="card">
+    <div class="kpi-label">🔥 Active Tasks</div>
+    <div id="activeCount" class="kpi-value">0</div>
+  </div>
+
+  <div class="card">
+    <div class="kpi-label">✅ Completed</div>
+    <div id="doneCount" class="kpi-value">0</div>
+  </div>
+
+  <div class="card">
+    <div class="kpi-label">👥 Online Users</div>
+    <div id="onlineCount" class="kpi-value">0</div>
+  </div>
+
+</div>
+
+<!-- ================= SECONDARY DASHBOARD ROW ================= -->
+<div class="grid">
+
+  <div class="card hover-lift">
+
+    <h3>⚡ System Status</h3>
+
+    <div class="status-row">
+      <p>Database: <span class="badge badge-green">Online</span></p>
+      <p>Auth: <span class="badge badge-blue">Active</span></p>
+      <p>Storage: <span class="badge badge-green">Stable</span></p>
     </div>
 
   </div>
 
-  <div class="chart-grid">
+  <div class="card hover-lift">
 
-    <div class="chart-card">
-      <h3>Task Distribution</h3>
-      <canvas id="chartDonut"></canvas>
-    </div>
+    <h3>📡 Live Activity</h3>
 
-    <div class="chart-card">
-      <h3>Activity Flow</h3>
-      <canvas id="chartBar"></canvas>
+    <div id="activityFeed">
+
+      <div class="activity-item">
+        System initialized
+      </div>
+
     </div>
 
   </div>
+
+</div>
+
+<!-- ================= CHART SECTION ================= -->
+<div class="chart-grid">
+
+  <!-- TASK DISTRIBUTION -->
+  <div class="chart-card">
+
+    <h3>Task Distribution</h3>
+    <canvas id="chartDonut"></canvas>
+
+  </div>
+
+  <!-- ACTIVITY FLOW -->
+  <div class="chart-card">
+
+    <h3>Activity Flow</h3>
+    <canvas id="chartBar"></canvas>
+
+  </div>
+
+</div>
+
+<!-- ================= QUICK ACTIONS ================= -->
+<div class="grid">
+
+  <div class="card hover-lift">
+    <h3>⚡ Quick Actions</h3>
+
+    <button class="btn btn-primary" onclick="openPage('kanban')">
+      📌 Open Tasks
+    </button>
+
+    <button class="btn btn-success" onclick="openPage('broadcast')">
+      📡 Broadcast
+    </button>
+
+    <button class="btn" onclick="openPage('files')">
+      ☁ Files
+    </button>
+
+  </div>
+
+  <div class="card hover-lift">
+
+    <h3>📈 System Health</h3>
+
+    <div class="health-bar">
+      <p>CPU Usage</p>
+      <div class="progress-bar"></div>
+
+      <p>Memory</p>
+      <div class="progress-bar"></div>
+
+      <p>Storage</p>
+      <div class="progress-bar"></div>
+    </div>
+
+  </div>
+
+</div>
 
 </section>
-
-<!-- ================= KANBAN ================= -->
+<!-- ================= END DASHBOARD ================= -->
+ <!-- =========================================================
+KANBAN PAGE
+========================================================= -->
 <section id="kanban" class="page hidden">
 
-  <div class="page-header">
-    <h2>📌 Kanban Board</h2>
-    <p>Kelola tugas dan progress pekerjaan tim.</p>
-  </div>
+<!-- ================= PAGE HEADER ================= -->
+<div class="page-header">
 
-  <div class="task-add">
+  <h2>📌 Kanban Board</h2>
+  <p>Manajemen task realtime untuk workflow tim</p>
+
+</div>
+
+<!-- ================= TASK INPUT ================= -->
+<div class="card">
+
+  <div class="kanban-input">
 
     <input
       id="taskInput"
       type="text"
-      placeholder="Masukkan task..."
-    >
+      placeholder="Tulis task baru..."
+    />
 
-    <button onclick="addTask()">
-      + Tambah Task
+    <button class="btn btn-primary" onclick="addTask()">
+      + Add Task
     </button>
 
   </div>
 
-  <!-- FILTER FUTURE -->
-  <div class="toolbar">
+</div>
+
+<!-- ================= TOOLBAR (SEARCH + FILTER) ================= -->
+<div class="grid">
+
+  <div class="card">
 
     <input
-      type="text"
       id="taskSearch"
+      type="text"
       placeholder="Cari task..."
-    >
+      oninput="filterTasks()"
+    />
 
-    <select id="taskFilter">
-      <option value="all">Semua</option>
+  </div>
+
+  <div class="card">
+
+    <select id="taskFilter" onchange="filterTasks()">
+
+      <option value="all">Semua Task</option>
       <option value="todo">To Do</option>
       <option value="doing">Doing</option>
       <option value="done">Done</option>
+
     </select>
 
   </div>
 
-  <div class="kanban">
+</div>
 
-    <!-- TODO -->
-    <div class="kanban-column">
+<!-- ================= KANBAN BOARD ================= -->
+<div class="kanban">
 
-      <div class="kanban-header">
-        <h3>📋 To Do</h3>
-        <span id="todoCount">0</span>
-      </div>
+  <!-- ================= TO DO ================= -->
+  <div class="kanban-column">
 
-      <div
-        id="todoList"
-        class="kanban-list"
-      ></div>
-
+    <div class="kanban-header">
+      <h3>📋 To Do</h3>
+      <span id="todoCount" class="badge badge-blue">0</span>
     </div>
 
-    <!-- DOING -->
-    <div class="kanban-column">
-
-      <div class="kanban-header">
-        <h3>⚡ Doing</h3>
-        <span id="doingCount">0</span>
-      </div>
-
-      <div
-        id="doingList"
-        class="kanban-list"
-      ></div>
-
-    </div>
-
-    <!-- DONE -->
-    <div class="kanban-column">
-
-      <div class="kanban-header">
-        <h3>✅ Done</h3>
-        <span id="doneTaskCount">0</span>
-      </div>
-
-      <div
-        id="doneList"
-        class="kanban-list"
-      ></div>
-
-    </div>
+    <div id="todoList" class="kanban-list"></div>
 
   </div>
+
+  <!-- ================= DOING ================= -->
+  <div class="kanban-column">
+
+    <div class="kanban-header">
+      <h3>⚡ Doing</h3>
+      <span id="doingCount" class="badge badge-blue">0</span>
+    </div>
+
+    <div id="doingList" class="kanban-list"></div>
+
+  </div>
+
+  <!-- ================= DONE ================= -->
+  <div class="kanban-column">
+
+    <div class="kanban-header">
+      <h3>✅ Done</h3>
+      <span id="doneCount" class="badge badge-green">0</span>
+    </div>
+
+    <div id="doneList" class="kanban-list"></div>
+
+  </div>
+
+</div>
+
+<!-- ================= KANBAN FOOTER INFO ================= -->
+<div class="card">
+
+  <h3>📊 Workflow Info</h3>
+
+  <p class="text-muted">
+    Drag & drop task antar kolom untuk update status otomatis.
+  </p>
+
+</div>
 
 </section>
-
-<!-- ================= BROADCAST ================= -->
+<!-- =========================================================
+BROADCAST PAGE
+========================================================= -->
 <section id="broadcast" class="page hidden">
 
-  <div class="page-header">
-    <h2>📡 Live Broadcast</h2>
-    <p>Kirim pesan real-time ke seluruh pengguna online.</p>
-  </div>
+<!-- ================= HEADER ================= -->
+<div class="page-header">
 
-  <div class="broadcast-box">
+  <h2>📡 Live Broadcast</h2>
+  <p>Kirim pesan ke seluruh user secara realtime</p>
+
+</div>
+
+<!-- ================= INPUT AREA ================= -->
+<div class="card">
+
+  <div class="broadcast-input">
 
     <input
       id="broadcastInput"
+      type="text"
       placeholder="Tulis pesan broadcast..."
-    >
+    />
 
-    <button onclick="sendBroadcast()">
-      Send Live
+    <button class="btn btn-primary" onclick="sendBroadcast()">
+      Send
     </button>
 
   </div>
 
-  <div class="card">
+</div>
 
-    <h3>Broadcast History</h3>
+<!-- ================= LIVE STATUS ================= -->
+<div class="card">
 
-    <div id="broadcastList"></div>
+  <div class="broadcast-status">
 
-  </div>
-
-</section>
-
-<!-- ================= CERTIFICATE AI ================= -->
-<section id="certificate" class="page hidden">
-
-  <div class="page-header">
-    <h2>🎓 AI Certificate Generator</h2>
-    <p>Generate sertifikat otomatis dalam format PDF.</p>
-  </div>
-
-  <div class="form-grid">
-
-    <input
-      id="certName"
-      placeholder="Nama Peserta"
-    >
-
-    <input
-      id="certEvent"
-      placeholder="Nama Event"
-    >
-
-    <input
-      id="certOrganizer"
-      placeholder="Penyelenggara"
-    >
-
-    <input
-      id="certDate"
-      type="date"
-    >
+    <span class="badge badge-green">● Online Broadcast Active</span>
+    <span class="text-muted">Realtime mode ready</span>
 
   </div>
 
-  <div class="action-group">
+</div>
 
-    <button onclick="generateCertificate()">
-      Generate PDF
-    </button>
+<!-- ================= BROADCAST FEED ================= -->
+<div class="card">
 
-  </div>
+  <h3>📢 Broadcast History</h3>
 
-  <!-- PREVIEW -->
-  <div class="card">
+  <div id="broadcastList" class="broadcast-list">
 
-    <h3>Preview</h3>
-
-    <div id="certificatePreview">
-
-      <h2>SERTIFIKAT</h2>
-
-      <p>
-        Preview sertifikat akan muncul di sini.
-      </p>
-
-    </div>
-
-  </div>
-
-</section>
-
-<!-- ================= CERTIFICATE STUDIO ================= -->
-<section
-  id="certificateStudio"
-  class="page hidden"
->
-
-  <div class="page-header">
-
-    <h2>🧾 Certificate Studio Pro</h2>
-
-    <p>
-      Canva Style Certificate Designer
-    </p>
-
-  </div>
-
-  <div class="grid">
-
-    <!-- LEFT PANEL -->
-    <div class="card">
-
-      <h3>Template Tools</h3>
-
-      <input
-        type="file"
-        id="certBgUpload"
-      />
-
-      <hr>
-
-      <button onclick="addTextField('nama')">
-        + Nama
-      </button>
-
-      <button onclick="addTextField('kelas')">
-        + Kelas
-      </button>
-
-      <button onclick="addTextField('event')">
-        + Event
-      </button>
-
-      <button onclick="addTextField('tanggal')">
-        + Tanggal
-      </button>
-
-      <button onclick="addTextField('nomor')">
-        + Nomor Sertifikat
-      </button>
-
-      <button onclick="addTextField('instansi')">
-        + Instansi
-      </button>
-
-      <hr>
-
-      <button onclick="saveCertTemplate()">
-        💾 Save Template
-      </button>
-
-      <button onclick="exportSingleCertificate()">
-        📄 Export PDF
-      </button>
-
-      <button onclick="generateBatchCertificates()">
-        📦 Batch Generate
-      </button>
-
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="card">
-
-      <h3>Mail Merge Fields</h3>
-
-      <p style="font-size:12px;color:#9ca3af;">
-
-        {{nama}}<br>
-        {{kelas}}<br>
-        {{event}}<br>
-        {{tanggal}}<br>
-        {{nomor}}<br>
-        {{instansi}}
-
-      </p>
-
-      <hr>
-
-      <input
-        id="editText"
-        placeholder="Edit text"
-      >
-
-      <input
-        id="editSize"
-        type="number"
-        placeholder="Font size"
-      >
-
-      <button onclick="updateSelectedText()">
-        Update
-      </button>
-
-    </div>
-
-  </div>
-
-  <!-- DESIGN AREA -->
-  <div
-    id="certCanvas"
-    style="
-      margin-top:15px;
-      width:900px;
-      height:550px;
-      background:white;
-      position:relative;
-      border-radius:12px;
-      overflow:hidden;
-    "
-  ></div>
-
-</section>
-
-<!-- ================= PDF TOOLS ================= -->
-<section id="pdf" class="page hidden">
-
-  <div class="page-header">
-    <h2>📄 PDF Tools</h2>
-    <p>Kelola dan ekspor dokumen PDF.</p>
-  </div>
-
-  <div class="grid">
-
-    <div class="card">
-
-      <h3>PDF Actions</h3>
-
-      <button onclick="mergePDF()">
-        Merge PDF
-      </button>
-
-      <button onclick="splitPDF()">
-        Split PDF
-      </button>
-
-      <button onclick="exportPDF()">
-        Export Task PDF
-      </button>
-
-    </div>
-
-    <div class="card">
-
-      <h3>PDF Queue</h3>
-
-      <div id="pdfQueue">
-
-        <p>Belum ada file diproses.</p>
-
+    <!-- MESSAGE ITEM TEMPLATE -->
+    <div class="broadcast-item">
+      <div class="broadcast-meta">
+        <span class="badge badge-blue">System</span>
+        <span class="text-muted">just now</span>
       </div>
 
-    </div>
-
-  </div>
-
-</section>
-
-<!-- ================= EXCEL ================= -->
-<section id="excel" class="page hidden">
-
-  <div class="page-header">
-
-    <h2>📊 Excel Import & Mail Merge</h2>
-
-    <p>
-      Import data peserta, siswa, karyawan,
-      atau data lainnya dari Excel.
-    </p>
-
-  </div>
-
-  <div class="grid">
-
-    <div class="card">
-
-      <h3>Upload Excel</h3>
-
-      <input
-        type="file"
-        id="excelFile"
-        accept=".xlsx,.xls,.csv"
-      />
-
-      <button onclick="uploadExcel()">
-        Upload
-      </button>
-
-    </div>
-
-    <div class="card">
-
-      <h3>Data Preview</h3>
-
-      <div id="excelPreview">
-
-        <p>
-          Data Excel akan tampil di sini.
-        </p>
-
+      <div class="broadcast-message">
+        Welcome to MyWork SaaS Core 🚀
       </div>
-
     </div>
 
   </div>
 
-</section>
+</div>
 
-<!-- ================= USERS ================= -->
-<section id="users" class="page hidden">
+<!-- ================= QUICK INFO ================= -->
+<div class="card">
 
-  <div class="page-header">
+  <h3>ℹ Info</h3>
 
-    <h2>👥 Online Users</h2>
+  <p class="text-muted">
+    Broadcast digunakan untuk mengirim informasi penting ke semua user yang sedang online.
+  </p>
 
-    <p>
-      Monitoring pengguna yang sedang aktif.
-    </p>
-
-  </div>
-
-  <div class="card">
-
-    <div id="userList"></div>
-
-  </div>
+</div>
 
 </section>
-
 <!-- ================= FILE STORAGE ================= -->
 <section id="files" class="page hidden">
 
   <div class="page-header">
-
     <h2>☁ Cloud Storage</h2>
-
-    <p>
-      Simpan dan kelola file proyek.
-    </p>
-
+    <p>Simpan, upload, dan kelola file proyek.</p>
   </div>
 
-  <div class="card">
+  <div class="grid">
 
-    <input
-      type="file"
-      id="fileUpload"
-    />
+    <!-- UPLOAD -->
+    <div class="card">
+      <h3>Upload File</h3>
 
-    <button onclick="uploadFile()">
-      Upload
-    </button>
+      <input type="file" id="fileUpload" />
+
+      <button class="btn btn-primary" onclick="uploadFile()">
+        Upload File
+      </button>
+
+      <div class="divider"></div>
+
+      <p class="text-muted">
+        Support: PDF, Image, Excel, Document
+      </p>
+    </div>
+
+    <!-- FILE LIST -->
+    <div class="card">
+      <h3>File List</h3>
+
+      <div id="fileList" class="scroll">
+        <p class="text-muted">Belum ada file.</p>
+      </div>
+    </div>
 
   </div>
-
-  <div class="card">
-
-    <h3>File List</h3>
-
-    <div id="fileList"></div>
-
-  </div>
-
 </section>
 
 <!-- ================= REPORTS ================= -->
 <section id="reports" class="page hidden">
 
   <div class="page-header">
-
-    <h2>📈 Reports</h2>
-
-    <p>
-      Laporan aktivitas dan produktivitas.
-    </p>
-
+    <h2>📈 Reports & Analytics</h2>
+    <p>Statistik sistem, task, dan aktivitas pengguna.</p>
   </div>
 
+  <!-- KPI ROW -->
   <div class="grid">
 
     <div class="card">
-
-      <h3>Task Summary</h3>
-
-      <canvas id="reportTaskChart"></canvas>
-
+      <span class="badge badge-blue">Total Tasks</span>
+      <div class="kpi-number" id="reportTotalTasks">0</div>
     </div>
 
     <div class="card">
+      <span class="badge badge-green">Completed</span>
+      <div class="kpi-number" id="reportCompleted">0</div>
+    </div>
 
+    <div class="card">
+      <span class="badge badge-red">Pending</span>
+      <div class="kpi-number" id="reportPending">0</div>
+    </div>
+
+    <div class="card">
+      <span class="badge badge-blue">Active Users</span>
+      <div class="kpi-number" id="reportUsers">0</div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS -->
+  <div class="chart-grid">
+
+    <div class="chart-card">
+      <h3>Task Distribution</h3>
+      <canvas id="reportTaskChart"></canvas>
+    </div>
+
+    <div class="chart-card">
       <h3>Monthly Activity</h3>
-
       <canvas id="reportMonthlyChart"></canvas>
-
     </div>
 
   </div>
@@ -661,23 +575,14 @@
 <section id="activityLog" class="page hidden">
 
   <div class="page-header">
-
     <h2>📝 Activity Log</h2>
-
-    <p>
-      Riwayat aktivitas sistem.
-    </p>
-
+    <p>Semua aktivitas pengguna dan sistem tercatat di sini.</p>
   </div>
 
   <div class="card">
 
-    <div id="activityList">
-
-      <p>
-        Belum ada aktivitas.
-      </p>
-
+    <div id="activityList" class="scroll">
+      <p class="text-muted">Belum ada aktivitas.</p>
     </div>
 
   </div>
@@ -688,23 +593,14 @@
 <section id="notifications" class="page hidden">
 
   <div class="page-header">
-
     <h2>🔔 Notification Center</h2>
-
-    <p>
-      Semua notifikasi sistem tersimpan di sini.
-    </p>
-
+    <p>Semua notifikasi real-time sistem.</p>
   </div>
 
   <div class="card">
 
-    <div id="notificationList">
-
-      <p>
-        Tidak ada notifikasi.
-      </p>
-
+    <div id="notificationList" class="scroll">
+      <p class="text-muted">Tidak ada notifikasi.</p>
     </div>
 
   </div>
@@ -715,41 +611,36 @@
 <section id="profile" class="page hidden">
 
   <div class="page-header">
-
     <h2>👤 My Profile</h2>
-
-    <p>
-      Informasi akun pengguna.
-    </p>
-
+    <p>Informasi akun dan pengaturan user.</p>
   </div>
 
   <div class="grid">
 
+    <!-- PROFILE INFO -->
     <div class="card">
 
-      <h3>Account Information</h3>
+      <h3>Account Info</h3>
 
       <div id="profileInfo">
-
         <p>Nama : -</p>
         <p>Email : -</p>
-        <p>Instansi : -</p>
-
+        <p>WhatsApp : -</p>
       </div>
 
     </div>
 
+    <!-- PROFILE ACTION -->
     <div class="card">
 
-      <h3>Account Settings</h3>
+      <h3>Actions</h3>
 
-      <button>
-        Ubah Password
+      <button class="btn btn-primary" onclick="openEditProfile()">
+        Edit Profile
       </button>
 
-      <button>
-        Edit Profil
+      <button class="btn btn-danger" onclick="logout()">
+        Logout
       </button>
 
     </div>
@@ -757,7 +648,6 @@
   </div>
 
 </section>
-
 <!-- ================= CALENDAR ================= -->
 <section id="calendar" class="page hidden">
 
@@ -768,31 +658,37 @@
 
   <div class="grid">
 
+    <!-- ADD EVENT -->
     <div class="card">
+
       <h3>Tambah Agenda</h3>
 
       <input
         id="eventTitle"
         type="text"
         placeholder="Nama Agenda"
-      >
+      />
 
       <input
         id="eventDate"
         type="date"
-      >
+      />
 
-      <button onclick="saveEvent()">
+      <button class="btn btn-primary" onclick="saveEvent()">
         Simpan Agenda
       </button>
+
     </div>
 
+    <!-- EVENT LIST -->
     <div class="card">
+
       <h3>Agenda Mendatang</h3>
 
-      <div id="eventList">
-        <p>Belum ada agenda.</p>
+      <div id="eventList" class="scroll">
+        <p class="text-muted">Belum ada agenda.</p>
       </div>
+
     </div>
 
   </div>
@@ -804,37 +700,41 @@
 
   <div class="page-header">
     <h2>👨‍💼 Team Management</h2>
-    <p>Kelola anggota dan struktur tim.</p>
+    <p>Kelola anggota tim dan struktur organisasi.</p>
   </div>
 
   <div class="grid">
 
+    <!-- ADD MEMBER -->
     <div class="card">
 
       <h3>Tambah Anggota</h3>
 
       <input
         id="teamName"
-        placeholder="Nama"
-      >
+        type="text"
+        placeholder="Nama Anggota"
+      />
 
       <input
         id="teamRole"
-        placeholder="Jabatan"
-      >
+        type="text"
+        placeholder="Jabatan / Role"
+      />
 
-      <button onclick="addTeamMember()">
-        Tambah
+      <button class="btn btn-success" onclick="addTeamMember()">
+        Tambah Anggota
       </button>
 
     </div>
 
+    <!-- TEAM LIST -->
     <div class="card">
 
       <h3>Daftar Tim</h3>
 
-      <div id="teamList">
-        <p>Belum ada anggota.</p>
+      <div id="teamList" class="scroll">
+        <p class="text-muted">Belum ada anggota.</p>
       </div>
 
     </div>
@@ -848,40 +748,47 @@
 
   <div class="page-header">
     <h2>📞 CRM & Contact Manager</h2>
-    <p>Kelola pelanggan, peserta, dan relasi.</p>
+    <p>Kelola pelanggan, peserta, dan database kontak.</p>
   </div>
 
   <div class="grid">
 
+    <!-- ADD CONTACT -->
     <div class="card">
+
+      <h3>Tambah Kontak</h3>
 
       <input
         id="contactName"
+        type="text"
         placeholder="Nama Kontak"
-      >
+      />
 
       <input
         id="contactPhone"
+        type="text"
         placeholder="Nomor HP"
-      >
+      />
 
       <input
         id="contactEmail"
+        type="email"
         placeholder="Email"
-      >
+      />
 
-      <button onclick="addContact()">
+      <button class="btn btn-primary" onclick="addContact()">
         Simpan Kontak
       </button>
 
     </div>
 
+    <!-- CONTACT LIST -->
     <div class="card">
 
       <h3>Daftar Kontak</h3>
 
-      <div id="contactList">
-        <p>Belum ada data.</p>
+      <div id="contactList" class="scroll">
+        <p class="text-muted">Belum ada data kontak.</p>
       </div>
 
     </div>
@@ -895,31 +802,37 @@
 
   <div class="page-header">
     <h2>📝 Notes Workspace</h2>
-    <p>Catatan pribadi dan tim.</p>
+    <p>Catatan pribadi dan kolaborasi tim.</p>
   </div>
 
-  <div class="card">
+  <div class="grid">
 
-    <textarea
-      id="noteEditor"
-      rows="12"
-      placeholder="Tulis catatan di sini..."
-    ></textarea>
+    <!-- EDITOR -->
+    <div class="card">
 
-    <br><br>
+      <h3>Editor Catatan</h3>
 
-    <button onclick="saveNote()">
-      Simpan Catatan
-    </button>
+      <textarea
+        id="noteEditor"
+        rows="10"
+        placeholder="Tulis catatan di sini..."
+      ></textarea>
 
-  </div>
+      <button class="btn btn-success" onclick="saveNote()">
+        Simpan Catatan
+      </button>
 
-  <div class="card">
+    </div>
 
-    <h3>Daftar Catatan</h3>
+    <!-- NOTES LIST -->
+    <div class="card">
 
-    <div id="notesList">
-      <p>Belum ada catatan.</p>
+      <h3>Daftar Catatan</h3>
+
+      <div id="notesList" class="scroll">
+        <p class="text-muted">Belum ada catatan.</p>
+      </div>
+
     </div>
 
   </div>
@@ -931,118 +844,101 @@
 
   <div class="page-header">
     <h2>🤖 AI Assistant</h2>
-    <p>Asisten kerja untuk membantu produktivitas.</p>
+    <p>Asisten pintar untuk membantu produktivitas kerja.</p>
   </div>
 
+  <!-- INPUT -->
   <div class="card">
 
     <input
       id="aiPrompt"
-      placeholder="Tulis pertanyaan..."
-    >
+      type="text"
+      placeholder="Tulis pertanyaan ke AI..."
+    />
 
-    <button onclick="askAI()">
+    <button class="btn btn-primary" onclick="askAI()">
       Kirim
     </button>
 
   </div>
 
+  <!-- RESPONSE -->
   <div class="card">
 
     <h3>AI Response</h3>
 
-    <div id="aiResponse">
-      <p>Belum ada percakapan.</p>
+    <div id="aiResponse" class="scroll">
+      <p class="text-muted">Belum ada percakapan.</p>
     </div>
 
   </div>
 
 </section>
-
 <!-- ================= SETTINGS ================= -->
 <section id="settings" class="page hidden">
 
   <div class="page-header">
     <h2>⚙️ System Settings</h2>
-    <p>Konfigurasi aplikasi dan workspace.</p>
+    <p>Konfigurasi workspace, preferensi, dan akun.</p>
   </div>
 
-  <div class="grid">
+  <div class="settings-grid">
 
-    <div class="card">
+    <!-- WORKSPACE -->
+    <div class="card settings-card">
 
       <h3>Workspace</h3>
 
       <input
         id="workspaceName"
+        type="text"
         placeholder="Nama Workspace"
-      >
+      />
 
-      <button onclick="saveWorkspaceSettings()">
-        Simpan
+      <button class="btn btn-primary" onclick="saveWorkspaceSettings()">
+        Simpan Workspace
       </button>
 
     </div>
 
-    <div class="card">
+    <!-- PREFERENCES -->
+    <div class="card settings-card">
 
       <h3>Preferences</h3>
 
-      <label>
-        <input type="checkbox" id="darkMode">
+      <label class="text-muted">
+        <input type="checkbox" id="darkMode" />
         Dark Mode
       </label>
 
-      <br><br>
+      <br /><br />
 
-      <label>
-        <input type="checkbox" id="emailNotif">
+      <label class="text-muted">
+        <input type="checkbox" id="emailNotif" />
         Email Notification
+      </label>
+
+      <br /><br />
+
+      <label class="text-muted">
+        <input type="checkbox" id="autoSave" />
+        Auto Save
       </label>
 
     </div>
 
-  </div>
+    <!-- ACCOUNT INFO -->
+    <div class="card settings-card">
 
-</section>
+      <h3>Account Info</h3>
 
-<!-- ================= HELP CENTER ================= -->
-<section id="help" class="page hidden">
+      <p id="settingsEmail">Email: -</p>
+      <p id="settingsName">Nama: -</p>
 
-  <div class="page-header">
-    <h2>📚 Help Center</h2>
-    <p>Panduan penggunaan aplikasi.</p>
-  </div>
+      <button class="btn btn-danger" onclick="logout()">
+        Logout
+      </button>
 
-  <div class="card">
-
-    <h3>Dokumentasi</h3>
-
-    <ul>
-      <li>Dashboard Management</li>
-      <li>Kanban Board</li>
-      <li>Certificate Studio</li>
-      <li>Cloud Storage</li>
-      <li>Broadcast System</li>
-      <li>Excel Mail Merge</li>
-    </ul>
-
-  </div>
-
-</section>
-
-<!-- ================= AUDIT LOG ================= -->
-<section id="audit" class="page hidden">
-
-  <div class="page-header">
-    <h2>🔍 Audit Trail</h2>
-    <p>Monitoring seluruh aktivitas sistem.</p>
-  </div>
-
-  <div class="card">
-
-    <div id="auditList">
-      <p>Belum ada data audit.</p>
     </div>
 
   </div>
@@ -1052,18 +948,19 @@
 <!-- ================= GLOBAL SEARCH ================= -->
 <div id="globalSearchModal" class="modal hidden">
 
-  <div class="modal-content">
+  <div class="modal-box">
 
     <h3>🔍 Global Search</h3>
 
     <input
       id="globalSearchInput"
       type="text"
-      placeholder="Cari menu, task, user, file..."
-    >
+      placeholder="Cari task, user, file, menu..."
+      oninput="runGlobalSearch()"
+    />
 
-    <div id="globalSearchResults">
-      <p>Hasil pencarian akan muncul di sini.</p>
+    <div id="globalSearchResults" class="scroll">
+      <p class="text-muted">Hasil pencarian muncul di sini.</p>
     </div>
 
   </div>
@@ -1073,18 +970,19 @@
 <!-- ================= COMMAND PALETTE ================= -->
 <div id="commandPalette" class="modal hidden">
 
-  <div class="modal-content">
+  <div class="modal-box">
 
     <h3>⌨️ Command Palette</h3>
 
     <input
       id="commandInput"
       type="text"
-      placeholder="Ketik perintah..."
-    >
+      placeholder="Ketik command (ex: open dashboard)"
+      onkeydown="handleCommand(event)"
+    />
 
-    <div id="commandResults">
-      <p>Ketik untuk menjalankan perintah cepat.</p>
+    <div id="commandResults" class="scroll">
+      <p class="text-muted">Ketik perintah untuk menjalankan aksi cepat.</p>
     </div>
 
   </div>
@@ -1094,34 +992,30 @@
 <!-- ================= UNIVERSAL MODAL ================= -->
 <div id="universalModal" class="modal hidden">
 
-  <div class="modal-content">
+  <div class="modal-box">
 
     <div class="modal-header">
 
-      <h3 id="modalTitle">
-        Modal Title
-      </h3>
+      <h3 id="modalTitle">Modal Title</h3>
 
-      <button id="closeModalBtn">
+      <button class="btn btn-danger" onclick="closeModal()">
         ✖
       </button>
 
     </div>
 
     <div id="modalBody">
-
-      Modal Content
-
+      <p class="text-muted">Modal content akan tampil di sini.</p>
     </div>
 
   </div>
 
 </div>
 
-<!-- ================= CONFIRM DIALOG ================= -->
+<!-- ================= CONFIRM MODAL ================= -->
 <div id="confirmModal" class="modal hidden">
 
-  <div class="modal-content small-modal">
+  <div class="modal-box">
 
     <h3>Konfirmasi</h3>
 
@@ -1129,13 +1023,13 @@
       Apakah Anda yakin?
     </p>
 
-    <div class="modal-actions">
+    <div class="flex gap-10">
 
-      <button id="confirmYes">
+      <button class="btn btn-danger" id="confirmYes">
         Ya
       </button>
 
-      <button id="confirmNo">
+      <button class="btn" id="confirmNo">
         Batal
       </button>
 
@@ -1145,70 +1039,54 @@
 
 </div>
 
+<!-- ================= NOTIFICATION SYSTEM ================= -->
+<div id="notificationPanel" class="notification-panel hidden">
+
+  <h4>🔔 Notifications</h4>
+
+  <div id="notificationList" class="scroll">
+    <p class="text-muted">Tidak ada notifikasi.</p>
+  </div>
+
+</div>
+
+<!-- ================= TOAST CONTAINER ================= -->
+<div id="toastContainer"></div>
+
 <!-- ================= LOADING OVERLAY ================= -->
-<div
-  id="loadingOverlay"
-  class="loading-overlay hidden"
->
+<div id="loadingOverlay" class="hidden">
 
   <div class="loader-box">
 
     <div class="loader"></div>
 
-    <p>
-      Memproses...
-    </p>
+    <p class="text-muted">Loading system...</p>
+
+    <div class="progress-bar"></div>
 
   </div>
 
 </div>
 
-<!-- ================= TOAST ================= -->
-<div id="toastContainer"></div>
-
-<!-- ================= FLOATING ACTION BUTTON ================= -->
-<button
-  id="fabButton"
-  class="fab"
->
-
-  +
-
-</button>
-
 <!-- ================= QUICK ACTION MENU ================= -->
-<div
-  id="quickActionMenu"
-  class="quick-menu hidden"
->
+<div id="quickActionMenu" class="hidden">
 
-  <button onclick="openPage('dashboard')">
-    📊 Dashboard
-  </button>
-
-  <button onclick="openPage('kanban')">
-    📌 Kanban
-  </button>
-
-  <button onclick="openPage('files')">
-    ☁ Files
-  </button>
-
-  <button onclick="openPage('profile')">
-    👤 Profile
-  </button>
+  <button onclick="openPage('dashboard')">📊 Dashboard</button>
+  <button onclick="openPage('kanban')">📌 Kanban</button>
+  <button onclick="openPage('files')">☁ Files</button>
+  <button onclick="openPage('profile')">👤 Profile</button>
 
 </div>
 
-<!-- ================= SYSTEM STATUS ================= -->
-<div
-  id="systemStatus"
-  class="system-status"
->
+<!-- ================= FLOATING ACTION BUTTON ================= -->
+<button id="fabButton" class="fab" onclick="toggleQuickMenu()">
+  +
+</button>
 
-  <span id="connectionStatus">
-    🟢 Online
-  </span>
+<!-- ================= SYSTEM STATUS ================= -->
+<div id="systemStatus" class="system-status">
+
+  <span id="connectionStatus">🟢 Online</span>
 
 </div>
 
@@ -1217,83 +1095,716 @@
 
   <div class="footer-left">
 
-    <strong>
-      MyWork SaaS Core
-    </strong>
-
-    <p>
-      Enterprise Workspace System
-    </p>
+    <strong>MyWork SaaS Core</strong>
+    <p class="text-muted">Enterprise Workspace System</p>
 
   </div>
 
   <div class="footer-right">
 
-    <span>
-      Version 1.0.0
-    </span>
+    <span class="text-muted">Version 1.0.0</span>
 
   </div>
 
 </footer>
+<!-- ================= DASHBOARD HERO (ENGINE READY) ================= -->
+<section id="dashboard" class="page active">
 
-</main>
-<!-- END MAIN -->
+  <div class="hero-card">
 
-<section id="settings" class="page hidden">
+    <h2 class="text-gradient">⚡ System Dashboard</h2>
 
-  <h2>⚙️ Account Settings</h2>
+    <p class="text-muted">
+      Real-time workspace overview & system analytics
+    </p>
 
-  <div class="settings-grid">
+    <div class="divider"></div>
 
-    <div class="card settings-card">
-      <h3>Profile</h3>
+    <div class="grid">
 
-      <div class="avatar-box">
-        <img id="avatarPreview" src="https://i.pravatar.cc/150" />
-        <input type="file" id="avatarInput" />
+      <div class="card hover-lift">
+        <span class="badge badge-blue">Total Tasks</span>
+        <div class="kpi-number" id="taskCount">0</div>
       </div>
 
-      <input id="updateName" type="text" placeholder="Nama" />
-      <input id="updateWhatsapp" type="text" placeholder="WhatsApp" />
+      <div class="card hover-lift">
+        <span class="badge badge-green">Active Tasks</span>
+        <div class="kpi-number" id="activeCount">0</div>
+      </div>
 
-      <button class="btn-primary" onclick="updateProfile()">
-        Save Profile
-      </button>
+      <div class="card hover-lift">
+        <span class="badge badge-green">Completed</span>
+        <div class="kpi-number" id="doneCount">0</div>
+      </div>
+
+      <div class="card hover-lift">
+        <span class="badge badge-blue">Online Users</span>
+        <div class="kpi-number" id="onlineCount">0</div>
+      </div>
+
     </div>
 
-    <div class="card settings-card">
-      <h3>Security</h3>
+  </div>
 
-      <input id="newPassword" type="password" placeholder="Password baru" />
+  <!-- ================= CHART ENGINE SECTION ================= -->
+  <div class="chart-grid">
 
-      <button class="btn-danger" onclick="changePassword()">
-        Change Password
-      </button>
+    <div class="chart-card neon">
+      <h3>📊 Task Distribution</h3>
+      <canvas id="chartDonut"></canvas>
     </div>
 
-    <div class="card settings-card">
-      <h3>Account Info</h3>
-
-      <p id="settingsEmail"></p>
-      <p id="settingsName"></p>
-
-      <button class="btn" onclick="logout()">
-        Logout
-      </button>
+    <div class="chart-card neon">
+      <h3>📈 Activity Flow</h3>
+      <canvas id="chartBar"></canvas>
     </div>
 
   </div>
 
 </section>
 
+<!-- ================= UI WIDGET ROW ================= -->
+<section class="page hidden" id="widgetRow">
+
+  <div class="page-header">
+    <h2>🧩 System Widgets</h2>
+    <p>Reusable UI components for dashboard engine</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- LIVE STATUS WIDGET -->
+    <div class="card deep-shadow">
+
+      <h3>🟢 System Status</h3>
+
+      <p id="systemHealth" class="text-green-glow">
+        All systems operational
+      </p>
+
+      <div class="divider"></div>
+
+      <p class="text-muted">
+        Uptime: <span id="uptime">99.9%</span>
+      </p>
+
+    </div>
+
+    <!-- LIVE ACTIVITY WIDGET -->
+    <div class="card">
+
+      <h3>⚡ Live Activity</h3>
+
+      <div id="liveActivity" class="scroll">
+        <p class="text-muted">Waiting activity stream...</p>
+      </div>
+
+    </div>
+
+    <!-- QUICK STATS WIDGET -->
+    <div class="card">
+
+      <h3>📌 Quick Stats</h3>
+
+      <ul class="text-muted">
+        <li>Total Users: <span id="statUsers">0</span></li>
+        <li>Tasks Today: <span id="statTasks">0</span></li>
+        <li>Files Uploaded: <span id="statFiles">0</span></li>
+      </ul>
+
+    </div>
+
+  </div>
+
 </section>
-<!-- END APP -->
+
+<!-- ================= REALTIME FEED SECTION ================= -->
+<section class="page hidden" id="realtimeFeed">
+
+  <div class="page-header">
+    <h2>📡 Realtime Feed</h2>
+    <p>Live system updates (task, user, broadcast, activity)</p>
+  </div>
+
+  <div class="card">
+
+    <div id="realtimeList" class="scroll">
+      <p class="text-muted">Waiting for realtime events...</p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= SYSTEM DEBUG PANEL ================= -->
+<section class="page hidden" id="debugPanel">
+
+  <div class="page-header">
+    <h2>🧪 Debug Panel</h2>
+    <p>System diagnostics & state inspector</p>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+
+      <h3>State Snapshot</h3>
+
+      <pre id="stateDump" class="text-muted">
+Loading state...
+      </pre>
+
+    </div>
+
+    <div class="card">
+
+      <h3>Console Logs</h3>
+
+      <div id="logStream" class="scroll">
+        <p class="text-muted">No logs yet.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= ROUTER DEBUG TOOL ================= -->
+<div id="routeDebugger" class="hidden">
+
+  <div class="card">
+
+    <h3>Router Debug</h3>
+
+    <p class="text-muted">
+      Active Page: <span id="activeRoute">dashboard</span>
+    </p>
+
+    <button class="btn btn-primary" onclick="printRoutes()">
+      Print Routes
+    </button>
+
+  </div>
 
 </div>
-<!-- END APP ROOT -->
 
-<script src="script.js"></script>
+<!-- ================= MINI COMMAND OVERLAY ================= -->
+<div id="miniCommand" class="hidden">
 
-</body>
-</html>
+  <input
+    id="miniCommandInput"
+    type="text"
+    placeholder="Quick command..."
+    onkeydown="handleMiniCommand(event)"
+  />
+
+</div>
+<!-- ================= AUTH FINAL POLISH LAYER ================= -->
+<section id="authBox" class="auth">
+
+  <div class="auth-card glass strong">
+
+    <header class="auth-header">
+      <h1 class="text-gradient">⚡ MyWork SaaS Core</h1>
+      <p class="text-muted">Enterprise Workspace System</p>
+    </header>
+
+    <!-- TAB SWITCH -->
+    <div class="auth-tabs">
+
+      <button id="loginTab" class="tab active" onclick="showLogin()">
+        Login
+      </button>
+
+      <button id="registerTab" class="tab" onclick="showRegister()">
+        Register
+      </button>
+
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm" class="auth-form">
+
+      <input id="loginEmail" type="email" placeholder="Email" />
+      <input id="loginPassword" type="password" placeholder="Password" />
+
+      <button class="btn btn-primary" onclick="login()">
+        Login
+      </button>
+
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" class="auth-form hidden">
+
+      <input id="regName" type="text" placeholder="Nama Lengkap" />
+      <input id="regEmail" type="email" placeholder="Email" />
+      <input id="regWhatsapp" type="text" placeholder="WhatsApp" />
+      <input id="regPassword" type="password" placeholder="Password" />
+
+      <button class="btn btn-success" onclick="registerUser()">
+        Daftar
+      </button>
+
+    </div>
+
+    <p id="msg" class="text-muted"></p>
+
+  </div>
+
+</section>
+
+<!-- ================= GLOBAL EVENT OVERLAY SYSTEM ================= -->
+<div id="eventOverlay" class="hidden"></div>
+
+<!-- ================= ERROR SYSTEM OVERLAY ================= -->
+<div id="errorOverlay" class="hidden">
+
+  <div class="modal-box">
+
+    <h3 class="text-red">⚠ System Error</h3>
+
+    <p id="errorMessage" class="text-muted">
+      Something went wrong...
+    </p>
+
+    <button class="btn btn-danger" onclick="closeError()">
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+<!-- ================= SUCCESS TOAST SYSTEM ================= -->
+<div id="successToast" class="hidden">
+
+  <div class="toast-box glass">
+
+    <span>✅ Success</span>
+
+    <p id="successMessage" class="text-muted">
+      Action completed
+    </p>
+
+  </div>
+
+</div>
+
+<!-- ================= GLOBAL LOADER SYSTEM (UPGRADED) ================= -->
+<div id="loadingOverlay" class="hidden">
+
+  <div class="loader-box">
+
+    <div class="loader"></div>
+
+    <h3 class="text-gradient">Loading System</h3>
+
+    <p class="text-muted">Please wait...</p>
+
+    <div class="progress-bar"></div>
+
+  </div>
+
+</div>
+
+<!-- ================= GLOBAL KEYBOARD SHORTCUT LAYER ================= -->
+<script>
+
+document.addEventListener("keydown", function(e) {
+
+  // CTRL + K → Command Palette
+  if (e.ctrlKey && e.key === "k") {
+    e.preventDefault();
+    toggleCommandPalette();
+  }
+
+  // ESC → Close all modals
+  if (e.key === "Escape") {
+    closeAllModals();
+  }
+
+  // CTRL + P → Global Search
+  if (e.ctrlKey && e.key === "p") {
+    e.preventDefault();
+    openGlobalSearch();
+  }
+
+});
+
+</script>
+
+<!-- ================= GLOBAL UI STATE MANAGER HOOK ================= -->
+<script>
+
+window.UI_STATE = {
+  currentPage: "dashboard",
+  user: null,
+  theme: "dark",
+  online: true
+};
+
+function setState(key, value) {
+  window.UI_STATE[key] = value;
+  console.log("STATE UPDATE:", key, value);
+}
+
+function getState(key) {
+  return window.UI_STATE[key];
+}
+
+</script>
+
+<!-- ================= GLOBAL ERROR HANDLER ================= -->
+<script>
+
+window.onerror = function(message, source, lineno, colno, error) {
+
+  console.error("GLOBAL ERROR:", message);
+
+  const errorBox = document.getElementById("errorOverlay");
+  const errorMsg = document.getElementById("errorMessage");
+
+  if (errorMsg) {
+    errorMsg.innerText = message;
+  }
+
+  if (errorBox) {
+    errorBox.classList.remove("hidden");
+  }
+
+};
+
+</script>
+
+<!-- ================= APP BOOTSTRAP HOOK ================= -->
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  console.log("⚡ MyWork SaaS Core Loaded");
+
+  // INIT STATE
+  setState("currentPage", "dashboard");
+
+  // INIT TIME
+  setInterval(() => {
+
+    const timeEl = document.getElementById("time");
+    if (timeEl) {
+      timeEl.innerText = new Date().toLocaleTimeString();
+    }
+
+  }, 1000);
+
+  // INIT ROUTER DEFAULT
+  if (typeof openPage === "function") {
+    openPage("dashboard");
+  }
+
+});
+
+</script>
+
+<!-- ================= ROUTER ENGINE ================= -->
+<script>
+
+const pages = document.querySelectorAll(".page");
+const menuButtons = document.querySelectorAll(".menu");
+
+function openPage(pageId, el = null) {
+
+  // save state
+  setState("currentPage", pageId);
+
+  // hide all pages
+  pages.forEach(p => {
+    p.classList.remove("active");
+    p.classList.add("hidden");
+  });
+
+  // show selected page
+  const target = document.getElementById(pageId);
+  if (target) {
+    target.classList.remove("hidden");
+    target.classList.add("active");
+  }
+
+  // menu active UI
+  menuButtons.forEach(btn => btn.classList.remove("active"));
+  if (el) el.classList.add("active");
+
+  console.log("PAGE:", pageId);
+}
+
+</script>
+
+<!-- ================= AUTH ENGINE ================= -->
+<script>
+
+function login() {
+
+  const email = document.getElementById("loginEmail").value;
+  const pass = document.getElementById("loginPassword").value;
+
+  if (!email || !pass) {
+    showToast("Email / Password wajib diisi");
+    return;
+  }
+
+  // MOCK LOGIN (nanti Supabase replace)
+  setState("user", { email });
+
+  document.getElementById("authBox").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  showToast("Login berhasil ⚡");
+
+  console.log("LOGIN:", email);
+}
+
+function registerUser() {
+
+  const name = document.getElementById("regName").value;
+  const email = document.getElementById("regEmail").value;
+  const wa = document.getElementById("regWhatsapp").value;
+  const pass = document.getElementById("regPassword").value;
+
+  if (!name || !email || !pass) {
+    showToast("Data tidak lengkap");
+    return;
+  }
+
+  setState("user", { name, email, wa });
+
+  showToast("Register berhasil 🚀");
+
+}
+
+function logout() {
+
+  setState("user", null);
+
+  document.getElementById("authBox").style.display = "flex";
+  document.getElementById("app").style.display = "none";
+
+  showToast("Logout sukses");
+
+}
+
+</script>
+
+<!-- ================= TOAST ENGINE ================= -->
+<script>
+
+function showToast(message) {
+
+  const container = document.getElementById("toastContainer");
+
+  const toast = document.createElement("div");
+  toast.className = "toast-box glass";
+  toast.innerText = message;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 2500);
+
+}
+
+</script>
+
+<!-- ================= MODAL ENGINE ================= -->
+<script>
+
+function closeAllModals() {
+
+  document.querySelectorAll(".modal").forEach(m => {
+    m.classList.add("hidden");
+  });
+
+  document.getElementById("commandPalette")?.classList.add("hidden");
+  document.getElementById("globalSearchModal")?.classList.add("hidden");
+
+}
+
+function openGlobalSearch() {
+  document.getElementById("globalSearchModal").classList.remove("hidden");
+}
+
+function toggleCommandPalette() {
+  document.getElementById("commandPalette").classList.toggle("hidden");
+}
+
+function closeModal() {
+  document.getElementById("universalModal").classList.add("hidden");
+}
+
+</script>
+
+<!-- ================= KANBAN CORE ================= -->
+<script>
+
+let tasks = [];
+
+function addTask() {
+
+  const input = document.getElementById("taskInput");
+  if (!input.value) return;
+
+  const task = {
+    id: Date.now(),
+    title: input.value,
+    status: "todo"
+  };
+
+  tasks.push(task);
+  input.value = "";
+
+  renderTasks();
+}
+
+function renderTasks() {
+
+  const todo = document.getElementById("todoList");
+  const doing = document.getElementById("doingList");
+  const done = document.getElementById("doneList");
+
+  todo.innerHTML = "";
+  doing.innerHTML = "";
+  done.innerHTML = "";
+
+  tasks.forEach(t => {
+
+    const el = document.createElement("div");
+    el.className = "kanban-card";
+    el.innerText = t.title;
+
+    if (t.status === "todo") todo.appendChild(el);
+    if (t.status === "doing") doing.appendChild(el);
+    if (t.status === "done") done.appendChild(el);
+
+  });
+
+  updateCounters();
+}
+
+function updateCounters() {
+
+  document.getElementById("taskCount").innerText = tasks.length;
+
+  document.getElementById("todoCount").innerText =
+    tasks.filter(t => t.status === "todo").length;
+
+  document.getElementById("doingCount").innerText =
+    tasks.filter(t => t.status === "doing").length;
+
+  document.getElementById("doneTaskCount").innerText =
+    tasks.filter(t => t.status === "done").length;
+}
+
+</script>
+
+<!-- ================= BROADCAST ENGINE ================= -->
+<script>
+
+let broadcasts = [];
+
+function sendBroadcast() {
+
+  const input = document.getElementById("broadcastInput");
+
+  if (!input.value) return;
+
+  broadcasts.unshift({
+    text: input.value,
+    time: new Date().toLocaleTimeString()
+  });
+
+  input.value = "";
+
+  renderBroadcast();
+}
+
+function renderBroadcast() {
+
+  const list = document.getElementById("broadcastList");
+
+  list.innerHTML = "";
+
+  broadcasts.forEach(b => {
+
+    const div = document.createElement("div");
+    div.className = "broadcast-item";
+    div.innerHTML = `${b.text} <small>${b.time}</small>`;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+</script>
+
+<!-- ================= FILE UPLOAD ENGINE (BASIC MOCK) ================= -->
+<script>
+
+let files = [];
+
+function uploadFile() {
+
+  const input = document.getElementById("fileUpload");
+
+  if (!input.files.length) return;
+
+  const file = input.files[0];
+
+  files.push({
+    name: file.name,
+    size: file.size
+  });
+
+  renderFiles();
+}
+
+function renderFiles() {
+
+  const list = document.getElementById("fileList");
+
+  list.innerHTML = "";
+
+  files.forEach(f => {
+
+    const div = document.createElement("div");
+    div.className = "file-card";
+    div.innerHTML = `${f.name} <small>${f.size} bytes</small>`;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+</script>
+
+<!-- ================= MINI UTILITY ENGINE ================= -->
+<script>
+
+function formatTime() {
+  return new Date().toLocaleTimeString();
+}
+
+function uid() {
+  return Math.random().toString(36).substr(2, 9);
+}
+
+</script>
+
+<!-- ================= FINAL BOOT CONFIRM ================= -->
+<script>
+
+console.log("🚀 MyWork SaaS Core FULL ENGINE LOADED");
+
+</script>

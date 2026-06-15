@@ -1,321 +1,1466 @@
 /* =========================================================
-   MYWORK ULTRA ENTERPRISE UI v2 — DESIGN SYSTEM CORE
-   PART 1/5
+   MYWORK ULTRA ENTERPRISE UI v3
+   CSS SYSTEM — PART 1/10
+   CORE DESIGN TOKENS + FOUNDATION
 ========================================================= */
 
-/* ================= ROOT THEME ================= */
-:root{
 
-  /* CORE DARK TECH */
-  --bg: #050814;
-  --panel: #0b1020;
-  --panel-2: #0f172a;
-  --border: #1f2937;
+/* ================= DESIGN TOKENS (THEME ENGINE) ================= */
+:root {
 
-  /* TEXT */
+  /* ===== CORE BACKGROUND SYSTEM ===== */
+  --bg-0: #020617;
+  --bg-1: #050814;
+  --bg-2: #0b1020;
+  --bg-3: #0f172a;
+
+  /* ===== SURFACE SYSTEM ===== */
+  --surface: rgba(15, 23, 42, 0.75);
+  --surface-solid: #0f172a;
+  --surface-soft: rgba(11, 16, 32, 0.6);
+
+  /* ===== BORDER SYSTEM ===== */
+  --border: rgba(148, 163, 184, 0.15);
+  --border-strong: rgba(56, 189, 248, 0.25);
+
+  /* ===== TEXT SYSTEM ===== */
   --text: #e5e7eb;
-  --muted: #9ca3af;
+  --muted: #94a3b8;
+  --faint: #64748b;
 
-  /* ACCENT TECH COLORS */
+  /* ===== ACCENT SYSTEM ===== */
   --blue: #38bdf8;
   --blue-deep: #2563eb;
-  --cyan: #00e5ff;
-
-  --green-stabilo: #39ff14;
-  --green-soft: #10b981;
-
-  --purple: #7c3aed;
+  --cyan: #22d3ee;
+  --green: #10b981;
+  --neon-green: #39ff14;
   --red: #ef4444;
+  --purple: #8b5cf6;
 
-  /* GRADIENTS */
+  /* ===== GRADIENT ENGINE ===== */
   --grad-blue: linear-gradient(135deg, #38bdf8, #2563eb);
-  --grad-cyan: linear-gradient(135deg, #00e5ff, #38bdf8);
-  --grad-dark: radial-gradient(circle at top, #0f172a, #050814);
+  --grad-cyan: linear-gradient(135deg, #22d3ee, #38bdf8);
+  --grad-green: linear-gradient(135deg, #10b981, #22c55e);
+  --grad-dark: radial-gradient(circle at top, #0b1020, #020617);
 
-  /* EFFECTS */
-  --glow-blue: 0 0 25px rgba(56,189,248,0.25);
-  --glow-green: 0 0 25px rgba(57,255,20,0.15);
+  /* ===== EFFECT SYSTEM ===== */
+  --glow-blue: 0 0 25px rgba(56, 189, 248, 0.25);
+  --glow-green: 0 0 25px rgba(16, 185, 129, 0.2);
+  --glow-red: 0 0 25px rgba(239, 68, 68, 0.2);
 
-  /* RADIUS */
+  /* ===== SHADOW SYSTEM ===== */
+  --shadow-sm: 0 4px 10px rgba(0,0,0,0.2);
+  --shadow-md: 0 10px 25px rgba(0,0,0,0.35);
+  --shadow-lg: 0 20px 40px rgba(0,0,0,0.5);
+
+  /* ===== RADIUS SYSTEM ===== */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+  --radius-xl: 22px;
 
-  /* SHADOW */
-  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  /* ===== ANIMATION SYSTEM ===== */
+  --speed-fast: 0.15s;
+  --speed-normal: 0.25s;
+  --speed-slow: 0.45s;
 }
+
 
 /* ================= GLOBAL RESET ================= */
-.auth-card{
-  width: 340px;
-  padding: 20px;
-  border-radius: 16px;
-  background: rgba(15,23,42,0.8);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.auth-header h1{
-  font-size: 18px;
+* {
   margin: 0;
-}
-
-.auth-header p{
-  font-size: 12px;
-  color: var(--muted);
-  margin: 0;
-}
-
-.auth-tabs{
-  display: flex;
-  gap: 8px;
-}
-
-.tab{
-  flex: 1;
-  padding: 8px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--muted);
-}
-
-.tab.active{
-  background: var(--grad-blue);
-  color: white;
-}
-
-.auth-form{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.auth-form input{
-  width: 100%;
-}
-
-.full{
-  width: 100%;
-}
-
-*{
-  box-sizing:border-box;
+  padding: 0;
+  box-sizing: border-box;
   font-family: "Inter", system-ui, sans-serif;
-  transition: all 0.15s ease;
+  transition: all var(--speed-fast) ease;
 }
 
-html,body{
-  margin:0;
-  padding:0;
-  height:100%;
-  background: var(--bg);
+
+/* ================= BODY CORE ================= */
+html, body {
+  height: 100%;
+  width: 100%;
+  background: var(--grad-dark);
   color: var(--text);
-  overflow:hidden;
-}
-
-/* smooth text rendering */
-body{
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ================= SCROLLBAR (TECH STYLE) ================= */
-::-webkit-scrollbar{
-  width:8px;
+
+/* ================= BACKGROUND NEON LAYERS ================= */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(56,189,248,0.08), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(16,185,129,0.06), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(139,92,246,0.05), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: bgFloat 12s ease-in-out infinite alternate;
 }
 
-::-webkit-scrollbar-track{
-  background: var(--panel);
+
+/* ================= BACKGROUND ANIMATION ================= */
+@keyframes bgFloat {
+  0% { transform: scale(1) rotate(0deg); }
+  100% { transform: scale(1.1) rotate(1deg); }
 }
 
-::-webkit-scrollbar-thumb{
-  background: var(--blue);
+
+/* ================= SCROLLBAR (ULTRA TECH STYLE) ================= */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--blue), var(--green));
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover{
-  background: var(--cyan);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--grad-cyan);
 }
 
-/* ================= BUTTON BASE SYSTEM ================= */
-button{
-  cursor:pointer;
-  border:none;
+
+/* ================= TEXT SELECTION ================= */
+::selection {
+  background: rgba(56, 189, 248, 0.25);
+  color: white;
+}
+
+
+/* ================= TYPOGRAPHY BASE ================= */
+h1, h2, h3, h4, h5 {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+
+/* ================= BASE LINKS ================= */
+a {
+  color: var(--blue);
+  text-decoration: none;
+  transition: var(--speed-fast);
+}
+
+a:hover {
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(56,189,248,0.4);
+}
+
+
+/* ================= BASE BUTTON RESET ================= */
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
   border-radius: var(--radius-md);
-  font-weight:600;
-  letter-spacing:0.3px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  background: transparent;
+  color: var(--text);
+  transition: all var(--speed-fast) ease;
 }
 
-button:hover{
-  transform: translateY(-1px);
+button:hover {
+  transform: translateY(-2px);
   box-shadow: var(--glow-blue);
 }
 
-/* ================= INPUT BASE ================= */
-input, select, textarea{
-  outline:none;
+
+/* ================= INPUT BASE SYSTEM ================= */
+input, textarea, select {
+  width: 100%;
+  padding: 10px 12px;
   border-radius: var(--radius-md);
-  border:1px solid var(--border);
-  background: #0b1220;
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text);
-  padding:10px 12px;
+  outline: none;
+  transition: all var(--speed-fast) ease;
 }
 
-input:focus{
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+}
+
+
+/* ================= UTILITY CLASSES ================= */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.center { display: flex; align-items: center; justify-content: center; }
+
+.text-muted { color: var(--muted); }
+.text-blue { color: var(--blue); }
+.text-green { color: var(--green); }
+.text-neon { color: var(--neon-green); }
+
+.glow-blue { box-shadow: var(--glow-blue); }
+.glow-green { box-shadow: var(--glow-green); }
+
+.fade-in {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* =========================================================
+   MYWORK ULTRA ENTERPRISE UI v3
+   CSS SYSTEM — PART 2/10
+   LAYOUT ENGINE + APP STRUCTURE CORE
+========================================================= */
+
+
+/* ================= APP WRAPPER ================= */
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--grad-dark);
+  z-index: 1;
+}
+
+
+/* ================= SIDEBAR CORE ================= */
+.sidebar {
+  width: 270px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  padding: 18px 14px;
+
+  background: rgba(11, 16, 32, 0.85);
+  backdrop-filter: blur(16px);
+
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+
+  z-index: 10;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* neon top line */
+.sidebar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--grad-cyan);
+  opacity: 0.8;
+  animation: neonMove 3s linear infinite;
+}
+
+@keyframes neonMove {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+
+/* ================= BRAND ================= */
+.brand {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--blue);
+  text-shadow: 0 0 10px rgba(56,189,248,0.3);
+}
+
+.brand::before {
+  content: "⚡";
+  color: var(--neon-green);
+  filter: drop-shadow(0 0 5px rgba(57,255,20,0.5));
+}
+
+
+/* ================= MENU SYSTEM ================= */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 12px;
+  border-radius: var(--radius-md);
+
+  color: var(--muted);
+  background: transparent;
+
+  cursor: pointer;
+  transition: all var(--speed-fast);
+  position: relative;
+}
+
+/* hover effect */
+.menu:hover {
+  background: rgba(56,189,248,0.08);
+  color: var(--text);
+  transform: translateX(5px);
+}
+
+/* active menu */
+.menu.active {
+  background: linear-gradient(90deg, rgba(56,189,248,0.15), transparent);
+  border-left: 3px solid var(--blue);
+  color: white;
+  box-shadow: var(--glow-blue);
+}
+
+/* active dot indicator */
+.menu.active::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  box-shadow: 0 0 10px rgba(57,255,20,0.6);
+}
+
+
+/* ================= LOGOUT BUTTON ================= */
+.logout {
+  margin-top: auto;
+  padding: 12px;
+  border-radius: var(--radius-md);
+
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+
+  font-weight: 600;
+  text-align: center;
+
+  cursor: pointer;
+  transition: all var(--speed-fast);
+}
+
+.logout:hover {
+  transform: scale(1.03);
+  box-shadow: var(--glow-red);
+}
+
+
+/* ================= MAIN AREA ================= */
+.main {
+  margin-left: 270px;
+  width: calc(100% - 270px);
+  height: 100vh;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 20px;
+
+  background: radial-gradient(circle at top, #0b1220, #020617);
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ================= TOPBAR ================= */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 16px;
+  margin-bottom: 18px;
+
+  border-radius: var(--radius-lg);
+
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+}
+
+
+/* greeting */
+#greeting {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue);
+  text-shadow: 0 0 10px rgba(56,189,248,0.2);
+}
+
+/* time */
+#time {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+
+/* ================= PAGE SYSTEM ================= */
+.page {
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+.page.active {
+  display: block;
+}
+
+
+/* ================= SECTION TITLE ================= */
+.section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+
+  color: var(--faint);
+  margin: 14px 0 6px;
+}
+
+
+/* ================= NAV DIVIDER ================= */
+.sidebar hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 12px 0;
+}
+
+
+/* ================= ICON SUPPORT ================= */
+.menu i {
+  font-size: 14px;
+  color: var(--blue);
+}
+
+
+/* ================= STATUS DOT ================= */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: var(--glow-green);
+}
+
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .main {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+    padding: 12px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+/* =========================================================
+   MYWORK ULTRA ENTERPRISE UI v3
+   CSS SYSTEM — PART 3/10
+   DASHBOARD ENGINE + KPI + CHARTS
+========================================================= */
+
+
+/* ================= DASHBOARD GRID ================= */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+/* responsive grid */
+@media (max-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ================= KPI CARD SYSTEM ================= */
+.card {
+  position: relative;
+  padding: 16px;
+
+  border-radius: var(--radius-lg);
+
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+
+  transition: all var(--speed-normal);
+}
+
+/* glow overlay */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: radial-gradient(circle at top left,
+    rgba(56,189,248,0.15),
+    transparent 60%);
+
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+/* hover effect */
+.card:hover {
+  transform: translateY(-5px);
   border-color: var(--blue);
   box-shadow: var(--glow-blue);
 }
 
-/* ================= LOADER ================= */
-#loadingOverlay{
-  position:fixed;
-  inset:0;
-  background: var(--grad-dark);
+.card:hover::before {
+  opacity: 1;
+}
+
+
+/* ================= KPI TEXT ================= */
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  margin-top: 8px;
+  animation: pulseText 2.5s infinite;
+}
+
+.kpi-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* KPI pulse animation */
+@keyframes pulseText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+
+/* ================= HERO DASHBOARD CARD ================= */
+.hero-card {
+  grid-column: 1 / -1;
+
+  padding: 18px;
+
+  border-radius: var(--radius-lg);
+
+  background: linear-gradient(135deg,
+    rgba(15,23,42,0.9),
+    rgba(2,6,23,0.9));
+
+  border: 1px solid rgba(56,189,248,0.2);
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* shine animation */
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(56,189,248,0.08),
+    transparent
+  );
+
+  transform: translateX(-100%);
+  animation: shine 4s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+
+/* ================= CHART GRID ================= */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 900px) {
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ================= CHART CARD ================= */
+.chart-card {
+  height: 280px;
+
+  padding: 14px;
+
+  border-radius: var(--radius-lg);
+
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow-md);
+
+  display: flex;
+  flex-direction: column;
+
+  position: relative;
+  overflow: hidden;
+
+  transition: all var(--speed-normal);
+}
+
+/* chart title */
+.chart-card h3 {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* hover */
+.chart-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+
+/* ================= CANVAS CENTERING ================= */
+.chart-card canvas {
+  max-width: 180px !important;
+  max-height: 180px !important;
+
+  margin: auto;
+
+  filter: drop-shadow(0 0 10px rgba(56,189,248,0.2));
+}
+
+
+/* ================= BROADCAST SYSTEM ================= */
+.broadcast {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+
+/* input */
+.broadcast input {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-md);
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+
+  color: var(--text);
+
+  outline: none;
+}
+
+.broadcast input:focus {
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+/* button */
+.broadcast button {
+  padding: 12px 14px;
+
+  border-radius: var(--radius-md);
+
+  background: var(--grad-blue);
+  color: #001018;
+
+  font-weight: 700;
+
+  transition: all var(--speed-fast);
+}
+
+.broadcast button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-blue);
+}
+
+
+/* ================= BROADCAST LIST ================= */
+.broadcast-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* message */
+.broadcast-item {
+  padding: 10px 12px;
+
+  border-radius: var(--radius-md);
+
+  background: rgba(15,23,42,0.7);
+  border: 1px solid var(--border);
+
+  font-size: 13px;
+
+  animation: fadeIn 0.25s ease;
+}
+
+/* newest highlight */
+.broadcast-item:first-child {
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+
+/* ================= HERO BROADCAST EFFECT ================= */
+.broadcast-item {
+  background: linear-gradient(
+    135deg,
+    rgba(56,189,248,0.08),
+    rgba(16,185,129,0.08)
+  );
+}
+
+
+/* ================= UTILITY ALIGN ================= */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* =========================================================
+   PART 4/10 — COMPONENT ENGINE UPGRADE
+   FORMS + MODALS + TABLES + NOTIFICATIONS + TOOLTIP
+========================================================= */
+
+/* ================= FORM SYSTEM UPGRADE ================= */
+
+.form-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+label{
+  font-size:12px;
+  color: var(--muted);
+  letter-spacing:0.3px;
+}
+
+.input-group{
+  position:relative;
   display:flex;
   align-items:center;
+}
+
+.input-group i{
+  position:absolute;
+  left:10px;
+  color: var(--blue);
+  font-size:14px;
+}
+
+.input-group input{
+  padding-left:34px;
+}
+
+input, select, textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: rgba(11,18,32,0.9);
+  color: var(--text);
+  transition: all .2s ease;
+}
+
+input:focus, select:focus, textarea:focus{
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+  transform: translateY(-1px);
+}
+
+/* ================= FLOATING LABEL INPUT ================= */
+
+.float-field{
+  position:relative;
+}
+
+.float-field input{
+  padding:14px 12px 8px;
+}
+
+.float-field label{
+  position:absolute;
+  top:12px;
+  left:12px;
+  font-size:12px;
+  color: var(--muted);
+  transition:.2s ease;
+  pointer-events:none;
+}
+
+.float-field input:focus + label,
+.float-field input:not(:placeholder-shown) + label{
+  top:-8px;
+  left:10px;
+  font-size:10px;
+  color: var(--blue);
+  background: var(--panel);
+  padding:0 6px;
+}
+
+/* ================= TABLE SYSTEM UPGRADE ================= */
+
+.table-wrapper{
+  overflow:auto;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background: rgba(15,23,42,0.5);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+}
+
+th, td{
+  padding:12px 14px;
+  font-size:13px;
+  text-align:left;
+  border-bottom:1px solid rgba(31,41,55,0.6);
+}
+
+th{
+  position:sticky;
+  top:0;
+  background: rgba(15,23,42,0.95);
+  color: var(--blue);
+  backdrop-filter: blur(10px);
+  z-index:2;
+}
+
+tr:hover td{
+  background: rgba(56,189,248,0.05);
+}
+
+/* ================= MODAL SYSTEM UPGRADE ================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:flex;
   justify-content:center;
+  align-items:center;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
   z-index:9999;
+  animation: fadeIn .2s ease;
 }
 
-#loadingOverlay.hidden{
-  display:none;
+.modal-box{
+  width:420px;
+  max-width:90%;
+  padding:18px;
+  border-radius:16px;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid rgba(56,189,248,0.2);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: pop .25s ease;
 }
 
-/* animated pulse loader */
-.loader-dot{
-  width:12px;
-  height:12px;
-  background: var(--blue);
-  border-radius:50%;
-  margin:0 4px;
-  animation: pulse 1s infinite ease-in-out;
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
 }
 
-@keyframes pulse{
-  0%,100%{ transform:scale(0.8); opacity:0.5; }
-  50%{ transform:scale(1.4); opacity:1; }
+.modal-title{
+  font-size:14px;
+  color: var(--blue);
+  font-weight:600;
 }
 
-/* ================= TOAST SYSTEM ================= */
-#toast{
+.modal-close{
+  cursor:pointer;
+  color: var(--muted);
+  transition:.2s;
+}
+
+.modal-close:hover{
+  color: var(--red);
+  transform: rotate(90deg);
+}
+
+@keyframes pop{
+  from{ transform: scale(0.95); opacity:0; }
+  to{ transform: scale(1); opacity:1; }
+}
+
+/* ================= TOAST NOTIFICATION SYSTEM ================= */
+
+.toast-container{
+  position:fixed;
+  top:20px;
+  right:20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:99999;
+}
+
+.toast{
+  min-width:220px;
+  padding:10px 12px;
+  border-radius:12px;
   background: rgba(15,23,42,0.95);
   border:1px solid var(--border);
   color: var(--text);
   box-shadow: var(--shadow);
+  animation: slideIn .3s ease;
   backdrop-filter: blur(10px);
 }
 
-/* ================= AUTH BACKDROP ================= */
-.auth{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background: var(--grad-dark);
+.toast.success{
+  border-color: rgba(16,185,129,0.4);
 }
 
-/* ================= CARD BASE ================= */
-.card{
-  background: var(--panel-2);
+.toast.error{
+  border-color: rgba(239,68,68,0.4);
+}
+
+.toast.info{
+  border-color: rgba(56,189,248,0.4);
+}
+
+@keyframes slideIn{
+  from{
+    transform: translateX(100%);
+    opacity:0;
+  }
+  to{
+    transform: translateX(0);
+    opacity:1;
+  }
+}
+
+/* ================= TOOLTIP SYSTEM ================= */
+
+.tooltip{
+  position:relative;
+  cursor:help;
+}
+
+.tooltip::after{
+  content:attr(data-tip);
+  position:absolute;
+  bottom:120%;
+  left:50%;
+  transform:translateX(-50%);
+  background: rgba(15,23,42,0.95);
+  color: var(--text);
+  padding:6px 8px;
+  border-radius:8px;
+  font-size:11px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
   border:1px solid var(--border);
-  border-radius: var(--radius-lg);
+}
+
+.tooltip:hover::after{
+  opacity:1;
+}
+
+/* ================= BADGE IMPROVEMENT ================= */
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:999px;
+  background: rgba(15,23,42,0.8);
+  border:1px solid var(--border);
+}
+
+.badge-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background: var(--blue);
+}
+
+.badge.success .badge-dot{ background: var(--green-soft); }
+.badge.error .badge-dot{ background: var(--red); }
+.badge.info .badge-dot{ background: var(--blue); }
+
+/* ================= DIVIDER UPGRADE ================= */
+
+.divider{
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin:14px 0;
+}
+
+/* ================= LOADING SKELETON ================= */
+
+.skeleton{
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.1),
+    rgba(255,255,255,0.05));
+  background-size:200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius:10px;
+}
+
+@keyframes shimmer{
+  0%{ background-position:200% 0; }
+  100%{ background-position:-200% 0; }
+}
+
+/* ================= PROGRESS BAR ================= */
+
+.progress{
+  width:100%;
+  height:6px;
+  background: rgba(31,41,55,0.6);
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.progress-bar{
+  height:100%;
+  width:40%;
+  background: linear-gradient(90deg, var(--blue), var(--green-stabilo));
+  animation: progressMove 1.5s infinite;
+}
+
+@keyframes progressMove{
+  0%{ transform: translateX(-100%); }
+  100%{ transform: translateX(250%); }
+}
+
+/* ================= END PART 4 ================= */
+/* =========================================================
+   PART 5/10 — DASHBOARD CORE ENGINE
+   HERO + KPI + CARD SYSTEM UPGRADE
+========================================================= */
+
+/* ================= DASHBOARD WRAPPER ================= */
+
+.dashboard{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding:4px;
+}
+
+/* ================= HERO SECTION ================= */
+
+.hero{
+  position:relative;
+  padding:18px;
+  border-radius:16px;
+  background: linear-gradient(145deg, rgba(15,23,42,0.9), rgba(2,6,23,0.9));
+  border:1px solid rgba(56,189,248,0.2);
+  overflow:hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+/* animated light sweep */
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(56,189,248,0.08) 40%,
+    rgba(16,185,129,0.06) 60%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: heroShine 5s infinite;
+}
+
+@keyframes heroShine{
+  0%{ transform: translateX(-100%); }
+  100%{ transform: translateX(100%); }
+}
+
+/* hero title */
+.hero-title{
+  font-size:18px;
+  font-weight:700;
+  color: var(--blue);
+  margin-bottom:6px;
+}
+
+/* hero subtitle */
+.hero-subtitle{
+  font-size:12px;
+  color: var(--muted);
+}
+
+/* ================= KPI GRID ================= */
+
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+/* ================= KPI CARD ================= */
+
+.kpi-card{
+  position:relative;
+  padding:14px;
+  border-radius:16px;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid var(--border);
   box-shadow: var(--shadow);
+  overflow:hidden;
+  transition:.25s ease;
 }
 
-/* hover glow tech cards */
-.card:hover{
+/* glow overlay */
+.kpi-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: radial-gradient(circle at top left,
+    rgba(56,189,248,0.15),
+    transparent 60%);
+  opacity:0;
+  transition:.3s;
+}
+
+.kpi-card:hover{
+  transform: translateY(-4px);
   border-color: var(--blue);
-  box-shadow: var(--glow-blue);
-  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(56,189,248,0.2);
 }
 
-/* ================= PANEL GLASS EFFECT ================= */
-.glass{
-  background: rgba(15,23,42,0.6);
-  backdrop-filter: blur(12px);
-  border:1px solid rgba(255,255,255,0.05);
+.kpi-card:hover::before{
+  opacity:1;
 }
 
-/* ================= UTILITY TEXT ================= */
-.text-muted{ color: var(--muted); }
-.text-blue{ color: var(--blue); }
-.text-green{ color: var(--green-stabilo); }
-.text-cyan{ color: var(--cyan); }
+/* KPI label */
+.kpi-label{
+  font-size:11px;
+  color: var(--muted);
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+}
 
-/* ================= GRADIENT TEXT ================= */
-.gradient-text{
-  background: var(--grad-cyan);
+/* KPI value */
+.kpi-value{
+  font-size:24px;
+  font-weight:800;
+  margin-top:6px;
+  background: linear-gradient(90deg, var(--blue), var(--green-stabilo));
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
 
-/* ================= ANIMATION BASE ================= */
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(8px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-.fade-in{
-  animation: fadeIn 0.25s ease;
-}
-
-/* ================= FOCUS UI ================= */
-.focus-ring:focus{
-  outline:none;
-  box-shadow: 0 0 0 3px rgba(56,189,248,0.3);
-}
-
-/* ================= STATUS BADGES ================= */
-.badge{
-  padding:4px 8px;
-  border-radius:999px;
+/* KPI trend */
+.kpi-trend{
   font-size:11px;
-  font-weight:600;
-  background: var(--panel);
+  margin-top:6px;
+  color: var(--green-soft);
+}
+
+.kpi-trend.down{
+  color: var(--red);
+}
+
+/* ================= ANALYTICS GRID ================= */
+
+.analytics-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:14px;
+}
+
+/* ================= CHART PANEL ================= */
+
+.chart-panel{
+  padding:14px;
+  border-radius:16px;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
   border:1px solid var(--border);
-}
-
-.badge.blue{ background: rgba(56,189,248,0.1); color: var(--blue); }
-.badge.green{ background: rgba(16,185,129,0.1); color: var(--green-soft); }
-.badge.red{ background: rgba(239,68,68,0.1); color: var(--red); }
-.badge.neon{ background: rgba(57,255,20,0.1); color: var(--green-stabilo); }
-/* =========================================================
-   MYWORK ULTRA ENTERPRISE UI v2 — PART 2/5
-   SIDEBAR + TOPBAR + MAIN LAYOUT
-========================================================= */
-
-/* ================= APP WRAPPER ================= */
-.app{
-  display:flex;
-  height:100vh;
-  background: var(--bg);
-}
-
-/* ================= SIDEBAR ULTRA TECH ================= */
-.sidebar{
-  width:260px;
-  height:100vh;
-  position:fixed;
-  left:0;
-  top:0;
-
-  display:flex;
-  flex-direction:column;
-  padding:18px;
-  gap:10px;
-
-  background: linear-gradient(180deg, #0b1020, #050814);
-  border-right:1px solid var(--border);
-
   box-shadow: var(--shadow);
+  height:320px;
+  position:relative;
   overflow:hidden;
 }
 
-/* animated glow line */
+/* chart header */
+.chart-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.chart-title{
+  font-size:12px;
+  color: var(--muted);
+}
+
+/* chart canvas center */
+.chart-panel canvas{
+  width:100% !important;
+  height:240px !important;
+  filter: drop-shadow(0 0 10px rgba(56,189,248,0.2));
+}
+
+/* ================= ACTIVITY FEED ================= */
+
+.activity-feed{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:14px;
+  border-radius:16px;
+  background: rgba(15,23,42,0.7);
+  border:1px solid var(--border);
+  height:320px;
+  overflow:auto;
+}
+
+/* activity item */
+.activity-item{
+  padding:10px;
+  border-radius:12px;
+  background: rgba(2,6,23,0.6);
+  border:1px solid rgba(31,41,55,0.8);
+  font-size:12px;
+  color: var(--text);
+  animation: fadeIn .25s ease;
+}
+
+/* activity highlight */
+.activity-item:hover{
+  border-color: var(--blue);
+  transform: translateX(3px);
+}
+
+/* ================= QUICK ACTION GRID ================= */
+
+.quick-actions{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.action-card{
+  padding:14px;
+  border-radius:14px;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:.2s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+/* hover glow */
+.action-card:hover{
+  transform: translateY(-3px);
+  border-color: var(--blue);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* icon */
+.action-icon{
+  font-size:18px;
+  color: var(--blue);
+  margin-bottom:6px;
+}
+
+/* title */
+.action-title{
+  font-size:12px;
+  font-weight:600;
+}
+
+/* desc */
+.action-desc{
+  font-size:11px;
+  color: var(--muted);
+  margin-top:4px;
+}
+
+/* ================= DATA TABLE CARD ================= */
+
+.data-card{
+  padding:14px;
+  border-radius:16px;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.data-card h3{
+  font-size:12px;
+  color: var(--muted);
+  margin-bottom:10px;
+}
+
+/* ================= STATUS INDICATOR ================= */
+
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  background: rgba(15,23,42,0.8);
+  border:1px solid var(--border);
+}
+
+.status::before{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background: var(--green-stabilo);
+  box-shadow: 0 0 8px rgba(57,255,20,0.5);
+}
+
+.status.offline::before{
+  background: var(--red);
+  box-shadow: 0 0 8px rgba(239,68,68,0.4);
+}
+
+/* ================= NOTIFICATION BELL ================= */
+
+.bell{
+  position:relative;
+  cursor:pointer;
+  font-size:16px;
+  color: var(--blue);
+}
+
+.bell::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background: var(--red);
+  box-shadow: 0 0 10px rgba(239,68,68,0.5);
+}
+
+/* ================= END PART 5 ================= */
+/* =========================================================
+   PART 6/10 — SIDEBAR INTELLIGENCE ENGINE
+   NAVIGATION + ACTIVE STATE + UX FLOW UPGRADE
+========================================================= */
+
+/* ================= SIDEBAR CORE ================= */
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  width:260px;
+  height:100vh;
+
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+
+  padding:16px;
+  background: linear-gradient(180deg, #0b1020, #050814);
+  border-right:1px solid var(--border);
+
+  overflow:hidden;
+  z-index:100;
+}
+
+/* animated top glow line */
 .sidebar::before{
   content:"";
   position:absolute;
@@ -323,155 +1468,198 @@ input:focus{
   left:0;
   width:100%;
   height:2px;
-  background: var(--grad-cyan);
-  opacity:0.7;
+  background: linear-gradient(90deg, var(--blue), var(--green-stabilo), var(--cyan));
+  animation: sidebarGlow 4s infinite linear;
+}
+
+@keyframes sidebarGlow{
+  0%{ filter: hue-rotate(0deg); }
+  100%{ filter: hue-rotate(360deg); }
 }
 
 /* ================= BRAND ================= */
+
 .brand{
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:1px;
-  color: var(--blue);
   display:flex;
   align-items:center;
   gap:8px;
+  font-size:18px;
+  font-weight:800;
+  color: var(--blue);
   margin-bottom:10px;
+  letter-spacing:1px;
 }
 
 .brand::before{
   content:"⚡";
   color: var(--green-stabilo);
+  animation: pulse 2s infinite;
 }
 
-/* ================= MENU BUTTON ================= */
+/* ================= NAV MENU ================= */
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:10px;
+}
+
+/* menu item */
 .menu{
   position:relative;
-  background:transparent;
-  border:none;
-  color: var(--muted);
-  text-align:left;
-  padding:12px 12px;
-  border-radius:12px;
-  cursor:pointer;
-
   display:flex;
   align-items:center;
   gap:10px;
 
-  transition:0.2s;
+  padding:10px 12px;
+  border-radius:12px;
+
+  font-size:13px;
+  color: var(--muted);
+
+  cursor:pointer;
+  transition:.2s ease;
+
+  background: transparent;
+  border:1px solid transparent;
 }
 
-/* hover neon */
+/* hover effect */
 .menu:hover{
   background: rgba(56,189,248,0.08);
-  color:white;
+  color: white;
   transform: translateX(4px);
+  border-color: rgba(56,189,248,0.2);
 }
 
-/* active menu */
+/* ACTIVE STATE ENGINE */
 .menu.active{
-  background: linear-gradient(90deg, rgba(56,189,248,0.2), transparent);
+  background: linear-gradient(90deg,
+    rgba(56,189,248,0.2),
+    rgba(16,185,129,0.1));
+
   color: white;
   border-left:3px solid var(--blue);
-  box-shadow: var(--glow-blue);
+  box-shadow: 0 0 20px rgba(56,189,248,0.15);
 }
 
-/* neon dot indicator */
+/* active glow dot */
 .menu.active::before{
   content:"";
+  position:absolute;
+  left:6px;
   width:6px;
   height:6px;
   border-radius:50%;
   background: var(--green-stabilo);
-  position:absolute;
-  left:6px;
+  box-shadow: 0 0 10px rgba(57,255,20,0.6);
+}
+
+/* ================= MENU ICON ================= */
+
+.menu i{
+  font-size:14px;
+  color: var(--blue);
+}
+
+/* ================= SECTION TITLE ================= */
+
+.section-title{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  color: var(--muted);
+  margin:10px 0 4px;
+}
+
+/* ================= DIVIDER ================= */
+
+.sidebar hr{
+  border:none;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin:10px 0;
 }
 
 /* ================= LOGOUT BUTTON ================= */
+
 .logout{
   margin-top:auto;
-  padding:12px;
+  padding:10px;
   border-radius:12px;
+
   background: linear-gradient(135deg, #ef4444, #b91c1c);
   color:white;
   font-weight:600;
-  border:none;
+
   cursor:pointer;
+  transition:.2s ease;
 }
 
 .logout:hover{
-  transform: scale(1.02);
+  transform: scale(1.03);
   box-shadow: 0 0 20px rgba(239,68,68,0.3);
 }
 
-/* ================= MAIN AREA ================= */
+/* ================= MAIN LAYOUT ================= */
+
 .main{
   margin-left:260px;
   width:calc(100% - 260px);
-  height:100vh;
-  overflow-y:auto;
-  padding:22px;
+  min-height:100vh;
 
+  padding:18px;
   background: radial-gradient(circle at top, #0b1220, #050814);
-}
 
-/* smooth scroll */
-.main::-webkit-scrollbar{
-  width:6px;
+  overflow-y:auto;
 }
 
 /* ================= TOPBAR ================= */
+
 .topbar{
   display:flex;
   justify-content:space-between;
   align-items:center;
 
-  padding:14px 16px;
-  margin-bottom:18px;
+  padding:12px 14px;
+  margin-bottom:14px;
 
+  border-radius:14px;
   background: rgba(15,23,42,0.6);
   border:1px solid var(--border);
-  border-radius:14px;
-
   backdrop-filter: blur(10px);
+
   box-shadow: var(--shadow);
 }
 
-/* greeting text */
+/* greeting */
 #greeting{
-  font-size:14px;
+  font-size:13px;
   font-weight:600;
   color: var(--blue);
 }
 
-/* time display */
+/* time */
 #time{
-  font-size:12px;
+  font-size:11px;
   color: var(--muted);
 }
 
-/* ================= PAGE SYSTEM ================= */
-.page{
-  display:none;
-  animation: fadeIn 0.25s ease;
+/* ================= NAV ICON BADGE ================= */
+
+.nav-badge{
+  margin-left:auto;
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:999px;
+
+  background: rgba(56,189,248,0.15);
+  color: var(--blue);
 }
 
-.page.active{
-  display:block;
-}
+/* ================= MOBILE NAV INTELLIGENCE ================= */
 
-.page.hidden{
-  display:none;
-}
-
-/* ================= SCROLLABLE CONTENT AREA ================= */
-.scroll{
-  overflow-y:auto;
-  max-height:calc(100vh - 120px);
-}
-
-/* ================= RESPONSIVE SIDEBAR BEHAVIOR ================= */
 @media(max-width:900px){
 
   .sidebar{
@@ -484,927 +1672,1249 @@ input:focus{
   }
 }
 
-@media(max-width:600px){
+@media(max-width:768px){
 
   .sidebar{
-    display:none;
+    position:relative;
+    width:100%;
+    height:auto;
+
+    flex-direction:row;
+    overflow-x:auto;
+    padding:10px;
+  }
+
+  .menu{
+    flex:1;
+    justify-content:center;
+    font-size:11px;
   }
 
   .main{
     margin-left:0;
     width:100%;
-    padding:12px;
   }
 
   .topbar{
     flex-direction:column;
     align-items:flex-start;
-    gap:8px;
+    gap:6px;
   }
 }
 
-/* ================= NAVIGATION SEPARATOR ================= */
-.sidebar hr{
-  border:none;
-  height:1px;
-  background: linear-gradient(90deg, transparent, var(--border), transparent);
-  margin:10px 0;
-}
+/* ================= ULTRA ACTIVE INDICATOR ================= */
 
-/* ================= ACTIVE SECTION HIGHLIGHT ================= */
-.section-title{
-  font-size:12px;
-  color: var(--muted);
-  margin:10px 0 4px;
-  text-transform:uppercase;
-  letter-spacing:1px;
-}
-
-/* ================= ICON STYLE SUPPORT ================= */
-.menu i{
-  color: var(--blue);
-  font-size:14px;
-}
-
-/* ================= MINI STATUS DOT ================= */
-.status-dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background: var(--green-stabilo);
-  box-shadow: var(--glow-green);
-}
-/* =========================================================
-   MYWORK ULTRA ENTERPRISE UI v2 — PART 3/5
-   DASHBOARD + CARDS + CHART SYSTEM
-========================================================= */
-
-/* ================= DASHBOARD GRID ================= */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:18px;
-}
-
-/* ================= KPI CARD ULTRA ================= */
-.card{
-  position:relative;
-  background: linear-gradient(145deg, #0f172a, #0b1020);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:16px;
-
-  box-shadow: var(--shadow);
-  overflow:hidden;
-
-  transition:0.25s ease;
-}
-
-/* glowing edge effect */
-.card::before{
+.menu.active::after{
   content:"";
   position:absolute;
-  inset:0;
-  background: radial-gradient(circle at top left,
-    rgba(56,189,248,0.15),
-    transparent 60%);
-  opacity:0;
-  transition:0.3s;
+  right:10px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background: var(--blue);
+  box-shadow: 0 0 10px rgba(56,189,248,0.5);
 }
 
-/* hover lift + glow */
-.card:hover{
-  transform: translateY(-4px);
-  border-color: var(--blue);
-  box-shadow: var(--glow-blue);
+/* ================= NAV HOVER GLOW LINE ================= */
+
+.menu::after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:10%;
+  width:0%;
+  height:2px;
+  background: linear-gradient(90deg, var(--blue), var(--green-stabilo));
+  transition:.3s ease;
 }
 
-.card:hover::before{
-  opacity:1;
+.menu:hover::after{
+  width:80%;
 }
 
-/* KPI number style */
-.card h2,
-.card h3{
-  margin:0;
-  font-weight:700;
-}
+/* ================= END PART 6 ================= */
+/* =========================================================
+   PART 7/10 — KANBAN WORKFLOW ENGINE
+   TASK SYSTEM + DRAG DROP + INTERACTION UX
+========================================================= */
 
-/* KPI value highlight */
-.kpi-value{
-  font-size:26px;
-  font-weight:800;
-  color: var(--blue);
-  margin-top:6px;
-}
+/* ================= KANBAN WRAPPER ================= */
 
-/* KPI subtitle */
-.kpi-label{
-  font-size:12px;
-  color: var(--muted);
-  margin-top:4px;
-}
-
-/* ================= CHART GRID ================= */
-.chart-grid{
+.kanban{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(3,1fr);
   gap:14px;
-  margin-bottom:18px;
+
+  padding:4px;
 }
 
-/* ================= CHART CARD ================= */
-.chart-card{
-  position:relative;
-  background: linear-gradient(145deg, #0f172a, #0b1020);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:14px;
+/* ================= KANBAN COLUMN ================= */
 
-  height:280px;
+.kanban-column{
+  position:relative;
 
   display:flex;
   flex-direction:column;
 
+  min-height:450px;
+
+  padding:12px;
+  border-radius:16px;
+
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid var(--border);
+
   box-shadow: var(--shadow);
   overflow:hidden;
+
+  transition:.25s ease;
 }
 
-/* chart title */
-.chart-card h3{
-  margin:0 0 10px 0;
+/* column hover glow */
+.kanban-column:hover{
+  border-color: rgba(56,189,248,0.25);
+  box-shadow: 0 0 25px rgba(56,189,248,0.1);
+  transform: translateY(-2px);
+}
+
+/* column header */
+.kanban-column h4{
+  font-size:11px;
+  color: var(--muted);
+  margin-bottom:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+/* ================= TASK LIST ================= */
+
+.kanban-list{
+  flex:1;
+  min-height:300px;
+
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+
+  padding:4px;
+}
+
+/* ================= TASK CARD ================= */
+
+.kanban-card{
+  position:relative;
+
+  padding:10px;
+  border-radius:12px;
+
+  background: rgba(17,24,39,0.9);
+  border:1px solid var(--border);
+
+  cursor:grab;
+
+  transition:.2s ease;
+  animation: fadeIn .2s ease;
+}
+
+/* hover effect */
+.kanban-card:hover{
+  transform: translateY(-2px);
+  border-color: var(--blue);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* drag state */
+.kanban-card.dragging{
+  opacity:0.6;
+  transform: rotate(2deg) scale(0.98);
+  cursor:grabbing;
+}
+
+/* ================= TASK TITLE ================= */
+
+.task-title{
+  font-size:12px;
+  font-weight:600;
+  color: var(--text);
+}
+
+/* task description */
+.task-desc{
+  font-size:11px;
+  color: var(--muted);
+  margin-top:4px;
+}
+
+/* ================= TASK TAG ================= */
+
+.task-tag{
+  display:inline-flex;
+  align-items:center;
+
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:999px;
+
+  margin-top:8px;
+
+  background: rgba(56,189,248,0.12);
+  color: var(--blue);
+}
+
+/* ================= PRIORITY COLORS ================= */
+
+.task-tag.high{
+  background: rgba(239,68,68,0.15);
+  color: var(--red);
+}
+
+.task-tag.medium{
+  background: rgba(245,158,11,0.15);
+  color: #fbbf24;
+}
+
+.task-tag.low{
+  background: rgba(16,185,129,0.15);
+  color: var(--green-soft);
+}
+
+/* ================= TASK FOOTER ================= */
+
+.task-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin-top:10px;
+  font-size:10px;
+  color: var(--muted);
+}
+
+/* ================= DROP HIGHLIGHT ================= */
+
+.kanban-list.drag-over{
+  background: rgba(56,189,248,0.05);
+  border:1px dashed rgba(56,189,248,0.3);
+  border-radius:12px;
+}
+
+/* ================= ADD TASK BUTTON ================= */
+
+.add-task{
+  margin-top:10px;
+  padding:10px;
+
+  border-radius:12px;
+  border:1px dashed rgba(56,189,248,0.3);
+
+  color: var(--blue);
+  font-size:12px;
+  text-align:center;
+
+  cursor:pointer;
+
+  transition:.2s ease;
+}
+
+.add-task:hover{
+  background: rgba(56,189,248,0.08);
+  transform: translateY(-2px);
+}
+
+/* ================= KANBAN BADGE ================= */
+
+.kanban-badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+
+  font-size:10px;
+  padding:2px 6px;
+
+  border-radius:999px;
+
+  background: rgba(15,23,42,0.8);
+  border:1px solid var(--border);
+
+  color: var(--muted);
+}
+
+/* ================= TASK CHECK ================= */
+
+.task-check{
+  position:absolute;
+  top:10px;
+  left:10px;
+
+  width:14px;
+  height:14px;
+
+  border-radius:4px;
+  border:1px solid var(--border);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.task-check.checked{
+  background: var(--green-stabilo);
+  border-color: var(--green-stabilo);
+}
+
+/* ================= TASK CHECK ANIMATION ================= */
+
+@keyframes checkPop{
+  0%{ transform:scale(0.8); }
+  50%{ transform:scale(1.2); }
+  100%{ transform:scale(1); }
+}
+
+.task-check.checked{
+  animation: checkPop .25s ease;
+}
+
+/* ================= SWIMLANE VARIANT ================= */
+
+.kanban.swimlane{
+  grid-template-columns:1fr;
+}
+
+.kanban.swimlane .kanban-column{
+  min-height:auto;
+}
+
+/* ================= MOBILE OPTIMIZATION ================= */
+
+@media(max-width:900px){
+
+  .kanban{
+    grid-template-columns:1fr;
+  }
+
+  .kanban-column{
+    min-height:auto;
+  }
+}
+
+/* ================= END PART 7 ================= */
+/* =========================================================
+   PART 8/10 — NOTIFICATION & FEEDBACK ENGINE
+   TOAST + ALERT + LOADING + REALTIME UI STATES
+========================================================= */
+
+/* ================= TOAST CONTAINER ================= */
+
+.toast-container{
+  position:fixed;
+  top:20px;
+  right:20px;
+
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+
+  z-index:99999;
+  pointer-events:none;
+}
+
+/* ================= TOAST CORE ================= */
+
+.toast{
+  min-width:240px;
+  max-width:320px;
+
+  padding:10px 12px;
+  border-radius:12px;
+
+  background: rgba(15,23,42,0.95);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+
+  color: var(--text);
+  font-size:12px;
+
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+
+  animation: toastIn .3s ease;
+  backdrop-filter: blur(12px);
+
+  pointer-events:auto;
+}
+
+/* toast entry animation */
+@keyframes toastIn{
+  from{
+    transform: translateX(120%);
+    opacity:0;
+  }
+  to{
+    transform: translateX(0);
+    opacity:1;
+  }
+}
+
+/* ================= TOAST TYPES ================= */
+
+.toast.success{
+  border-color: rgba(16,185,129,0.4);
+}
+
+.toast.error{
+  border-color: rgba(239,68,68,0.4);
+}
+
+.toast.info{
+  border-color: rgba(56,189,248,0.4);
+}
+
+/* icon */
+.toast-icon{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+}
+
+.toast.success .toast-icon{
+  background: rgba(16,185,129,0.2);
+  color: var(--green-soft);
+}
+
+.toast.error .toast-icon{
+  background: rgba(239,68,68,0.2);
+  color: var(--red);
+}
+
+.toast.info .toast-icon{
+  background: rgba(56,189,248,0.2);
+  color: var(--blue);
+}
+
+/* ================= ALERT BOX ================= */
+
+.alert{
+  padding:10px 12px;
+  border-radius:12px;
+
+  background: rgba(15,23,42,0.8);
+  border:1px solid var(--border);
+
+  font-size:12px;
+  margin-bottom:10px;
+}
+
+.alert.success{
+  border-color: rgba(16,185,129,0.3);
+}
+
+.alert.error{
+  border-color: rgba(239,68,68,0.3);
+}
+
+.alert.info{
+  border-color: rgba(56,189,248,0.3);
+}
+
+/* ================= LOADING OVERLAY ================= */
+
+#loadingOverlay{
+  position:fixed;
+  inset:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  background: radial-gradient(circle, #0f172a, #020617);
+
+  z-index:999999;
+}
+
+/* hide state */
+#loadingOverlay.hidden{
+  display:none;
+}
+
+/* ================= SPINNER ================= */
+
+.spinner{
+  width:42px;
+  height:42px;
+
+  border-radius:50%;
+  border:3px solid rgba(31,41,55,0.6);
+  border-top:3px solid var(--blue);
+
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin{
+  to{ transform: rotate(360deg); }
+}
+
+/* ================= LOADING TEXT ================= */
+
+.loading-text{
+  margin-top:10px;
   font-size:12px;
   color: var(--muted);
   letter-spacing:0.5px;
 }
 
-/* canvas styling (center perfect) */
-.chart-card canvas{
-  max-width:180px !important;
-  max-height:180px !important;
-  margin:auto;
-  filter: drop-shadow(0 0 8px rgba(56,189,248,0.2));
+/* ================= SKELETON LOADING ================= */
+
+.skeleton{
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04),
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.04)
+  );
+
+  background-size:200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius:10px;
 }
 
-/* ================= BROADCAST PANEL ================= */
-.broadcast{
-  display:flex;
-  gap:10px;
-  margin-bottom:16px;
+@keyframes shimmer{
+  0%{ background-position:200% 0; }
+  100%{ background-position:-200% 0; }
+}
+
+/* ================= PROGRESS BAR ================= */
+
+.progress{
+  width:100%;
+  height:6px;
+
+  background: rgba(31,41,55,0.6);
+  border-radius:999px;
+
+  overflow:hidden;
+}
+
+.progress-bar{
+  height:100%;
+  width:40%;
+
+  background: linear-gradient(90deg, var(--blue), var(--green-stabilo));
+
+  animation: progressMove 1.4s infinite;
+}
+
+@keyframes progressMove{
+  0%{ transform: translateX(-100%); }
+  100%{ transform: translateX(250%); }
+}
+
+/* ================= ONLINE STATUS PULSE ================= */
+
+.pulse-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+
+  background: var(--green-stabilo);
+  box-shadow: 0 0 10px rgba(57,255,20,0.5);
+
+  animation: pulse 1.5s infinite;
+}
+
+/* ================= REALTIME INDICATOR ================= */
+
+.realtime{
+  display:inline-flex;
   align-items:center;
+  gap:6px;
+
+  font-size:11px;
+  color: var(--muted);
 }
 
-/* input field broadcast */
-.broadcast input{
-  flex:1;
-  padding:12px;
-  border-radius:12px;
+.realtime::before{
+  content:"";
+  width:6px;
+  height:6px;
+
+  border-radius:50%;
+  background: var(--blue);
+
+  animation: pulse 1.2s infinite;
+}
+
+/* ================= NOTIFICATION PANEL ================= */
+
+.notification-panel{
+  position:fixed;
+  right:20px;
+  top:70px;
+
+  width:320px;
+  max-height:420px;
+
+  overflow-y:auto;
+
+  background: rgba(15,23,42,0.95);
   border:1px solid var(--border);
-  background: #0b1220;
-  color:white;
-  outline:none;
+
+  border-radius:14px;
+  padding:10px;
+
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
 }
 
-.broadcast input:focus{
-  border-color: var(--blue);
-  box-shadow: var(--glow-blue);
+/* notification item */
+.notification-item{
+  padding:10px;
+
+  font-size:12px;
+  color: var(--text);
+
+  border-bottom:1px solid rgba(31,41,55,0.6);
+
+  transition:.2s;
 }
 
-/* send button */
-.broadcast button{
-  padding:12px 14px;
-  border-radius:12px;
-  background: var(--grad-blue);
-  color:white;
-  font-weight:700;
-  border:none;
+.notification-item:hover{
+  background: rgba(56,189,248,0.05);
 }
 
-.broadcast button:hover{
-  transform: translateY(-2px);
-  box-shadow: var(--glow-blue);
-}
+/* ================= ACTIVITY STREAM ================= */
 
-/* ================= BROADCAST LIST ================= */
-.broadcast-list{
+.activity-stream{
   display:flex;
   flex-direction:column;
   gap:8px;
 }
 
-/* message item */
-.broadcast-item{
-  padding:10px 12px;
-  border-radius:12px;
-  background: rgba(15,23,42,0.7);
-  border:1px solid var(--border);
-  font-size:13px;
-
-  animation: fadeIn 0.2s ease;
-}
-
-/* highlight newest message */
-.broadcast-item:first-child{
-  border-color: var(--blue);
-  box-shadow: var(--glow-blue);
-}
-
-/* ================= KANBAN WRAPPER ================= */
-.kanban{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-
-/* column container */
-.kanban-column{
-  background: linear-gradient(145deg, #0f172a, #0b1020);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:12px;
-
-  min-height:420px;
-
-  box-shadow: var(--shadow);
-}
-
-/* column header */
-.kanban-column h4{
-  margin:0 0 10px 0;
-  font-size:12px;
-  color: var(--muted);
-}
-
-/* kanban list */
-.kanban-list{
-  min-height:320px;
-  padding:6px;
-}
-
-/* task card */
-.kanban-card{
-  background: #111827;
-  border:1px solid var(--border);
+.activity-item{
   padding:10px;
-  border-radius:12px;
-  margin-bottom:10px;
 
-  cursor:grab;
-  transition:0.2s;
+  border-radius:10px;
+
+  background: rgba(2,6,23,0.6);
+  border:1px solid rgba(31,41,55,0.8);
+
+  font-size:11px;
+  color: var(--muted);
+
+  animation: fadeIn .25s ease;
 }
 
-.kanban-card:hover{
-  transform: scale(1.02);
+.activity-item:hover{
   border-color: var(--blue);
-  box-shadow: var(--glow-blue);
-}
-
-/* dragging effect */
-.dragging{
-  opacity:0.6;
-  transform: rotate(2deg);
-}
-
-/* ================= TABLE UI ================= */
-table{
-  width:100%;
-  border-collapse:collapse;
-  background: rgba(15,23,42,0.6);
-  border-radius:12px;
-  overflow:hidden;
-}
-
-th,td{
-  padding:12px;
-  border-bottom:1px solid var(--border);
-  font-size:13px;
-}
-
-th{
-  color: var(--blue);
-  text-align:left;
-  background: rgba(56,189,248,0.05);
-}
-
-/* ================= RESPONSIVE ================= */
-@media(max-width:900px){
-
-  .grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .chart-grid{
-    grid-template-columns:1fr;
-  }
-
-  .kanban{
-    grid-template-columns:1fr;
-  }
-}
-/* =========================================================
-   PART 4 - UI ENHANCEMENTS + EFFECTS + UTILITIES
-   ========================================================= */
-
-/* ================= GLASS EFFECT UTILITIES ================= */
-.glass {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(56, 189, 248, 0.15);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-}
-
-.glass-strong {
-  background: rgba(2, 6, 23, 0.75);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-/* ================= GRADIENT TEXT ================= */
-.text-gradient {
-  background: linear-gradient(90deg, #38bdf8, #10b981, #60a5fa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-green-glow {
-  color: #10b981;
-  text-shadow: 0 0 10px rgba(16,185,129,0.5);
-}
-
-.text-blue-glow {
-  color: #38bdf8;
-  text-shadow: 0 0 10px rgba(56,189,248,0.5);
-}
-
-/* ================= BUTTON UPGRADE SYSTEM ================= */
-.btn {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid #1f2937;
-  background: linear-gradient(135deg, #0f172a, #111827);
-  color: #e5e7eb;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all .2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-  border-color: #38bdf8;
-  box-shadow: 0 6px 20px rgba(56,189,248,0.15);
-}
-
-.btn-primary {
-  background: linear-gradient(90deg, #38bdf8, #2563eb);
-  color: #001018;
-  font-weight: 600;
-}
-
-.btn-success {
-  background: linear-gradient(90deg, #10b981, #22c55e);
-  color: #00140a;
-}
-
-.btn-danger {
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-  color: white;
-}
-
-/* ================= INPUT UPGRADE ================= */
-input, select, textarea {
-  outline: none;
-  transition: all .2s ease;
-}
-
-input:focus, select:focus, textarea:focus {
-  border-color: #38bdf8 !important;
-  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
-}
-
-/* ================= CARD ENHANCEMENT ================= */
-.card, .chart-card, .kanban-column {
-  transition: all .25s ease;
-}
-
-.card:hover, .chart-card:hover, .kanban-column:hover {
-  transform: translateY(-2px);
-  border-color: rgba(56,189,248,0.3);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-}
-
-/* ================= BADGE SYSTEM ================= */
-.badge {
-  display: inline-block;
-  padding: 4px 8px;
-  font-size: 11px;
-  border-radius: 6px;
-  background: #1f2937;
-  color: #9ca3af;
-}
-
-.badge-blue {
-  background: rgba(56,189,248,0.15);
-  color: #38bdf8;
-}
-
-.badge-green {
-  background: rgba(16,185,129,0.15);
-  color: #10b981;
-}
-
-.badge-red {
-  background: rgba(239,68,68,0.15);
-  color: #ef4444;
-}
-
-/* ================= MODAL SYSTEM ================= */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
-  z-index: 999;
-}
-
-.modal-box {
-  width: 420px;
-  padding: 20px;
-  border-radius: 14px;
-  background: #0f172a;
-  border: 1px solid #1f2937;
-  animation: pop .2s ease;
-}
-
-@keyframes pop {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* ================= LOADING ANIMATION ================= */
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #1f2937;
-  border-top: 3px solid #38bdf8;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ================= NOTIFICATION PANEL ================= */
-.notification-panel {
-  position: fixed;
-  right: 20px;
-  top: 80px;
-  width: 320px;
-  max-height: 400px;
-  overflow-y: auto;
-  background: rgba(15,23,42,0.95);
-  border: 1px solid #1f2937;
-  border-radius: 14px;
-  padding: 10px;
-  backdrop-filter: blur(12px);
-}
-
-.notification-item {
-  padding: 10px;
-  border-bottom: 1px solid #1f2937;
-  font-size: 12px;
-  color: #e5e7eb;
-}
-
-.notification-item:hover {
-  background: rgba(56,189,248,0.05);
-}
-
-/* ================= ACTIVITY PANEL ================= */
-.activity-item {
-  padding: 10px;
-  border-left: 2px solid #38bdf8;
-  margin-bottom: 8px;
-  background: rgba(15,23,42,0.6);
-  border-radius: 8px;
-}
-
-/* ================= USER STATUS ================= */
-.user-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 8px;
-  border-bottom: 1px solid #1f2937;
-}
-
-.user-row span:first-child {
-  font-size: 10px;
-}
-
-/* ================= BROADCAST LIVE FEED ================= */
-.broadcast-item {
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(16,185,129,0.08));
-  border: 1px solid rgba(56,189,248,0.15);
-}
-
-/* ================= FILE MANAGER ================= */
-.file-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-radius: 10px;
-  background: #0f172a;
-  border: 1px solid #1f2937;
-  margin-bottom: 8px;
-  transition: .2s;
-}
-
-.file-card:hover {
-  border-color: #38bdf8;
   transform: translateX(3px);
 }
 
-/* ================= SCROLLBAR CUSTOM ================= */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0b1220;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(#38bdf8, #10b981);
-  border-radius: 10px;
-}
-
-/* ================= GLITCH EFFECT (OPTIONAL HEADER) ================= */
-.glitch {
-  position: relative;
-  color: #38bdf8;
-}
-
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0.8;
-}
-
-.glitch::before {
-  color: #10b981;
-  transform: translate(1px, 0);
-}
-
-.glitch::after {
-  color: #2563eb;
-  transform: translate(-1px, 0);
-}
-
-/* ================= HOVER LIFT SYSTEM ================= */
-.hover-lift {
-  transition: .2s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-}
-
-/* ================= DIVIDER ================= */
-.divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #1f2937, transparent);
-  margin: 12px 0;
-}
+/* ================= END PART 8 ================= */
 /* =========================================================
-   PART 5 - FINAL POLISH (NEON TECH ULTIMATE UI)
-   ========================================================= */
+   MYWORK ULTRA ENTERPRISE UI v2 — PART 9/10
+   ADVANCED ANIMATIONS + MOTION SYSTEM
+========================================================= */
 
-/* ================= GLOBAL NEON BACKGROUND LAYER ================= */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(56,189,248,0.08), transparent 40%),
-    radial-gradient(circle at 80% 30%, rgba(16,185,129,0.07), transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(37,99,235,0.06), transparent 50%);
-  pointer-events: none;
-  z-index: 0;
+
+/* ================= MOTION SYSTEM VARIABLES ================= */
+:root{
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-smooth: cubic-bezier(0.45, 0, 0.2, 1);
+
+  --fast: 0.15s;
+  --normal: 0.25s;
+  --slow: 0.5s;
 }
 
-/* ================= GLOBAL FONT UPGRADE ================= */
-body {
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  letter-spacing: 0.2px;
+
+/* ================= GLOBAL ANIMATION BASE ================= */
+*{
+  transition: background var(--normal) var(--ease-smooth),
+              color var(--normal) var(--ease-smooth),
+              transform var(--normal) var(--ease-out),
+              box-shadow var(--normal) var(--ease-out),
+              border-color var(--normal) var(--ease-smooth);
 }
 
-/* ================= NEON BORDER ANIMATION ================= */
-@keyframes neonBorder {
-  0% { box-shadow: 0 0 5px rgba(56,189,248,0.2); }
-  50% { box-shadow: 0 0 20px rgba(16,185,129,0.25); }
-  100% { box-shadow: 0 0 5px rgba(37,99,235,0.2); }
+
+/* ================= FADE SYSTEM ================= */
+.fade-in{
+  animation: fadeInUp var(--normal) var(--ease-out) both;
 }
 
-.neon {
-  animation: neonBorder 3s infinite ease-in-out;
+.fade-out{
+  animation: fadeOutDown var(--fast) var(--ease-in) both;
 }
 
-/* ================= DASHBOARD HERO CARD ================= */
-.hero-card {
-  background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(2,6,23,0.9));
-  border: 1px solid rgba(56,189,248,0.2);
-  border-radius: 16px;
-  padding: 18px;
+@keyframes fadeInUp{
+  from{
+    opacity:0;
+    transform: translateY(10px) scale(0.98);
+    filter: blur(6px);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeOutDown{
+  from{
+    opacity:1;
+    transform: translateY(0);
+  }
+  to{
+    opacity:0;
+    transform: translateY(10px);
+  }
+}
+
+
+/* ================= STAGGER ANIMATION SYSTEM ================= */
+.stagger-1{ animation-delay:0.05s; }
+.stagger-2{ animation-delay:0.1s; }
+.stagger-3{ animation-delay:0.15s; }
+.stagger-4{ animation-delay:0.2s; }
+.stagger-5{ animation-delay:0.25s; }
+
+.stagger-item{
+  animation: fadeInUp 0.4s var(--ease-out) both;
+}
+
+
+/* ================= FLOAT SYSTEM ================= */
+.float{
+  animation: floatY 3s var(--ease-smooth) infinite;
+}
+
+@keyframes floatY{
+  0%{ transform: translateY(0px); }
+  50%{ transform: translateY(-6px); }
+  100%{ transform: translateY(0px); }
+}
+
+
+/* ================= PULSE SYSTEM ================= */
+.pulse{
+  animation: pulseSoft 2s infinite var(--ease-smooth);
+}
+
+@keyframes pulseSoft{
+  0%,100%{
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(56,189,248,0);
+  }
+  50%{
+    transform: scale(1.03);
+    box-shadow: 0 0 20px rgba(56,189,248,0.2);
+  }
+}
+
+
+/* ================= NEON BREATH EFFECT ================= */
+.neon-breathe{
+  animation: breathe 3s infinite ease-in-out;
+}
+
+@keyframes breathe{
+  0%,100%{
+    filter: drop-shadow(0 0 5px rgba(56,189,248,0.2));
+  }
+  50%{
+    filter: drop-shadow(0 0 18px rgba(56,189,248,0.5));
+  }
+}
+
+
+/* ================= HOVER LIFT ULTRA ================= */
+.hover-lift-ultra{
+  transition: all var(--normal) var(--ease-out);
+}
+
+.hover-lift-ultra:hover{
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+
+/* ================= CLICK FEEDBACK SYSTEM ================= */
+.click-pop:active{
+  transform: scale(0.96);
+  transition: transform 0.08s var(--ease-in);
+}
+
+
+/* ================= BUTTON RIPPLE EFFECT ================= */
+.ripple{
   position: relative;
   overflow: hidden;
 }
 
-.hero-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(56,189,248,0.05), transparent);
-  transform: translateX(-100%);
-  animation: shine 4s infinite;
+.ripple::after{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background: rgba(255,255,255,0.3);
+  transform: scale(0);
+  opacity:0;
+  pointer-events:none;
+  transition: transform 0.6s, opacity 0.6s;
 }
 
-@keyframes shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.ripple:active::after{
+  transform: scale(12);
+  opacity:0;
 }
 
-/* ================= KPI NUMBER ANIMATION ================= */
-.kpi-number {
-  font-size: 24px;
-  font-weight: bold;
-  background: linear-gradient(90deg, #38bdf8, #10b981);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: pulseText 2s infinite;
-}
 
-@keyframes pulseText {
-  0%,100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-/* ================= MOBILE ULTRA OPTIMIZATION ================= */
-@media(max-width: 768px) {
-
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    flex-direction: row;
-    overflow-x: auto;
-  }
-
-  .menu {
-    flex: 1;
-    text-align: center;
-    font-size: 12px;
-  }
-
-  .main {
-    margin-left: 0;
-    width: 100%;
-    padding: 12px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .chart-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .kanban {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ================= ULTRA DARK MODE ENHANCEMENT ================= */
-@media (prefers-color-scheme: dark) {
-  html, body {
-    background: #020617;
-  }
-}
-
-/* ================= GLASS STRONG HEADER ================= */
-.topbar {
-  background: rgba(15,23,42,0.6);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(56,189,248,0.15);
-  padding: 10px 14px;
-  border-radius: 12px;
-}
-
-/* ================= ACTIVE MENU GLOW ================= */
-.menu.active {
+/* ================= GLASS ANIMATION FLOW ================= */
+.glass-flow{
   position: relative;
-  background: linear-gradient(90deg, rgba(56,189,248,0.2), rgba(16,185,129,0.15));
-  border-left: 3px solid #38bdf8;
-  box-shadow: 0 0 15px rgba(56,189,248,0.15);
+  overflow: hidden;
 }
 
-/* ================= FLOATING ACTION EFFECT ================= */
-.fab {
+.glass-flow::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(56,189,248,0.08),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: glassMove 4s infinite;
+}
+
+@keyframes glassMove{
+  0%{ transform: translateX(-100%); }
+  100%{ transform: translateX(100%); }
+}
+
+
+/* ================= TEXT TYPEWRITER EFFECT ================= */
+.typewriter{
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--blue);
+  animation: typing 2.5s steps(30, end), blink 0.7s infinite;
+}
+
+@keyframes typing{
+  from{ width:0; }
+  to{ width:100%; }
+}
+
+@keyframes blink{
+  50%{ border-color: transparent; }
+}
+
+
+/* ================= SCANLINE EFFECT ================= */
+.scanline{
+  position: relative;
+}
+
+.scanline::after{
+  content:"";
+  position:absolute;
+  left:0;
+  top:-100%;
+  width:100%;
+  height:100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(56,189,248,0.08),
+    transparent
+  );
+  animation: scan 2.5s linear infinite;
+}
+
+@keyframes scan{
+  0%{ top:-100%; }
+  100%{ top:100%; }
+}
+
+
+/* ================= BACKGROUND PARTICLE FLOAT ================= */
+.particles{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particles span{
+  position: absolute;
+  width:4px;
+  height:4px;
+  background: rgba(56,189,248,0.4);
+  border-radius:50%;
+  animation: particleFloat 10s linear infinite;
+}
+
+@keyframes particleFloat{
+  0%{
+    transform: translateY(100vh) scale(0.5);
+    opacity:0;
+  }
+  50%{
+    opacity:1;
+  }
+  100%{
+    transform: translateY(-10vh) scale(1);
+    opacity:0;
+  }
+}
+
+
+/* ================= LOADING DOT WAVE ================= */
+.dot-wave{
+  display:flex;
+  gap:6px;
+}
+
+.dot-wave span{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background: var(--blue);
+  animation: wave 1s infinite ease-in-out;
+}
+
+.dot-wave span:nth-child(2){ animation-delay:0.1s; }
+.dot-wave span:nth-child(3){ animation-delay:0.2s; }
+
+@keyframes wave{
+  0%,100%{ transform: translateY(0); opacity:0.5; }
+  50%{ transform: translateY(-6px); opacity:1; }
+}
+
+
+/* ================= FINAL MICRO SHADOW PULSE ================= */
+.micro-glow{
+  animation: microGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes microGlow{
+  0%,100%{
+    box-shadow: 0 0 5px rgba(56,189,248,0.1);
+  }
+  50%{
+    box-shadow: 0 0 18px rgba(56,189,248,0.25);
+  }
+}
+/* =========================================================
+   MYWORK ULTRA ENTERPRISE UI v2 — PART 10/10
+   FINAL POLISH + SYSTEM CLEANUP + RESPONSIVE MASTER
+========================================================= */
+
+
+/* ================= FINAL GLOBAL RESET FIX ================= */
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
+}
+
+html, body{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+
+/* ================= DARK CORE BACKGROUND FIX ================= */
+body{
+  background: radial-gradient(circle at top, #0b1220, #050814 70%);
+  color: var(--text, #e5e7eb);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+
+/* ================= Z-INDEX LAYER SYSTEM ================= */
+:root{
+  --z-base: 1;
+  --z-ui: 10;
+  --z-overlay: 100;
+  --z-modal: 1000;
+  --z-toast: 1100;
+  --z-loading: 9999;
+}
+
+
+/* ================= SAFE LAYOUT FIX ================= */
+.app{
+  position: relative;
+  z-index: var(--z-base);
+}
+
+
+/* ================= SIDEBAR FINAL HARDENING ================= */
+.sidebar{
+  z-index: var(--z-ui);
+  -webkit-overflow-scrolling: touch;
+}
+
+.sidebar *{
+  user-select: none;
+}
+
+
+/* ================= MAIN CONTENT SAFETY ================= */
+.main{
+  position: relative;
+  z-index: var(--z-base);
+  min-height: 100vh;
+}
+
+
+/* ================= MODAL FINAL LOCK ================= */
+.modal{
+  z-index: var(--z-modal);
+  animation: modalFade 0.2s ease;
+}
+
+@keyframes modalFade{
+  from{ opacity: 0; }
+  to{ opacity: 1; }
+}
+
+
+/* ================= TOAST FIX ================= */
+#toast,
+.toast{
+  z-index: var(--z-toast);
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #38bdf8, #10b981);
-  color: #001018;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
+}
+
+
+/* ================= LOADING OVERLAY FINAL ================= */
+#loadingOverlay{
+  z-index: var(--z-loading);
+  backdrop-filter: blur(10px);
+}
+
+
+/* ================= BUTTON GLOBAL HARDENING ================= */
+button{
+  outline: none;
+  border: none;
   cursor: pointer;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  transition: .2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.fab:hover {
-  transform: scale(1.1);
+button:focus{
+  outline: 2px solid rgba(56,189,248,0.4);
+  outline-offset: 2px;
 }
 
-/* ================= LOADING SCREEN FULL PREMIUM ================= */
-#loadingOverlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, #0f172a, #020617);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 9999;
+
+/* ================= INPUT FINAL FIX ================= */
+input, textarea, select{
+  width: 100%;
+  font-family: inherit;
 }
 
-#loadingOverlay.hidden {
-  display: none;
+input::placeholder{
+  color: rgba(156,163,175,0.7);
 }
 
-/* ================= PROGRESS BAR ================= */
-.progress-bar {
-  width: 200px;
-  height: 4px;
-  background: #1f2937;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 10px;
-}
 
-.progress-bar::after {
-  content: "";
-  display: block;
-  height: 100%;
-  width: 40%;
-  background: linear-gradient(90deg, #38bdf8, #10b981);
-  animation: load 1.5s infinite;
-}
+/* ================= RESPONSIVE MASTER SYSTEM ================= */
 
-@keyframes load {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(250%); }
-}
+/* TABLET FIX */
+@media (max-width: 1024px){
+  .grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-/* ================= FINAL UI CLEAN FIX ================= */
-.hidden {
-  display: none !important;
-}
+  .chart-grid{
+    grid-template-columns: 1fr;
+  }
 
-.active {
-  opacity: 1;
-}
+  .kanban{
+    grid-template-columns: 1fr 1fr;
+  }
 
-/* ================= SELECTION COLOR ================= */
-::selection {
-  background: rgba(56,189,248,0.3);
-  color: white;
-}
+  .sidebar{
+    width: 220px;
+  }
 
-/* ================= FINAL SHADOW DEPTH SYSTEM ================= */
-.deep-shadow {
-  box-shadow:
-    0 5px 15px rgba(0,0,0,0.4),
-    0 0 25px rgba(56,189,248,0.08);
-}
-
-/* ================= MICRO INTERACTION ================= */
-button, .menu, .card {
-  transition: all .2s ease;
-}
-
-/* ================= AUTH CARD ================= */
-.auth-card{
-  width:340px;
-  padding:20px;
-  border-radius:16px;
-  background: rgba(15,23,42,0.9);
-  border:1px solid var(--border);
-  box-shadow: var(--shadow);
-}
-
-/* HEADER */
-.auth-header{
-  text-align:center;
-  margin-bottom:14px;
-}
-
-.auth-header h1{
-  font-size:18px;
-  color: var(--blue);
-}
-
-.auth-header p{
-  font-size:12px;
-  color: var(--muted);
-}
-
-/* TAB */
-.auth-tabs{
-  display:flex;
-  gap:10px;
-  margin-bottom:12px;
-}
-
-.tab{
-  flex:1;
-  padding:8px;
-  border-radius:10px;
-  background: transparent;
-  border:1px solid var(--border);
-  color: var(--muted);
-}
-
-.tab.active{
-  background: rgba(56,189,248,0.15);
-  color: white;
-  border-color: var(--blue);
-}
-
-/* FORM */
-.auth-form{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-/* HIDDEN */
-.hidden{
-  display:none !important;
-}
-
-/* ================= SETTINGS PAGE ================= */
-
-.settings-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin-top:15px;
-}
-
-.settings-card{
-  padding:16px;
-}
-
-.avatar-box{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  margin-bottom:10px;
-}
-
-.avatar-box img{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  border:2px solid var(--blue);
-  object-fit:cover;
-  box-shadow: var(--glow-blue);
-}
-
-@media(max-width:900px){
-  .settings-grid{
-    grid-template-columns:1fr;
+  .main{
+    margin-left: 220px;
   }
 }
 
-/* ================= END SYSTEM ================= */
+
+/* MOBILE MASTER FIX */
+@media (max-width: 768px){
+  .sidebar{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    overflow-x: auto;
+    z-index: var(--z-ui);
+  }
+
+  .menu{
+    flex: 1;
+    justify-content: center;
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  .main{
+    margin-left: 0;
+    margin-top: 60px;
+    width: 100%;
+  }
+
+  .grid{
+    grid-template-columns: 1fr;
+  }
+
+  .kanban{
+    grid-template-columns: 1fr;
+  }
+
+  .topbar{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+
+/* SMALL PHONE FIX */
+@media (max-width: 480px){
+  .auth-card{
+    width: 90%;
+  }
+
+  .card{
+    padding: 12px;
+  }
+
+  .kpi-value{
+    font-size: 20px;
+  }
+}
+
+
+/* ================= PERFORMANCE MODE (LOW END DEVICES) ================= */
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* ================= PRINT MODE CLEANUP ================= */
+@media print{
+  body{
+    background: white !important;
+    color: black !important;
+  }
+
+  .sidebar,
+  .topbar,
+  .modal,
+  #loadingOverlay{
+    display: none !important;
+  }
+}
+
+
+/* ================= FINAL UI CLEAN CLASSES ================= */
+.no-select{
+  user-select: none;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.full-width{
+  width: 100%;
+}
+
+.center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* ================= SAFE HIDE SYSTEM ================= */
+.hidden{
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+
+/* ================= FINAL GLASS POLISH ================= */
+.glass{
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(56,189,248,0.12);
+}
+
+
+/* ================= FINAL CARD SHARPEN ================= */
+.card{
+  border-radius: 14px;
+  transition: all 0.25s var(--ease-out, ease);
+}
+
+
+/* ================= FINAL ACTIVE STATE FIX ================= */
+.active{
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+
+/* ================= FINAL ANCHOR FIX ================= */
+a{
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover{
+  color: #38bdf8;
+}
+
+
+/* ================= ULTRA CLEAN END SYSTEM ================= */
+body::after{
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.15));
+  z-index: 0;
+}
