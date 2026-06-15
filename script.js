@@ -1,5 +1,10 @@
 // =========================================================
-// SUPABASE CONFIG
+// MYWORK ENTERPRISE CORE v3 (REBUILD FROM ZERO)
+// PART 1 - FOUNDATION LAYER
+// =========================================================
+
+// =========================================================
+// SUPABASE INIT (SAFE + SCALABLE)
 // =========================================================
 
 const SUPABASE_URL =
@@ -9,231 +14,192 @@ const SUPABASE_KEY =
   "sb_publishable_UEEIA0b0Cw3ucS8OoP0ZPQ_9N6iAmGc";
 
 const client =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // =========================================================
-// GLOBAL STATE
+// APP METADATA
 // =========================================================
 
-let user = null;
-let tasks = [];
-let chartDonut = null;
-let chartBar = null;
+const APP = {
+  name: "MyWork SaaS Core",
+  version: "3.0.0",
+  mode: "enterprise",
+  developer: "Bantunala",
+  build: new Date().toISOString()
+};
 
-let realtimeStarted = false;
-let presenceStarted = false;
+client.auth.onAuthStateChange((event, session) => {
 
-let excelData = [];
+  if (event === "SIGNED_IN" && session) {
+    state.user = session.user;
+    enterApp();
+  }
 
-let certElements = [];
-let selectedElement = null;
+  if (event === "SIGNED_OUT") {
+    state.user = null;
+    exitApp();
+  }
+
+});
 
 // =========================================================
-// APP START
+// GLOBAL STATE (CENTRALIZED STORE)
 // =========================================================
 
-window.addEventListener(
-  "load",
-  async () => {
+let state = {
+
+  user: null,
+
+  tasks: [],
+
+  excelData: [],
+
+  cert: {
+    elements: [],
+    selected: null
+  },
+
+  ui: {
+    currentPage: "dashboard",
+    systemReady: false,
+    loader: false
+  },
+
+  charts: {
+    donut: null,
+    bar: null
+  },
+
+  realtime: {
+    taskChannel: null,
+    presenceChannel: null,
+    started: false
+  },
+
+  broadcast: [],
+  notifications: [],
+  activityLogs: []
+
+};
+
+// =========================================================
+// APP BOOTSTRAP
+// =========================================================
+
+window.addEventListener("load", async () => {
+
+  try {
+
+    showLoader();
 
     initClock();
+    initKeyboardShortcuts();
 
     await restoreSession();
 
-    listenBroadcast();
+    loadLocalModules();
 
+    console.log("🚀 MyWork Boot Complete");
+
+  } catch (err) {
+    console.error("BOOT ERROR:", err);
+  } finally {
+    hideLoader();
   }
-);
+
+});
 
 // =========================================================
 // SESSION RESTORE
 // =========================================================
 
-async function restoreSession(){
+async function restoreSession() {
 
-  try{
+  try {
 
-    const {
-      data:{session}
-    } = await client.auth.getSession();
+    const { data: { session } } =
+      await client.auth.getSession();
 
-    if(session){
-
-      user = session.user;
-
-      startApp();
-
+    if (session) {
+      state.user = session.user;
+      enterApp();
+    } else {
+      exitApp();
     }
 
-  }catch(err){
-
-    console.error(err);
-
+  } catch (err) {
+    console.error("SESSION ERROR:", err);
+    exitApp();
   }
 
 }
 
 // =========================================================
-// AUTH LOGIN
+// APP STARTER
 // =========================================================
 
-async function login(){
+function enterApp() {
 
-  const email =
-    document.getElementById("email").value;
+  const authBox = document.getElementById("authBox");
+  const appBox = document.getElementById("app");
 
-  const password =
-    document.getElementById("password").value;
+  if (authBox) authBox.style.display = "none";
+  if (appBox) appBox.style.display = "flex";
 
-  const msg =
-    document.getElementById("msg");
-
-  if(!email || !password){
-
-    msg.innerText =
-      "❌ Email dan Password wajib diisi";
-
-    return;
-  }
-
-  msg.innerText = "Loading...";
-
-  const {
-    data,
-    error
-  } =
-  await client.auth.signInWithPassword({
-
-    email,
-    password
-
-  });
-
-  if(error){
-
-    msg.innerText =
-      "❌ " + error.message;
-
-    return;
-  }
-
-  user = data.user;
-
-  msg.innerText =
-    "✅ Login berhasil";
-
-  startApp();
-
-}
-
-// =========================================================
-// LOGOUT
-// =========================================================
-
-async function logout(){
-
-  if(
-    !confirm(
-      "Yakin ingin logout?"
-    )
-  ) return;
-
-  await client.auth.signOut();
-
-  location.reload();
-
-}
-
-// =========================================================
-// START APP
-// =========================================================
-
-function startApp(){
-
-  const auth =
-    document.getElementById("authBox");
-
-  const app =
-    document.getElementById("app");
-
-  if(auth)
-    auth.style.display = "none";
-
-  if(app)
-    app.style.display = "flex";
+  state.ui.systemReady = true;
 
   openPage("dashboard");
 
   loadTasks();
+  loadFiles();
+  loadBroadcastHistory();
+  loadProfile();
 
-  if(!realtimeStarted){
+  initRealtime();
+  initPresence();
+  listenBroadcast();
 
-    initRealtime();
-    realtimeStarted = true;
+  addActivity("LOGIN: " + (state.user?.email || "unknown"));
 
-  }
+  showToast("Welcome " + (state.user?.email || "User"));
+}
 
-  if(!presenceStarted){
+function exitApp() {
 
-    initPresence();
-    presenceStarted = true;
+  const authBox = document.getElementById("authBox");
+  const appBox = document.getElementById("app");
 
-  }
+  if (authBox) authBox.style.display = "flex";
+  if (appBox) appBox.style.display = "none";
 
+  state.ui.systemReady = false;
 }
 
 // =========================================================
-// NAVIGATION SYSTEM
+// PAGE SYSTEM
 // =========================================================
 
-function openPage(
-  pageId,
-  menuBtn
-){
+function openPage(pageId, menuBtn) {
 
-  document
-    .querySelectorAll(".page")
-    .forEach(page=>{
+  state.ui.currentPage = pageId;
 
-      page.classList.remove(
-        "active"
-      );
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.remove("active");
+    p.classList.add("hidden");
+  });
 
-    });
+  const target = document.getElementById(pageId);
 
-  const target =
-    document.getElementById(
-      pageId
-    );
-
-  if(target){
-
-    target.classList.add(
-      "active"
-    );
-
+  if (target) {
+    target.classList.remove("hidden");
+    target.classList.add("active");
   }
 
-  document
-    .querySelectorAll(".menu")
-    .forEach(menu=>{
+  document.querySelectorAll(".menu").forEach(m => {
+    m.classList.remove("active");
+  });
 
-      menu.classList.remove(
-        "active"
-      );
-
-    });
-
-  if(menuBtn){
-
-    menuBtn.classList.add(
-      "active"
-    );
-
-  }
+  if (menuBtn) menuBtn.classList.add("active");
 
 }
 
@@ -241,148 +207,269 @@ function openPage(
 // CLOCK SYSTEM
 // =========================================================
 
-function initClock(){
-
+function initClock() {
   updateClock();
+  setInterval(updateClock, 1000);
+}
 
-  setInterval(
-    updateClock,
-    60000
+function updateClock() {
+
+  const now = new Date();
+  const hour = now.getHours();
+
+  let greet = "Welcome";
+
+  if (hour < 12) greet = "Good Morning ☀️";
+  else if (hour < 17) greet = "Good Afternoon 🌤";
+  else greet = "Good Evening 🌙";
+
+  setText("greeting", greet);
+
+  setText(
+    "time",
+    now.toLocaleDateString("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }) +
+    " • " +
+    now.toLocaleTimeString("id-ID")
   );
 
 }
 
-function updateClock(){
+// =========================================================
+// DOM HELPERS (SAFE ACCESS)
+// =========================================================
 
-  const now =
-    new Date();
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
 
-  const hour =
-    now.getHours();
+function setHTML(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = value;
+}
 
-  let greeting =
-    "Welcome";
+// =========================================================
+// LOADER SYSTEM
+// =========================================================
 
-  if(hour < 12){
+function showLoader() {
+  const el = document.getElementById("loadingOverlay");
+  if (el) el.classList.remove("hidden");
+}
 
-    greeting =
-      "Good Morning ☀️";
+function hideLoader() {
+  const el = document.getElementById("loadingOverlay");
+  if (el) el.classList.add("hidden");
+}
 
+// =========================================================
+// TOAST SYSTEM (GLOBAL SAFE)
+// =========================================================
+
+function showToast(message) {
+
+  let toast = document.getElementById("toast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+
+    toast.style.position = "fixed";
+    toast.style.bottom = "20px";
+    toast.style.right = "20px";
+    toast.style.background = "#111827";
+    toast.style.color = "#fff";
+    toast.style.padding = "10px 14px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "13px";
+    toast.style.zIndex = "9999";
+    toast.style.transition = "0.3s";
+
+    document.body.appendChild(toast);
   }
-  else if(hour < 17){
 
-    greeting =
-      "Good Afternoon 🌤";
+  toast.innerText = message;
+  toast.style.opacity = "1";
 
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 2500);
+
+}
+
+// =========================================================
+// ACTIVITY LOG CORE
+// =========================================================
+
+function addActivity(text) {
+
+  state.activityLogs.unshift({
+    text,
+    time: new Date().toLocaleString("id-ID")
+  });
+
+}
+// =========================================================
+// MYWORK CORE v3
+// PART 2 - TASK SYSTEM (ENTERPRISE LEVEL)
+// =========================================================
+
+// =========================================================
+// LOAD TASKS
+// =========================================================
+
+async function loadTasks() {
+
+  try {
+
+    showLoader();
+
+    const { data, error } = await client
+      .from("tasks")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.error("LOAD TASK ERROR:", error);
+      hideLoader();
+      return;
+    }
+
+    state.tasks = data || [];
+
+    updateDashboard();
+    renderTaskCounters();
+    renderKanban();
+    renderChart();
+
+  } catch (err) {
+    console.error("LOAD TASK EXCEPTION:", err);
   }
-  else{
 
-    greeting =
-      "Good Evening 🌙";
+  hideLoader();
+}
 
+// =========================================================
+// ADD TASK (SAFE + VALIDATED)
+// =========================================================
+
+async function addTask() {
+
+  const input = document.getElementById("taskInput");
+
+  if (!input || !input.value.trim()) {
+    showToast("Task tidak boleh kosong");
+    return;
   }
 
-  const greetingEl =
-    document.getElementById(
-      "greeting"
-    );
+  const title = input.value.trim();
 
-  const timeEl =
-    document.getElementById(
-      "time"
-    );
+  try {
 
-  if(greetingEl){
+    const { error } = await client
+      .from("tasks")
+      .insert([{
+        title,
+        done: false,
+        status: "todo",
+        priority: "normal",
+        created_by: state.user?.email || "system",
+        created_at: new Date().toISOString()
+      }]);
 
-    greetingEl.innerText =
-      greeting;
+    if (error) {
+      console.error(error);
+      showToast(error.message);
+      return;
+    }
 
-  }
+    addActivity("ADD TASK: " + title);
+    showToast("Task berhasil ditambahkan");
 
-  if(timeEl){
+    input.value = "";
 
-    timeEl.innerText =
-      now.toLocaleDateString(
-        "id-ID",
-        {
-          weekday:"long",
-          day:"numeric",
-          month:"long",
-          year:"numeric"
-        }
-      )
-      +
-      " • "
-      +
-      now.toLocaleTimeString(
-        "id-ID",
-        {
-          hour:"2-digit",
-          minute:"2-digit"
-        }
-      );
+    loadTasks();
 
+  } catch (err) {
+    console.error("ADD TASK ERROR:", err);
   }
 
 }
 
 // =========================================================
-// TASK SYSTEM
+// DELETE TASK
 // =========================================================
 
-async function loadTasks(){
+async function deleteTask(id) {
 
-  try{
+  if (!confirm("Hapus task ini?")) return;
 
-    const {
-      data,
-      error
-    } =
+  try {
+
     await client
       .from("tasks")
-      .select("*")
-      .order(
-        "id",
-        {
-          ascending:false
-        }
-      );
+      .delete()
+      .eq("id", id);
 
-    if(error){
+    addActivity("DELETE TASK #" + id);
+    showToast("Task dihapus");
 
-      console.error(error);
-      return;
+    loadTasks();
 
-    }
-
-    tasks =
-      data || [];
-
-    updateDashboard();
-
-    if(
-      typeof renderKanban
-      === "function"
-    ){
-
-      renderKanban();
-
-    }
-
-    if(
-      typeof renderChart
-      === "function"
-    ){
-
-      renderChart();
-
-    }
-
-  }
-  catch(err){
-
+  } catch (err) {
     console.error(err);
+  }
 
+}
+
+// =========================================================
+// TOGGLE DONE STATUS
+// =========================================================
+
+async function toggleTask(id, current) {
+
+  try {
+
+    await client
+      .from("tasks")
+      .update({
+        done: !current
+      })
+      .eq("id", id);
+
+    addActivity("TOGGLE TASK #" + id);
+
+    loadTasks();
+
+  } catch (err) {
+    console.error(err);
+  }
+
+}
+
+// =========================================================
+// UPDATE STATUS (KANBAN DRAG SYSTEM)
+// =========================================================
+
+async function updateTaskStatus(taskId, status) {
+
+  try {
+
+    await client
+      .from("tasks")
+      .update({
+        status,
+        done: status === "done"
+      })
+      .eq("id", taskId);
+
+  } catch (err) {
+    console.error("UPDATE STATUS ERROR:", err);
   }
 
 }
@@ -391,448 +478,120 @@ async function loadTasks(){
 // DASHBOARD KPI
 // =========================================================
 
-function updateDashboard(){
+function updateDashboard() {
 
-  const total =
-    tasks.length;
+  const total = state.tasks.length;
+  const done = state.tasks.filter(t => t.done).length;
+  const active = total - done;
 
-  const done =
-    tasks.filter(
-      t => t.done
-    ).length;
+  setText("taskCount", total);
+  setText("doneCount", done);
+  setText("activeCount", active);
 
-  const active =
-    total - done;
+}
 
-  updateText(
-    "taskCount",
-    total
+// =========================================================
+// TASK COUNTERS (KANBAN HEADER)
+// =========================================================
+
+function renderTaskCounters() {
+
+  setText(
+    "todoCount",
+    state.tasks.filter(t => t.status === "todo").length
   );
 
-  updateText(
-    "doneCount",
-    done
+  setText(
+    "doingCount",
+    state.tasks.filter(t => t.status === "doing").length
   );
 
-  updateText(
-    "activeCount",
-    active
-  );
-
-}
-
-// =========================================================
-// DOM HELPERS
-// =========================================================
-
-function updateText(
-  id,
-  value
-){
-
-  const el =
-    document.getElementById(
-      id
-    );
-
-  if(el){
-
-    el.innerText =
-      value;
-
-  }
-
-}
-
-function showMessage(
-  id,
-  text
-){
-
-  const el =
-    document.getElementById(
-      id
-    );
-
-  if(el){
-
-    el.innerText =
-      text;
-
-  }
-
-}
-
-// =========================================================
-// REALTIME TASKS
-// =========================================================
-
-function initRealtime(){
-
-  client
-    .channel(
-      "tasks-realtime"
-    )
-    .on(
-      "postgres_changes",
-      {
-        event:"*",
-        schema:"public",
-        table:"tasks"
-      },
-      ()=>{
-        loadTasks();
-      }
-    )
-    .subscribe();
-
-}
-
-// =========================================================
-// ONLINE PRESENCE
-// =========================================================
-
-function initPresence(){
-
-  const channel =
-    client.channel(
-      "online-users"
-    );
-
-  channel.subscribe(
-    async status => {
-
-      if(
-        status ===
-        "SUBSCRIBED"
-      ){
-
-        await channel.track({
-
-          email:
-            user?.email ||
-            "guest",
-
-          online:true,
-
-          last_seen:
-            new Date()
-              .toISOString()
-
-        });
-
-      }
-
-    }
+  setText(
+    "doneTaskCount",
+    state.tasks.filter(t => t.status === "done").length
   );
 
 }
 
 // =========================================================
-// BROADCAST LISTENER
+// SEARCH / FILTER TASKS
 // =========================================================
 
-function listenBroadcast(){
+function filterTasks() {
 
-  client
-    .channel(
-      "broadcast-live"
-    )
-    .on(
-      "postgres_changes",
-      {
-        event:"INSERT",
-        schema:"public",
-        table:"broadcast"
-      },
-      payload=>{
+  const q =
+    document.getElementById("taskSearch")?.value.toLowerCase() || "";
 
-        const list =
-          document.getElementById(
-            "broadcastList"
-          );
+  document.querySelectorAll(".kanban-card").forEach(card => {
 
-        if(!list)
-          return;
+    const text = card.innerText.toLowerCase();
 
-        const item =
-          document.createElement(
-            "div"
-          );
-
-        item.className =
-          "broadcast-item";
-
-        item.innerHTML =
-          "📢 "
-          +
-          payload.new.message;
-
-        list.prepend(
-          item
-        );
-
-      }
-    )
-    .subscribe();
-
-}
-
-// =========================================================
-// ONLINE USER TABLE
-// =========================================================
-
-function renderOnlineUsers(
-  users
-){
-
-  const container =
-    document.getElementById(
-      "userList"
-    );
-
-  if(!container)
-    return;
-
-  container.innerHTML = "";
-
-  users.forEach(user=>{
-
-    const row =
-      document.createElement(
-        "div"
-      );
-
-    row.className =
-      "user-row";
-
-    row.innerHTML =
-
-      `
-      <span>🟢</span>
-      <span>${user.email}</span>
-      `;
-
-    container.appendChild(
-      row
-    );
+    card.style.display =
+      text.includes(q) ? "block" : "none";
 
   });
 
 }
-// =========================================================
-// TASK CRUD
-// =========================================================
-
-async function addTask(){
-
-  const input =
-    document.getElementById(
-      "taskInput"
-    );
-
-  if(
-    !input ||
-    !input.value.trim()
-  ){
-    return;
-  }
-
-  try{
-
-    const {
-      error
-    } =
-    await client
-      .from("tasks")
-      .insert([{
-
-        title:
-          input.value,
-
-        done:false,
-
-        status:"todo",
-
-        created_by:
-          user?.email ||
-
-          "system",
-
-        created_at:
-          new Date()
-            .toISOString()
-
-      }]);
-
-    if(error){
-
-      console.error(error);
-      return;
-
-    }
-
-    input.value = "";
-
-    loadTasks();
-
-  }
-  catch(err){
-
-    console.error(err);
-
-  }
-
-}
-
-async function deleteTask(id){
-
-  if(
-    !confirm(
-      "Hapus task ini?"
-    )
-  ){
-    return;
-  }
-
-  try{
-
-    await client
-      .from("tasks")
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-    loadTasks();
-
-  }
-  catch(err){
-
-    console.error(err);
-
-  }
-
-}
-
-async function toggleTask(
-  id,
-  currentStatus
-){
-
-  try{
-
-    await client
-      .from("tasks")
-      .update({
-
-        done:
-          !currentStatus
-
-      })
-      .eq(
-        "id",
-        id
-      );
-
-    loadTasks();
-
-  }
-  catch(err){
-
-    console.error(err);
-
-  }
-
-}
 
 // =========================================================
-// KANBAN RENDER
+// SEARCH LISTENER (AUTO)
 // =========================================================
 
-function renderKanban(){
+document.addEventListener("input", (e) => {
 
-  const todo =
-    document.getElementById(
-      "todoList"
-    );
-
-  const doing =
-    document.getElementById(
-      "doingList"
-    );
-
-  const done =
-    document.getElementById(
-      "doneList"
-    );
-
-  if(
-    !todo ||
-    !doing ||
-    !done
-  ){
-    return;
+  if (e.target.id === "taskSearch") {
+    filterTasks();
   }
+
+});
+// =========================================================
+// MYWORK CORE v3
+// PART 3 - KANBAN + DRAG + CHART ENGINE
+// =========================================================
+
+// =========================================================
+// RENDER KANBAN BOARD
+// =========================================================
+
+function renderKanban() {
+
+  const todo = document.getElementById("todoList");
+  const doing = document.getElementById("doingList");
+  const done = document.getElementById("doneList");
+
+  if (!todo || !doing || !done) return;
 
   todo.innerHTML = "";
   doing.innerHTML = "";
   done.innerHTML = "";
 
-  tasks.forEach(task=>{
+  state.tasks.forEach(task => {
 
-    const card =
-      document.createElement(
-        "div"
-      );
+    const card = document.createElement("div");
+    card.className = "kanban-card";
+    card.dataset.id = task.id;
 
-    card.className =
-      "kanban-card";
-
-    card.dataset.id =
-      task.id;
-
-    card.innerHTML =
-
-      `
+    card.innerHTML = `
       <div class="kanban-title">
         ${task.title}
       </div>
 
       <div class="kanban-footer">
-        ${task.created_by || ""}
+        <small>${task.created_by || ""}</small>
+
+        <div class="kanban-actions">
+          <button onclick="toggleTask(${task.id}, ${task.done})">✔</button>
+          <button onclick="deleteTask(${task.id})">✖</button>
+        </div>
       </div>
-      `;
+    `;
 
-    if(
-      task.status ===
-      "todo"
-    ){
-
-      todo.appendChild(
-        card
-      );
-
-    }
-
-    else if(
-      task.status ===
-      "doing"
-    ){
-
-      doing.appendChild(
-        card
-      );
-
-    }
-
-    else{
-
-      done.appendChild(
-        card
-      );
-
+    if (task.status === "todo") {
+      todo.appendChild(card);
+    } else if (task.status === "doing") {
+      doing.appendChild(card);
+    } else {
+      done.appendChild(card);
     }
 
   });
@@ -842,934 +601,486 @@ function renderKanban(){
 }
 
 // =========================================================
-// SORTABLE KANBAN
+// DRAG & DROP SYSTEM (SORTABLE.JS)
 // =========================================================
 
-function initDrag(){
+function initDrag() {
 
-  const lists = [
+  const lists = ["todoList", "doingList", "doneList"];
 
-    "todoList",
-    "doingList",
-    "doneList"
+  lists.forEach(id => {
 
-  ];
+    const el = document.getElementById(id);
+    if (!el) return;
 
-  lists.forEach(id=>{
+    new Sortable(el, {
 
-    const container =
-      document.getElementById(
-        id
-      );
+      group: "kanban",
+      animation: 200,
+      ghostClass: "dragging",
 
-    if(!container){
-      return;
-    }
+      onEnd: async function (evt) {
 
-    new Sortable(
-      container,
-      {
+        const taskId = evt.item.dataset.id;
 
-        group:"kanban",
-
-        animation:250,
-
-        ghostClass:
-          "dragging",
-
-        onEnd:
-          async function(evt){
-
-            const taskId =
-              evt.item.dataset.id;
-
-            const newStatus =
-
-              evt.to.id ===
-              "todoList"
-
-              ? "todo"
-
-              :
-
-              evt.to.id ===
-              "doingList"
-
+        const newStatus =
+          evt.to.id === "todoList"
+            ? "todo"
+            : evt.to.id === "doingList"
               ? "doing"
+              : "done";
 
-              :
+        await updateTaskStatus(taskId, newStatus);
 
-              "done";
+        addActivity(`MOVE TASK #${taskId} → ${newStatus}`);
+        showToast("Task dipindahkan");
 
-            try{
-
-              await client
-                .from("tasks")
-                .update({
-
-                  status:
-                    newStatus,
-
-                  done:
-                    newStatus ===
-                    "done"
-
-                })
-                .eq(
-                  "id",
-                  taskId
-                );
-
-            }
-            catch(err){
-
-              console.error(
-                err
-              );
-
-            }
-
-          }
+        loadTasks(); // refresh sync
 
       }
-    );
-
-  });
-
-}
-
-// =========================================================
-// CHART SYSTEM
-// =========================================================
-
-function renderChart(){
-
-  const donutCanvas =
-    document.getElementById(
-      "chartDonut"
-    );
-
-  const barCanvas =
-    document.getElementById(
-      "chartBar"
-    );
-
-  if(
-    !donutCanvas ||
-    !barCanvas
-  ){
-    return;
-  }
-
-  const doneCount =
-    tasks.filter(
-      t => t.done
-    ).length;
-
-  const pendingCount =
-    tasks.length -
-    doneCount;
-
-  if(chartDonut){
-
-    chartDonut.destroy();
-
-  }
-
-  if(chartBar){
-
-    chartBar.destroy();
-
-  }
-
-  chartDonut =
-    new Chart(
-      donutCanvas,
-      {
-
-        type:"doughnut",
-
-        data:{
-
-          labels:[
-
-            "Done",
-            "Pending"
-
-          ],
-
-          datasets:[{
-
-            data:[
-
-              doneCount,
-              pendingCount
-
-            ],
-
-            backgroundColor:[
-
-              "#00E5FF",
-              "#7C3AED"
-
-            ],
-
-            borderWidth:0
-
-          }]
-
-        },
-
-        options:{
-
-          responsive:true,
-
-          maintainAspectRatio:
-            false,
-
-          cutout:"70%",
-
-          plugins:{
-
-            legend:{
-
-              position:
-                "bottom"
-
-            }
-
-          }
-
-        }
-
-      }
-    );
-
-  chartBar =
-    new Chart(
-      barCanvas,
-      {
-
-        type:"bar",
-
-        data:{
-
-          labels:[
-
-            "Tasks"
-
-          ],
-
-          datasets:[{
-
-            label:
-              "Total",
-
-            data:[
-
-              tasks.length
-
-            ],
-
-            backgroundColor:
-              "#00E5FF",
-
-            borderRadius:
-              10
-
-          }]
-
-        },
-
-        options:{
-
-          responsive:true,
-
-          maintainAspectRatio:
-            false,
-
-          plugins:{
-
-            legend:{
-
-              display:false
-
-            }
-
-          },
-
-          scales:{
-
-            y:{
-
-              beginAtZero:
-                true
-
-            }
-
-          }
-
-        }
-
-      }
-    );
-
-}
-
-// =========================================================
-// BROADCAST SYSTEM
-// =========================================================
-
-async function sendBroadcast(){
-
-  const input =
-    document.getElementById(
-      "broadcastInput"
-    );
-
-  if(
-    !input ||
-    !input.value.trim()
-  ){
-    return;
-  }
-
-  try{
-
-    await client
-      .from("broadcast")
-      .insert([{
-
-        message:
-          input.value,
-
-        sender:
-          user?.email,
-
-        created_at:
-          new Date()
-            .toISOString()
-
-      }]);
-
-    input.value = "";
-
-  }
-  catch(err){
-
-    console.error(err);
-
-  }
-
-}
-
-async function loadBroadcastHistory(){
-
-  const list =
-    document.getElementById(
-      "broadcastList"
-    );
-
-  if(!list){
-    return;
-  }
-
-  const {
-    data
-  } =
-  await client
-    .from("broadcast")
-    .select("*")
-    .order(
-      "id",
-      {
-        ascending:false
-      }
-    );
-
-  list.innerHTML = "";
-
-  (data || [])
-  .forEach(item=>{
-
-    const row =
-      document.createElement(
-        "div"
-      );
-
-    row.className =
-      "broadcast-item";
-
-    row.innerHTML =
-
-      `
-      📢 ${item.message}
-      `;
-
-    list.appendChild(
-      row
-    );
-
-  });
-
-}
-// =========================================================
-// CERTIFICATE STUDIO
-// =========================================================
-
-function initCertificateStudio(){
-
-  const canvas =
-    document.getElementById(
-      "certCanvas"
-    );
-
-  if(!canvas) return;
-
-  if(
-    canvas.dataset.loaded
-  ) return;
-
-  canvas.dataset.loaded = true;
-
-  addTextToCert(
-    "{{NAMA}}",
-    300,
-    240
-  );
-
-  addTextToCert(
-    "{{KELAS}}",
-    300,
-    300
-  );
-
-  addTextToCert(
-    "{{PRESTASI}}",
-    300,
-    360
-  );
-
-}
-
-// =========================================================
-// TEMPLATE BACKGROUND UPLOAD
-// =========================================================
-
-function uploadCertificateTemplate(){
-
-  const file =
-    document.getElementById(
-      "templateUpload"
-    )?.files?.[0];
-
-  if(!file) return;
-
-  const reader =
-    new FileReader();
-
-  reader.onload =
-    function(e){
-
-      const canvas =
-        document.getElementById(
-          "certCanvas"
-        );
-
-      if(!canvas) return;
-
-      canvas.style.backgroundImage =
-        `url(${e.target.result})`;
-
-      canvas.style.backgroundSize =
-        "cover";
-
-      canvas.style.backgroundPosition =
-        "center";
-
-      localStorage.setItem(
-        "certificate_template",
-        e.target.result
-      );
-
-    };
-
-  reader.readAsDataURL(
-    file
-  );
-
-}
-
-// =========================================================
-// LOAD SAVED TEMPLATE
-// =========================================================
-
-function loadSavedTemplate(){
-
-  const template =
-    localStorage.getItem(
-      "certificate_template"
-    );
-
-  const canvas =
-    document.getElementById(
-      "certCanvas"
-    );
-
-  if(
-    template &&
-    canvas
-  ){
-
-    canvas.style.backgroundImage =
-      `url(${template})`;
-
-    canvas.style.backgroundSize =
-      "cover";
-
-  }
-
-}
-
-// =========================================================
-// DRAGGABLE TEXT SYSTEM
-// =========================================================
-
-function addTextToCert(
-  text,
-  x = 100,
-  y = 100
-){
-
-  const canvas =
-    document.getElementById(
-      "certCanvas"
-    );
-
-  if(!canvas) return;
-
-  const item =
-    document.createElement(
-      "div"
-    );
-
-  item.className =
-    "text-item";
-
-  item.innerText =
-    text;
-
-  item.style.left =
-    x + "px";
-
-  item.style.top =
-    y + "px";
-
-  item.onclick =
-    ()=>{
-
-      selectElement(
-        item
-      );
-
-    };
-
-  enableDrag(
-    item
-  );
-
-  canvas.appendChild(
-    item
-  );
-
-  certElements.push(
-    item
-  );
-
-}
-
-function selectElement(
-  el
-){
-
-  document
-    .querySelectorAll(
-      ".text-item"
-    )
-    .forEach(e=>{
-
-      e.classList.remove(
-        "active"
-      );
 
     });
 
-  el.classList.add(
-    "active"
-  );
-
-  selectedElement =
-    el;
+  });
 
 }
 
 // =========================================================
-// DRAG ENGINE
+// CHART ENGINE (DONUT + BAR)
 // =========================================================
 
-function enableDrag(el){
-
-  let dragging =
-    false;
-
-  let offsetX = 0;
-  let offsetY = 0;
-
-  el.addEventListener(
-    "mousedown",
-    e=>{
-
-      dragging = true;
-
-      offsetX =
-        e.offsetX;
-
-      offsetY =
-        e.offsetY;
-
-    }
-  );
-
-  document.addEventListener(
-    "mousemove",
-    e=>{
-
-      if(
-        !dragging
-      ) return;
-
-      const canvas =
-        document.getElementById(
-          "certCanvas"
-        );
-
-      const rect =
-        canvas.getBoundingClientRect();
-
-      el.style.left =
-        (
-          e.clientX -
-          rect.left -
-          offsetX
-        ) + "px";
-
-      el.style.top =
-        (
-          e.clientY -
-          rect.top -
-          offsetY
-        ) + "px";
-
-    }
-  );
-
-  document.addEventListener(
-    "mouseup",
-    ()=>{
-
-      dragging =
-        false;
-
-    }
-  );
-
-}
-
-// =========================================================
-// SAVE TEMPLATE LAYOUT
-// =========================================================
-
-function saveTemplateLayout(){
-
-  const layout =
-    certElements.map(
-      el => ({
-
-        text:
-          el.innerText,
-
-        left:
-          el.style.left,
-
-        top:
-          el.style.top
-
-      })
-    );
-
-  localStorage.setItem(
-    "cert_layout",
-    JSON.stringify(
-      layout
-    )
-  );
-
-  alert(
-    "Template saved"
-  );
-
-}
-
-// =========================================================
-// LOAD TEMPLATE LAYOUT
-// =========================================================
-
-function loadTemplateLayout(){
-
-  const layout =
-    JSON.parse(
-      localStorage.getItem(
-        "cert_layout"
-      ) || "[]"
-    );
-
-  const canvas =
-    document.getElementById(
-      "certCanvas"
-    );
-
-  if(!canvas) return;
-
-  canvas
-    .querySelectorAll(
-      ".text-item"
-    )
-    .forEach(
-      e=>e.remove()
-    );
-
-  certElements = [];
-
-  layout.forEach(
-    item=>{
-
-      addTextToCert(
-        item.text,
-        parseInt(
-          item.left
-        ),
-        parseInt(
-          item.top
-        )
-      );
-
-    }
-  );
-
-}
-
-// =========================================================
-// EXCEL IMPORT
-// =========================================================
-
-function uploadExcel(){
-
-  const file =
-    document.getElementById(
-      "excelFile"
-    )?.files?.[0];
-
-  if(!file) return;
-
-  const reader =
-    new FileReader();
-
-  reader.onload =
-    function(e){
-
-      const data =
-        new Uint8Array(
-          e.target.result
-        );
-
-      const workbook =
-        XLSX.read(
-          data,
-          {
-            type:"array"
-          }
-        );
-
-      const sheet =
-        workbook.Sheets[
-          workbook.SheetNames[0]
-        ];
-
-      excelData =
-        XLSX.utils.sheet_to_json(
-          sheet
-        );
-
-      alert(
-        excelData.length +
-        " data berhasil dimuat"
-      );
-
-    };
-
-  reader.readAsArrayBuffer(
-    file
-  );
-
-}
-
-// =========================================================
-// SINGLE CERTIFICATE PDF
-// =========================================================
-
-async function generateCertificate(){
-
-  const {
-    jsPDF
-  } = window.jspdf;
-
-  const doc =
-    new jsPDF(
-      "landscape"
-    );
-
-  const nama =
-    document.getElementById(
-      "certName"
-    )?.value ||
-    "Nama Peserta";
-
-  doc.setFontSize(
-    28
-  );
-
-  doc.text(
-    nama,
-    140,
-    90,
-    {
-      align:"center"
-    }
-  );
-
-  doc.save(
-    "certificate.pdf"
-  );
-
-}
-
-// =========================================================
-// BATCH CERTIFICATE EXPORT
-// =========================================================
-
-async function exportAllCertificates(){
-
-  if(
-    excelData.length === 0
-  ){
-
-    alert(
-      "Upload excel terlebih dahulu"
-    );
-
-    return;
-
-  }
-
-  const {
-    jsPDF
-  } = window.jspdf;
-
-  for(
-
-    let i = 0;
-    i < excelData.length;
-    i++
-
-  ){
-
-    const row =
-      excelData[i];
-
-    const doc =
-      new jsPDF(
-        "landscape"
-      );
-
-    doc.setFontSize(
-      24
-    );
-
-    doc.text(
-      row.NAMA ||
-      row.nama ||
-      "PESERTA",
-      140,
-      90,
-      {
-        align:"center"
+function renderChart() {
+
+  const donutEl = document.getElementById("chartDonut");
+  const barEl = document.getElementById("chartBar");
+
+  if (!donutEl || !barEl) return;
+
+  const done = state.tasks.filter(t => t.done).length;
+  const pending = state.tasks.length - done;
+
+  // destroy old chart (prevent memory leak)
+  if (state.charts.donut) state.charts.donut.destroy();
+  if (state.charts.bar) state.charts.bar.destroy();
+
+  // =====================================================
+  // DONUT CHART
+  // =====================================================
+
+  state.charts.donut = new Chart(donutEl, {
+    type: "doughnut",
+    data: {
+      labels: ["Done", "Pending"],
+      datasets: [{
+        data: [done, pending]
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: "70%",
+      plugins: {
+        legend: { position: "bottom" }
       }
-    );
+    }
+  });
 
-    doc.save(
-      `CERTIFICATE_${
-        row.NAMA ||
-        row.nama ||
-        i
-      }.pdf`
-    );
+  // =====================================================
+  // BAR CHART
+  // =====================================================
 
-  }
+  state.charts.bar = new Chart(barEl, {
+    type: "bar",
+    data: {
+      labels: ["Tasks"],
+      datasets: [{
+        label: "Total Tasks",
+        data: [state.tasks.length]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
 
-  alert(
-    "Batch export selesai"
-  );
+}
+// =========================================================
+// MYWORK CORE v3
+// PART 4 - REALTIME + PRESENCE + BROADCAST SYSTEM
+// =========================================================
+
+// =========================================================
+// REALTIME TASK LISTENER
+// =========================================================
+
+function initRealtime() {
+
+  if (state.realtime.started) return;
+
+  const channel = client.channel("tasks-realtime");
+
+  channel
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "tasks"
+      },
+      (payload) => {
+
+        console.log("TASK UPDATE:", payload);
+
+        loadTasks();
+
+        addNotification("Task updated");
+        addActivity("Realtime task change");
+
+      }
+    )
+    .subscribe((status) => {
+
+      updateConnectionStatus(status);
+
+    });
+
+  state.realtime.taskChannel = channel;
+  state.realtime.started = true;
 
 }
 
 // =========================================================
-// CLOUD STORAGE
+// CONNECTION STATUS UI
 // =========================================================
 
-async function uploadFile(){
+function updateConnectionStatus(status) {
 
-  const file =
-    document.getElementById(
-      "fileUpload"
-    )?.files?.[0];
+  const el = document.getElementById("connectionStatus");
+  if (!el) return;
 
-  if(!file) return;
-
-  const path =
-    Date.now() +
-    "_" +
-    file.name;
-
-  const {
-    error
-  } =
-  await client.storage
-    .from("files")
-    .upload(
-      path,
-      file
-    );
-
-  if(error){
-
-    alert(
-      error.message
-    );
-
-    return;
-
+  if (status === "SUBSCRIBED") {
+    el.innerText = "🟢 Online";
+  } else {
+    el.innerText = "🔴 Offline";
   }
 
+}
+
+// =========================================================
+// PRESENCE SYSTEM (ONLINE USERS)
+// =========================================================
+
+let presenceChannel = null;
+
+function initPresence() {
+
+  if (presenceChannel) return;
+
+  presenceChannel = client.channel("online-users");
+
+  presenceChannel
+    .on("presence", { event: "sync" }, () => {
+
+      const state = presenceChannel.presenceState();
+
+      const users = [];
+
+      Object.keys(state).forEach(key => {
+        state[key].forEach(u => users.push(u));
+      });
+
+      renderOnlineUsers(users);
+
+      setText("onlineCount", users.length);
+
+    });
+
+  presenceChannel.subscribe(async (status) => {
+
+    if (status === "SUBSCRIBED") {
+
+      await presenceChannel.track({
+        email: state.user?.email || "guest",
+        online: true,
+        login_time: new Date().toISOString()
+      });
+
+    }
+
+  });
+
+}
+
+// =========================================================
+// RENDER ONLINE USERS
+// =========================================================
+
+function renderOnlineUsers(users) {
+
+  const box = document.getElementById("userList");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  if (!users.length) {
+    box.innerHTML = "<p>No online users</p>";
+    return;
+  }
+
+  users.forEach(u => {
+
+    const row = document.createElement("div");
+    row.className = "user-row";
+
+    row.innerHTML = `
+      <span>🟢</span>
+      <span>${u.email}</span>
+    `;
+
+    box.appendChild(row);
+
+  });
+
+}
+
+// =========================================================
+// NOTIFICATION ENGINE
+// =========================================================
+
+function addNotification(message) {
+
+  state.notifications.unshift({
+    message,
+    time: new Date().toLocaleString("id-ID")
+  });
+
+  renderNotifications();
+
+}
+
+function renderNotifications() {
+
+  const box = document.getElementById("notificationList");
+  if (!box) return;
+
+  if (!state.notifications.length) {
+    box.innerHTML = "<p>No notifications</p>";
+    return;
+  }
+
+  box.innerHTML = "";
+
+  state.notifications.forEach(n => {
+
+    const el = document.createElement("div");
+    el.className = "notification-item";
+
+    el.innerHTML = `
+      <strong>${n.message}</strong><br>
+      <small>${n.time}</small>
+    `;
+
+    box.appendChild(el);
+
+  });
+
+}
+
+// =========================================================
+// ACTIVITY LOG RENDER
+// =========================================================
+
+function renderActivityLogs() {
+
+  const box = document.getElementById("activityList");
+  if (!box) return;
+
+  if (!state.activityLogs.length) {
+    box.innerHTML = "<p>No activity yet</p>";
+    return;
+  }
+
+  box.innerHTML = "";
+
+  state.activityLogs.forEach(a => {
+
+    const el = document.createElement("div");
+    el.className = "activity-item";
+
+    el.innerHTML = `
+      <strong>${a.text}</strong><br>
+      <small>${a.time}</small>
+    `;
+
+    box.appendChild(el);
+
+  });
+
+}
+
+// =========================================================
+// BROADCAST LISTENER (LIVE FEED)
+// =========================================================
+
+function listenBroadcast() {
+
+  const channel = client.channel("broadcast-live");
+
+  channel
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "broadcast"
+      },
+      (payload) => {
+
+        const box = document.getElementById("broadcastList");
+
+        if (box) {
+
+          const item = document.createElement("div");
+          item.className = "broadcast-item";
+
+          item.innerHTML = `
+            📢 ${payload.new.message}<br>
+            <small>${payload.new.sender || ""}</small>
+          `;
+
+          box.prepend(item);
+
+        }
+
+        addNotification("New broadcast");
+        showToast(payload.new.message);
+
+      }
+    )
+    .subscribe();
+
+}
+
+// =========================================================
+// BROADCAST HISTORY LOAD
+// =========================================================
+
+async function loadBroadcastHistory() {
+
+  const box = document.getElementById("broadcastList");
+  if (!box) return;
+
+  const { data } = await client
+    .from("broadcast")
+    .select("*")
+    .order("id", { ascending: false });
+
+  box.innerHTML = "";
+
+  (data || []).forEach(item => {
+
+    const el = document.createElement("div");
+
+    el.className = "broadcast-item";
+
+    el.innerHTML = `
+      📢 ${item.message}<br>
+      <small>${item.sender || ""}</small>
+    `;
+
+    box.appendChild(el);
+
+  });
+
+}
+// =========================================================
+// MYWORK CORE v3
+// PART 5 - FINAL MODULES (ENTERPRISE TOOLKIT)
+// =========================================================
+
+// =========================================================
+// PROFILE SYSTEM
+// =========================================================
+
+function loadProfile() {
+
+  const box = document.getElementById("profileInfo");
+  if (!box || !state.user) return;
+
+  box.innerHTML = `
+    <p>Nama: ${state.user.user_metadata?.name || "-"}</p>
+    <p>Email: ${state.user.email || "-"}</p>
+    <p>Instansi: ${state.user.user_metadata?.institution || "-"}</p>
+  `;
+
+}
+
+// =========================================================
+// LOCAL STORAGE MODULES
+// =========================================================
+
+function loadLocalModules() {
+
+  state.notes = JSON.parse(localStorage.getItem("mywork_notes") || "[]");
+  state.contacts = JSON.parse(localStorage.getItem("mywork_contacts") || "[]");
+  state.teamMembers = JSON.parse(localStorage.getItem("mywork_team") || "[]");
+
+}
+
+// =========================================================
+// KEYBOARD SHORTCUTS
+// =========================================================
+
+function initKeyboardShortcuts() {
+
+  document.addEventListener("keydown", (e) => {
+
+    if (e.ctrlKey && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+
+      const el = document.getElementById("commandPalette");
+      if (el) el.classList.toggle("hidden");
+
+    }
+
+    if (e.ctrlKey && e.key.toLowerCase() === "b") {
+      e.preventDefault();
+      openPage("broadcast");
+      showToast("Broadcast mode");
+    }
+
+  });
+
+}
+
+// =========================================================
+// FILE UPLOAD (SUPABASE STORAGE)
+// =========================================================
+
+async function uploadFile() {
+
+  const file = document.getElementById("fileUpload")?.files?.[0];
+  if (!file) return;
+
+  const path = Date.now() + "_" + file.name;
+
+  const { error } = await client.storage
+    .from("files")
+    .upload(path, file);
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast("File uploaded");
   loadFiles();
 
 }
@@ -1778,122 +1089,352 @@ async function uploadFile(){
 // LOAD FILES
 // =========================================================
 
-async function loadFiles(){
+async function loadFiles() {
 
-  const box =
-    document.getElementById(
-      "fileList"
-    );
+  const box = document.getElementById("fileList");
+  if (!box) return;
 
-  if(!box) return;
-
-  const {
-    data
-  } =
-  await client.storage
+  const { data, error } = await client.storage
     .from("files")
     .list();
 
+  if (error) {
+    console.error(error);
+    return;
+  }
+
   box.innerHTML = "";
 
-  (data || [])
-  .forEach(file=>{
+  (data || []).forEach(file => {
 
-    const item =
-      document.createElement(
-        "div"
-      );
+    const el = document.createElement("div");
 
-    item.className =
-      "file-card";
+    el.className = "file-card";
 
-    item.innerHTML =
-
-      `
+    el.innerHTML = `
       📄 ${file.name}
-      `;
+      <button onclick="deleteFile('${file.name}')">🗑</button>
+    `;
 
-    box.appendChild(
-      item
-    );
+    box.appendChild(el);
 
   });
 
 }
 
 // =========================================================
-// PDF TOOLS PLACEHOLDER
+// DELETE FILE
 // =========================================================
 
-function mergePDF(){
+async function deleteFile(name) {
 
-  alert(
-    "Merge PDF Module"
-  );
+  if (!confirm("Hapus file ini?")) return;
+
+  const { error } = await client.storage
+    .from("files")
+    .remove([name]);
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast("File deleted");
+  loadFiles();
 
 }
 
-function splitPDF(){
+// =========================================================
+// PDF TOOLS (BASIC PLACEHOLDER UPGRADE)
+// =========================================================
 
-  alert(
-    "Split PDF Module"
-  );
-
+function mergePDF() {
+  showToast("Merge PDF module ready (placeholder)");
 }
 
-function exportPDF(){
+function splitPDF() {
+  showToast("Split PDF module ready (placeholder)");
+}
 
+function exportPDF() {
   window.print();
+  showToast("Export PDF done");
+}
+
+// =========================================================
+// EXCEL IMPORT SYSTEM
+// =========================================================
+
+function uploadExcel() {
+
+  const file = document.getElementById("excelFile")?.files?.[0];
+  if (!file) {
+    showToast("Pilih file Excel");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+
+    const data = new Uint8Array(e.target.result);
+
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    state.excelData = XLSX.utils.sheet_to_json(sheet);
+
+    renderExcelPreview();
+
+    showToast(state.excelData.length + " data loaded");
+
+  };
+
+  reader.readAsArrayBuffer(file);
 
 }
 
 // =========================================================
-// INITIALIZE EXTRA MODULES
+// EXCEL PREVIEW
 // =========================================================
 
-window.addEventListener(
-  "load",
-  ()=>{
+function renderExcelPreview() {
 
-    loadSavedTemplate();
+  const box = document.getElementById("excelPreview");
+  if (!box) return;
 
-    loadTemplateLayout();
+  box.innerHTML = "";
 
-    initCertificateStudio();
+  state.excelData.slice(0, 5).forEach(row => {
 
-    loadBroadcastHistory();
+    const el = document.createElement("div");
+    el.className = "excel-row";
+    el.innerText = JSON.stringify(row);
 
-    loadFiles();
+    box.appendChild(el);
+
+  });
+
+}
+
+// =========================================================
+// CERTIFICATE GENERATOR (SINGLE)
+// =========================================================
+
+async function generateCertificate() {
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF("landscape");
+
+  const nama =
+    document.getElementById("certName")?.value || "PESERTA";
+
+  const event =
+    document.getElementById("certEvent")?.value || "";
+
+  doc.setFontSize(28);
+  doc.text(nama, 148, 90, { align: "center" });
+
+  doc.setFontSize(16);
+  doc.text(event, 148, 110, { align: "center" });
+
+  doc.save("certificate.pdf");
+
+}
+
+// =========================================================
+// BATCH CERTIFICATE GENERATOR
+// =========================================================
+
+async function generateBatchCertificates() {
+
+  if (!state.excelData.length) {
+    showToast("Upload Excel dulu");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  for (const row of state.excelData) {
+
+    const doc = new jsPDF("landscape");
+
+    const nama = row.nama || row.NAMA || "PESERTA";
+
+    doc.setFontSize(28);
+    doc.text(nama, 148, 90, { align: "center" });
+
+    doc.save(nama + ".pdf");
 
   }
-);
-document.addEventListener(
-  "input",
-  function(e){
 
-    if(
-      !selectedElement
-    ) return;
+  showToast("Batch selesai");
 
-    if(
-      e.target.id ===
-      "editText"
-    ){
+}
 
-      selectedElement.innerText =
-        e.target.value;
+// =========================================================
+// CERTIFICATE STUDIO INIT
+// =========================================================
 
-    }
+function initCertificateStudio() {
 
-    if(
-      e.target.id ===
-      "editSize"
-    ){
+  const canvas = document.getElementById("certCanvas");
+  if (!canvas || canvas.dataset.loaded) return;
 
-      selectedElement.style.fontSize =
-        e.target.value + "px";
+  canvas.dataset.loaded = true;
 
-    }
+  loadSavedTemplate();
+  loadTemplateLayout();
+
+  if (state.cert.elements.length === 0) {
+
+    addTextToCert("{{nama}}", 100, 100);
+    addTextToCert("{{kelas}}", 100, 160);
+    addTextToCert("{{event}}", 100, 220);
 
   }
-);
+
+}
+
+// =========================================================
+// ADD TEXT TO CERT
+// =========================================================
+
+function addTextToCert(text, x = 100, y = 100) {
+
+  const canvas = document.getElementById("certCanvas");
+  if (!canvas) return;
+
+  const el = document.createElement("div");
+
+  el.className = "text-item";
+  el.innerText = text;
+
+  el.style.position = "absolute";
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+  el.style.cursor = "move";
+
+  el.onclick = () => selectElement(el);
+
+  enableDrag(el);
+
+  canvas.appendChild(el);
+
+  state.cert.elements.push(el);
+
+}
+
+// =========================================================
+// SELECT ELEMENT
+// =========================================================
+
+function selectElement(el) {
+
+  document.querySelectorAll(".text-item")
+    .forEach(e => e.classList.remove("active"));
+
+  state.cert.selected = el;
+  el.classList.add("active");
+
+}
+
+// =========================================================
+// DRAG ENGINE
+// =========================================================
+
+function enableDrag(el) {
+
+  let dragging = false;
+  let ox = 0;
+  let oy = 0;
+
+  el.addEventListener("mousedown", (e) => {
+    dragging = true;
+    ox = e.offsetX;
+    oy = e.offsetY;
+  });
+
+  document.addEventListener("mousemove", (e) => {
+
+    if (!dragging) return;
+
+    const canvas = document.getElementById("certCanvas");
+    const rect = canvas.getBoundingClientRect();
+
+    el.style.left = (e.clientX - rect.left - ox) + "px";
+    el.style.top = (e.clientY - rect.top - oy) + "px";
+
+  });
+
+  document.addEventListener("mouseup", () => {
+    dragging = false;
+  });
+
+}
+
+// =========================================================
+// SAVE TEMPLATE LAYOUT
+// =========================================================
+
+function saveTemplateLayout() {
+
+  const layout = state.cert.elements.map(el => ({
+    text: el.innerText,
+    left: el.style.left,
+    top: el.style.top
+  }));
+
+  localStorage.setItem("cert_layout", JSON.stringify(layout));
+
+  showToast("Template saved");
+
+}
+
+// =========================================================
+// LOAD TEMPLATE LAYOUT
+// =========================================================
+
+function loadTemplateLayout() {
+
+  const data = JSON.parse(localStorage.getItem("cert_layout") || "[]");
+
+  const canvas = document.getElementById("certCanvas");
+  if (!canvas) return;
+
+  canvas.querySelectorAll(".text-item").forEach(e => e.remove());
+
+  state.cert.elements = [];
+
+  data.forEach(item => {
+    addTextToCert(item.text, parseInt(item.left), parseInt(item.top));
+  });
+
+}
+
+// =========================================================
+// BACKGROUND TEMPLATE
+// =========================================================
+
+function loadSavedTemplate() {
+
+  const bg = localStorage.getItem("cert_bg");
+  const canvas = document.getElementById("certCanvas");
+
+  if (bg && canvas) {
+    canvas.style.backgroundImage = `url(${bg})`;
+  }
+
+}
+
+// =========================================================
+// FINAL BOOT LOG
+// =========================================================
+
+window.addEventListener("load", () => {
+
+  console.log("✅ MyWork v3 Fully Loaded");
+
+});

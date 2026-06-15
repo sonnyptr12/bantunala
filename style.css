@@ -1,135 +1,369 @@
+/* =========================================================
+   MYWORK ULTRA ENTERPRISE UI v2 — DESIGN SYSTEM CORE
+   PART 1/5
+========================================================= */
+
+/* ================= ROOT THEME ================= */
+:root{
+
+  /* CORE DARK TECH */
+  --bg: #050814;
+  --panel: #0b1020;
+  --panel-2: #0f172a;
+  --border: #1f2937;
+
+  /* TEXT */
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+
+  /* ACCENT TECH COLORS */
+  --blue: #38bdf8;
+  --blue-deep: #2563eb;
+  --cyan: #00e5ff;
+
+  --green-stabilo: #39ff14;
+  --green-soft: #10b981;
+
+  --purple: #7c3aed;
+  --red: #ef4444;
+
+  /* GRADIENTS */
+  --grad-blue: linear-gradient(135deg, #38bdf8, #2563eb);
+  --grad-cyan: linear-gradient(135deg, #00e5ff, #38bdf8);
+  --grad-dark: radial-gradient(circle at top, #0f172a, #050814);
+
+  /* EFFECTS */
+  --glow-blue: 0 0 25px rgba(56,189,248,0.25);
+  --glow-green: 0 0 25px rgba(57,255,20,0.15);
+
+  /* RADIUS */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* SHADOW */
+  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+/* ================= GLOBAL RESET ================= */
 *{
   box-sizing:border-box;
-  font-family:system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
+  transition: all 0.15s ease;
 }
 
 html,body{
   margin:0;
   padding:0;
   height:100%;
-  background:#050814;
-  color:#e5e7eb;
+  background: var(--bg);
+  color: var(--text);
   overflow:hidden;
 }
 
-/* ================= AUTH ================= */
+/* smooth text rendering */
+body{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================= SCROLLBAR (TECH STYLE) ================= */
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-track{
+  background: var(--panel);
+}
+
+::-webkit-scrollbar-thumb{
+  background: var(--blue);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background: var(--cyan);
+}
+
+/* ================= BUTTON BASE SYSTEM ================= */
+button{
+  cursor:pointer;
+  border:none;
+  border-radius: var(--radius-md);
+  font-weight:600;
+  letter-spacing:0.3px;
+}
+
+button:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--glow-blue);
+}
+
+/* ================= INPUT BASE ================= */
+input, select, textarea{
+  outline:none;
+  border-radius: var(--radius-md);
+  border:1px solid var(--border);
+  background: #0b1220;
+  color: var(--text);
+  padding:10px 12px;
+}
+
+input:focus{
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+/* ================= LOADER ================= */
+#loadingOverlay{
+  position:fixed;
+  inset:0;
+  background: var(--grad-dark);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+#loadingOverlay.hidden{
+  display:none;
+}
+
+/* animated pulse loader */
+.loader-dot{
+  width:12px;
+  height:12px;
+  background: var(--blue);
+  border-radius:50%;
+  margin:0 4px;
+  animation: pulse 1s infinite ease-in-out;
+}
+
+@keyframes pulse{
+  0%,100%{ transform:scale(0.8); opacity:0.5; }
+  50%{ transform:scale(1.4); opacity:1; }
+}
+
+/* ================= TOAST SYSTEM ================= */
+#toast{
+  background: rgba(15,23,42,0.95);
+  border:1px solid var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+/* ================= AUTH BACKDROP ================= */
 .auth{
   position:fixed;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:radial-gradient(circle at top,#0f172a,#050814);
+  background: var(--grad-dark);
 }
 
-.auth-card{
-  width:360px;
-  padding:28px;
-  border-radius:16px;
-  background:rgba(15,23,42,0.92);
-  border:1px solid #1f2937;
-  text-align:center;
-  backdrop-filter:blur(12px);
+/* ================= CARD BASE ================= */
+.card{
+  background: var(--panel-2);
+  border:1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
 }
 
-.auth-card h1{
-  margin:0;
-  color:#38bdf8;
+/* hover glow tech cards */
+.card:hover{
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+  transform: translateY(-2px);
 }
 
-.auth-card input{
-  width:100%;
-  margin-top:10px;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #1f2937;
-  background:#0b1220;
-  color:white;
+/* ================= PANEL GLASS EFFECT ================= */
+.glass{
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(12px);
+  border:1px solid rgba(255,255,255,0.05);
 }
 
-.auth-card button{
-  width:100%;
-  margin-top:12px;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:#38bdf8;
+/* ================= UTILITY TEXT ================= */
+.text-muted{ color: var(--muted); }
+.text-blue{ color: var(--blue); }
+.text-green{ color: var(--green-stabilo); }
+.text-cyan{ color: var(--cyan); }
+
+/* ================= GRADIENT TEXT ================= */
+.gradient-text{
+  background: var(--grad-cyan);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* ================= ANIMATION BASE ================= */
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(8px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.fade-in{
+  animation: fadeIn 0.25s ease;
+}
+
+/* ================= FOCUS UI ================= */
+.focus-ring:focus{
+  outline:none;
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.3);
+}
+
+/* ================= STATUS BADGES ================= */
+.badge{
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:11px;
   font-weight:600;
-  cursor:pointer;
+  background: var(--panel);
+  border:1px solid var(--border);
 }
 
-/* ================= APP ================= */
+.badge.blue{ background: rgba(56,189,248,0.1); color: var(--blue); }
+.badge.green{ background: rgba(16,185,129,0.1); color: var(--green-soft); }
+.badge.red{ background: rgba(239,68,68,0.1); color: var(--red); }
+.badge.neon{ background: rgba(57,255,20,0.1); color: var(--green-stabilo); }
+/* =========================================================
+   MYWORK ULTRA ENTERPRISE UI v2 — PART 2/5
+   SIDEBAR + TOPBAR + MAIN LAYOUT
+========================================================= */
+
+/* ================= APP WRAPPER ================= */
 .app{
   display:flex;
   height:100vh;
+  background: var(--bg);
 }
 
-/* ================= SIDEBAR ================= */
+/* ================= SIDEBAR ULTRA TECH ================= */
 .sidebar{
-  width:240px;
+  width:260px;
   height:100vh;
   position:fixed;
   left:0;
   top:0;
 
-  background:#0b1020;
-  border-right:1px solid #1f2937;
-
   display:flex;
   flex-direction:column;
-  padding:16px;
-  gap:8px;
+  padding:18px;
+  gap:10px;
 
+  background: linear-gradient(180deg, #0b1020, #050814);
+  border-right:1px solid var(--border);
+
+  box-shadow: var(--shadow);
   overflow:hidden;
 }
 
+/* animated glow line */
+.sidebar::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:2px;
+  background: var(--grad-cyan);
+  opacity:0.7;
+}
+
+/* ================= BRAND ================= */
 .brand{
   font-size:20px;
-  font-weight:bold;
-  color:#38bdf8;
+  font-weight:800;
+  letter-spacing:1px;
+  color: var(--blue);
+  display:flex;
+  align-items:center;
+  gap:8px;
   margin-bottom:10px;
 }
 
-/* MENU */
+.brand::before{
+  content:"⚡";
+  color: var(--green-stabilo);
+}
+
+/* ================= MENU BUTTON ================= */
 .menu{
+  position:relative;
   background:transparent;
   border:none;
-  color:#9ca3af;
+  color: var(--muted);
   text-align:left;
-  padding:10px;
-  border-radius:10px;
+  padding:12px 12px;
+  border-radius:12px;
   cursor:pointer;
-  transition:.2s;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  transition:0.2s;
 }
 
+/* hover neon */
 .menu:hover{
-  background:#111827;
+  background: rgba(56,189,248,0.08);
   color:white;
+  transform: translateX(4px);
 }
 
+/* active menu */
 .menu.active{
-  background:#1f2937;
-  color:white;
+  background: linear-gradient(90deg, rgba(56,189,248,0.2), transparent);
+  color: white;
+  border-left:3px solid var(--blue);
+  box-shadow: var(--glow-blue);
 }
 
-/* LOGOUT */
+/* neon dot indicator */
+.menu.active::before{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background: var(--green-stabilo);
+  position:absolute;
+  left:6px;
+}
+
+/* ================= LOGOUT BUTTON ================= */
 .logout{
   margin-top:auto;
   padding:12px;
-  border:none;
-  border-radius:10px;
-  background:#ef4444;
+  border-radius:12px;
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
   color:white;
+  font-weight:600;
+  border:none;
   cursor:pointer;
 }
 
-/* ================= MAIN ================= */
+.logout:hover{
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(239,68,68,0.3);
+}
+
+/* ================= MAIN AREA ================= */
 .main{
-  margin-left:240px;
-  width:calc(100% - 240px);
+  margin-left:260px;
+  width:calc(100% - 260px);
   height:100vh;
   overflow-y:auto;
-  padding:20px;
+  padding:22px;
+
+  background: radial-gradient(circle at top, #0b1220, #050814);
+}
+
+/* smooth scroll */
+.main::-webkit-scrollbar{
+  width:6px;
 }
 
 /* ================= TOPBAR ================= */
@@ -137,161 +371,370 @@ html,body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:16px;
+
+  padding:14px 16px;
+  margin-bottom:18px;
+
+  background: rgba(15,23,42,0.6);
+  border:1px solid var(--border);
+  border-radius:14px;
+
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
 }
 
+/* greeting text */
+#greeting{
+  font-size:14px;
+  font-weight:600;
+  color: var(--blue);
+}
+
+/* time display */
 #time{
-  color:#9ca3af;
-  font-size:13px;
+  font-size:12px;
+  color: var(--muted);
 }
 
 /* ================= PAGE SYSTEM ================= */
 .page{
   display:none;
-  animation:fade .25s ease;
+  animation: fadeIn 0.25s ease;
 }
 
 .page.active{
   display:block;
 }
 
-@keyframes fade{
-  from{opacity:0;transform:translateY(8px);}
-  to{opacity:1;transform:translateY(0);}
+.page.hidden{
+  display:none;
 }
+
+/* ================= SCROLLABLE CONTENT AREA ================= */
+.scroll{
+  overflow-y:auto;
+  max-height:calc(100vh - 120px);
+}
+
+/* ================= RESPONSIVE SIDEBAR BEHAVIOR ================= */
+@media(max-width:900px){
+
+  .sidebar{
+    width:220px;
+  }
+
+  .main{
+    margin-left:220px;
+    width:calc(100% - 220px);
+  }
+}
+
+@media(max-width:600px){
+
+  .sidebar{
+    display:none;
+  }
+
+  .main{
+    margin-left:0;
+    width:100%;
+    padding:12px;
+  }
+
+  .topbar{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+  }
+}
+
+/* ================= NAVIGATION SEPARATOR ================= */
+.sidebar hr{
+  border:none;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin:10px 0;
+}
+
+/* ================= ACTIVE SECTION HIGHLIGHT ================= */
+.section-title{
+  font-size:12px;
+  color: var(--muted);
+  margin:10px 0 4px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+/* ================= ICON STYLE SUPPORT ================= */
+.menu i{
+  color: var(--blue);
+  font-size:14px;
+}
+
+/* ================= MINI STATUS DOT ================= */
+.status-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background: var(--green-stabilo);
+  box-shadow: var(--glow-green);
+}
+/* =========================================================
+   MYWORK ULTRA ENTERPRISE UI v2 — PART 3/5
+   DASHBOARD + CARDS + CHART SYSTEM
+========================================================= */
 
 /* ================= DASHBOARD GRID ================= */
 .grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-bottom:16px;
+  gap:14px;
+  margin-bottom:18px;
 }
 
+/* ================= KPI CARD ULTRA ================= */
 .card{
-  background:#0f172a;
-  border:1px solid #1f2937;
-  padding:14px;
-  border-radius:14px;
+  position:relative;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+
+  box-shadow: var(--shadow);
+  overflow:hidden;
+
+  transition:0.25s ease;
 }
 
-/* ================= CHART ================= */
+/* glowing edge effect */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: radial-gradient(circle at top left,
+    rgba(56,189,248,0.15),
+    transparent 60%);
+  opacity:0;
+  transition:0.3s;
+}
+
+/* hover lift + glow */
+.card:hover{
+  transform: translateY(-4px);
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+.card:hover::before{
+  opacity:1;
+}
+
+/* KPI number style */
+.card h2,
+.card h3{
+  margin:0;
+  font-weight:700;
+}
+
+/* KPI value highlight */
+.kpi-value{
+  font-size:26px;
+  font-weight:800;
+  color: var(--blue);
+  margin-top:6px;
+}
+
+/* KPI subtitle */
+.kpi-label{
+  font-size:12px;
+  color: var(--muted);
+  margin-top:4px;
+}
+
+/* ================= CHART GRID ================= */
 .chart-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-bottom:16px;
+  gap:14px;
+  margin-bottom:18px;
 }
 
+/* ================= CHART CARD ================= */
 .chart-card{
-  background:#0f172a;
-  border:1px solid #1f2937;
-  border-radius:14px;
+  position:relative;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid var(--border);
+  border-radius:16px;
   padding:14px;
-  height:260px;
+
+  height:280px;
 
   display:flex;
   flex-direction:column;
+
+  box-shadow: var(--shadow);
+  overflow:hidden;
 }
 
+/* chart title */
 .chart-card h3{
   margin:0 0 10px 0;
-  font-size:13px;
-  color:#9ca3af;
+  font-size:12px;
+  color: var(--muted);
+  letter-spacing:0.5px;
 }
 
-/* FIX CHART CENTER */
+/* canvas styling (center perfect) */
 .chart-card canvas{
   max-width:180px !important;
   max-height:180px !important;
   margin:auto;
+  filter: drop-shadow(0 0 8px rgba(56,189,248,0.2));
 }
 
-/* ================= BROADCAST ================= */
+/* ================= BROADCAST PANEL ================= */
 .broadcast{
   display:flex;
   gap:10px;
   margin-bottom:16px;
+  align-items:center;
 }
 
+/* input field broadcast */
 .broadcast input{
   flex:1;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #1f2937;
-  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: #0b1220;
   color:white;
+  outline:none;
 }
 
+.broadcast input:focus{
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+/* send button */
 .broadcast button{
-  padding:10px 14px;
+  padding:12px 14px;
+  border-radius:12px;
+  background: var(--grad-blue);
+  color:white;
+  font-weight:700;
   border:none;
-  border-radius:10px;
-  background:#38bdf8;
-  cursor:pointer;
 }
 
-/* ================= KANBAN ================= */
+.broadcast button:hover{
+  transform: translateY(-2px);
+  box-shadow: var(--glow-blue);
+}
+
+/* ================= BROADCAST LIST ================= */
+.broadcast-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* message item */
+.broadcast-item{
+  padding:10px 12px;
+  border-radius:12px;
+  background: rgba(15,23,42,0.7);
+  border:1px solid var(--border);
+  font-size:13px;
+
+  animation: fadeIn 0.2s ease;
+}
+
+/* highlight newest message */
+.broadcast-item:first-child{
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+/* ================= KANBAN WRAPPER ================= */
 .kanban{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:12px;
+  gap:14px;
 }
 
+/* column container */
 .kanban-column{
-  background:#0f172a;
-  border:1px solid #1f2937;
-  border-radius:14px;
+  background: linear-gradient(145deg, #0f172a, #0b1020);
+  border:1px solid var(--border);
+  border-radius:16px;
   padding:12px;
-  min-height:400px;
+
+  min-height:420px;
+
+  box-shadow: var(--shadow);
 }
 
+/* column header */
+.kanban-column h4{
+  margin:0 0 10px 0;
+  font-size:12px;
+  color: var(--muted);
+}
+
+/* kanban list */
 .kanban-list{
-  min-height:300px;
+  min-height:320px;
   padding:6px;
 }
 
+/* task card */
 .kanban-card{
-  background:#111827;
-  border:1px solid #1f2937;
+  background: #111827;
+  border:1px solid var(--border);
   padding:10px;
-  border-radius:10px;
-  margin-bottom:8px;
+  border-radius:12px;
+  margin-bottom:10px;
+
   cursor:grab;
+  transition:0.2s;
 }
 
-/* ================= TABLE ================= */
+.kanban-card:hover{
+  transform: scale(1.02);
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+}
+
+/* dragging effect */
+.dragging{
+  opacity:0.6;
+  transform: rotate(2deg);
+}
+
+/* ================= TABLE UI ================= */
 table{
   width:100%;
   border-collapse:collapse;
+  background: rgba(15,23,42,0.6);
+  border-radius:12px;
+  overflow:hidden;
 }
 
 th,td{
-  padding:10px;
-  border-bottom:1px solid #1f2937;
-  text-align:left;
+  padding:12px;
+  border-bottom:1px solid var(--border);
   font-size:13px;
 }
 
-/* ================= PDF / TOOLS ================= */
-button{
-  cursor:pointer;
-}
-
-button:hover{
-  opacity:0.9;
-}
-
-/* ================= EXCEL ================= */
-input[type="file"]{
-  background:#0b1220;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #1f2937;
+th{
+  color: var(--blue);
+  text-align:left;
+  background: rgba(56,189,248,0.05);
 }
 
 /* ================= RESPONSIVE ================= */
 @media(max-width:900px){
+
   .grid{
     grid-template-columns:repeat(2,1fr);
   }
@@ -304,150 +747,513 @@ input[type="file"]{
     grid-template-columns:1fr;
   }
 }
+/* =========================================================
+   PART 4 - UI ENHANCEMENTS + EFFECTS + UTILITIES
+   ========================================================= */
 
-@media(max-width:600px){
-  .sidebar{
-    display:none;
+/* ================= GLASS EFFECT UTILITIES ================= */
+.glass {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+}
+
+.glass-strong {
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* ================= GRADIENT TEXT ================= */
+.text-gradient {
+  background: linear-gradient(90deg, #38bdf8, #10b981, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-green-glow {
+  color: #10b981;
+  text-shadow: 0 0 10px rgba(16,185,129,0.5);
+}
+
+.text-blue-glow {
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56,189,248,0.5);
+}
+
+/* ================= BUTTON UPGRADE SYSTEM ================= */
+.btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  color: #e5e7eb;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  border-color: #38bdf8;
+  box-shadow: 0 6px 20px rgba(56,189,248,0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  color: #001018;
+  font-weight: 600;
+}
+
+.btn-success {
+  background: linear-gradient(90deg, #10b981, #22c55e);
+  color: #00140a;
+}
+
+.btn-danger {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  color: white;
+}
+
+/* ================= INPUT UPGRADE ================= */
+input, select, textarea {
+  outline: none;
+  transition: all .2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+}
+
+/* ================= CARD ENHANCEMENT ================= */
+.card, .chart-card, .kanban-column {
+  transition: all .25s ease;
+}
+
+.card:hover, .chart-card:hover, .kanban-column:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56,189,248,0.3);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+}
+
+/* ================= BADGE SYSTEM ================= */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  background: #1f2937;
+  color: #9ca3af;
+}
+
+.badge-blue {
+  background: rgba(56,189,248,0.15);
+  color: #38bdf8;
+}
+
+.badge-green {
+  background: rgba(16,185,129,0.15);
+  color: #10b981;
+}
+
+.badge-red {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+}
+
+/* ================= MODAL SYSTEM ================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+}
+
+.modal-box {
+  width: 420px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  animation: pop .2s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ================= LOADING ANIMATION ================= */
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #1f2937;
+  border-top: 3px solid #38bdf8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================= NOTIFICATION PANEL ================= */
+.notification-panel {
+  position: fixed;
+  right: 20px;
+  top: 80px;
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: rgba(15,23,42,0.95);
+  border: 1px solid #1f2937;
+  border-radius: 14px;
+  padding: 10px;
+  backdrop-filter: blur(12px);
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #1f2937;
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+.notification-item:hover {
+  background: rgba(56,189,248,0.05);
+}
+
+/* ================= ACTIVITY PANEL ================= */
+.activity-item {
+  padding: 10px;
+  border-left: 2px solid #38bdf8;
+  margin-bottom: 8px;
+  background: rgba(15,23,42,0.6);
+  border-radius: 8px;
+}
+
+/* ================= USER STATUS ================= */
+.user-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #1f2937;
+}
+
+.user-row span:first-child {
+  font-size: 10px;
+}
+
+/* ================= BROADCAST LIVE FEED ================= */
+.broadcast-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(16,185,129,0.08));
+  border: 1px solid rgba(56,189,248,0.15);
+}
+
+/* ================= FILE MANAGER ================= */
+.file-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  margin-bottom: 8px;
+  transition: .2s;
+}
+
+.file-card:hover {
+  border-color: #38bdf8;
+  transform: translateX(3px);
+}
+
+/* ================= SCROLLBAR CUSTOM ================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#38bdf8, #10b981);
+  border-radius: 10px;
+}
+
+/* ================= GLITCH EFFECT (OPTIONAL HEADER) ================= */
+.glitch {
+  position: relative;
+  color: #38bdf8;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0.8;
+}
+
+.glitch::before {
+  color: #10b981;
+  transform: translate(1px, 0);
+}
+
+.glitch::after {
+  color: #2563eb;
+  transform: translate(-1px, 0);
+}
+
+/* ================= HOVER LIFT SYSTEM ================= */
+.hover-lift {
+  transition: .2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* ================= DIVIDER ================= */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #1f2937, transparent);
+  margin: 12px 0;
+}
+/* =========================================================
+   PART 5 - FINAL POLISH (NEON TECH ULTIMATE UI)
+   ========================================================= */
+
+/* ================= GLOBAL NEON BACKGROUND LAYER ================= */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(56,189,248,0.08), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(16,185,129,0.07), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(37,99,235,0.06), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ================= GLOBAL FONT UPGRADE ================= */
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.2px;
+}
+
+/* ================= NEON BORDER ANIMATION ================= */
+@keyframes neonBorder {
+  0% { box-shadow: 0 0 5px rgba(56,189,248,0.2); }
+  50% { box-shadow: 0 0 20px rgba(16,185,129,0.25); }
+  100% { box-shadow: 0 0 5px rgba(37,99,235,0.2); }
+}
+
+.neon {
+  animation: neonBorder 3s infinite ease-in-out;
+}
+
+/* ================= DASHBOARD HERO CARD ================= */
+.hero-card {
+  background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(2,6,23,0.9));
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 16px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(56,189,248,0.05), transparent);
+  transform: translateX(-100%);
+  animation: shine 4s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ================= KPI NUMBER ANIMATION ================= */
+.kpi-number {
+  font-size: 24px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #38bdf8, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pulseText 2s infinite;
+}
+
+@keyframes pulseText {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ================= MOBILE ULTRA OPTIMIZATION ================= */
+@media(max-width: 768px) {
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex-direction: row;
+    overflow-x: auto;
   }
 
-  .main{
-    margin-left:0;
-    width:100%;
+  .menu {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+    padding: 12px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kanban {
+    grid-template-columns: 1fr;
   }
 }
 
-/* ================= CERTIFICATE STUDIO ADD-ON ================= */
-
-/* container canvas certificate */
-#certCanvas{
-  position:relative;
-  width:100%;
-  height:520px;
-  background:white;
-  border-radius:14px;
-  border:1px solid #1f2937;
-  overflow:hidden;
-  margin-top:10px;
+/* ================= ULTRA DARK MODE ENHANCEMENT ================= */
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background: #020617;
+  }
 }
 
-/* draggable text object */
-.text-item{
-  position:absolute;
-  cursor:move;
-  user-select:none;
-  padding:4px 6px;
-  border-radius:6px;
-  color:black;
-  font-size:16px;
-  font-weight:500;
+/* ================= GLASS STRONG HEADER ================= */
+.topbar {
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(56,189,248,0.15);
+  padding: 10px 14px;
+  border-radius: 12px;
 }
 
-/* active selected text */
-.text-item.active{
-  outline:2px dashed #38bdf8;
-  background:rgba(56,189,248,0.1);
+/* ================= ACTIVE MENU GLOW ================= */
+.menu.active {
+  position: relative;
+  background: linear-gradient(90deg, rgba(56,189,248,0.2), rgba(16,185,129,0.15));
+  border-left: 3px solid #38bdf8;
+  box-shadow: 0 0 15px rgba(56,189,248,0.15);
 }
 
-/* certificate toolbar section */
-.cert-toolbar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:10px;
+/* ================= FLOATING ACTION EFFECT ================= */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #38bdf8, #10b981);
+  color: #001018;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transition: .2s;
 }
 
-/* small tool button */
-.cert-toolbar button{
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #1f2937;
-  background:#0f172a;
-  color:#e5e7eb;
-  font-size:12px;
+.fab:hover {
+  transform: scale(1.1);
 }
 
-.cert-toolbar button:hover{
-  background:#111827;
+/* ================= LOADING SCREEN FULL PREMIUM ================= */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, #0f172a, #020617);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
 }
 
-/* certificate side editor panel */
-.cert-panel{
-  background:#0f172a;
-  border:1px solid #1f2937;
-  padding:12px;
-  border-radius:14px;
-  margin-top:10px;
+#loadingOverlay.hidden {
+  display: none;
 }
 
-/* field inputs inside certificate module */
-.cert-panel input,
-.cert-panel select{
-  width:100%;
-  margin-top:8px;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #1f2937;
-  background:#0b1220;
-  color:white;
+/* ================= PROGRESS BAR ================= */
+.progress-bar {
+  width: 200px;
+  height: 4px;
+  background: #1f2937;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
 }
 
-/* update button special */
-.cert-panel button{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  background:#38bdf8;
-  color:black;
-  font-weight:600;
+.progress-bar::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #38bdf8, #10b981);
+  animation: load 1.5s infinite;
 }
 
-/* mail merge preview box */
-.merge-preview{
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  border:1px dashed #1f2937;
-  font-size:12px;
-  color:#9ca3af;
+@keyframes load {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
 }
 
-/* certificate layout wrapper (if later export preview) */
-.cert-wrapper{
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
+/* ================= FINAL UI CLEAN FIX ================= */
+.hidden {
+  display: none !important;
 }
 
-/* canvas shadow glow (tech feel) */
-#certCanvas{
-  box-shadow:0 0 25px rgba(56,189,248,0.08);
+.active {
+  opacity: 1;
 }
 
-/* draggable hover effect */
-.text-item:hover{
-  transform:scale(1.02);
+/* ================= SELECTION COLOR ================= */
+::selection {
+  background: rgba(56,189,248,0.3);
+  color: white;
 }
 
-/* small badge tag (mail merge field) */
-.merge-tag{
-  display:inline-block;
-  padding:3px 6px;
-  font-size:11px;
-  border-radius:6px;
-  background:#1f2937;
-  color:#38bdf8;
-  margin:2px 2px 0 0;
+/* ================= FINAL SHADOW DEPTH SYSTEM ================= */
+.deep-shadow {
+  box-shadow:
+    0 5px 15px rgba(0,0,0,0.4),
+    0 0 25px rgba(56,189,248,0.08);
 }
 
-/* batch status box */
-.batch-status{
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  background:#0b1220;
-  border:1px solid #1f2937;
-  font-size:12px;
-  color:#9ca3af;
+/* ================= MICRO INTERACTION ================= */
+button, .menu, .card {
+  transition: all .2s ease;
 }
+
+/* ================= END SYSTEM ================= */
