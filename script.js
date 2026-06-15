@@ -1867,3 +1867,33 @@ window.addEventListener(
 
   }
 );
+document.addEventListener(
+  "input",
+  function(e){
+
+    if(
+      !selectedElement
+    ) return;
+
+    if(
+      e.target.id ===
+      "editText"
+    ){
+
+      selectedElement.innerText =
+        e.target.value;
+
+    }
+
+    if(
+      e.target.id ===
+      "editSize"
+    ){
+
+      selectedElement.style.fontSize =
+        e.target.value + "px";
+
+    }
+
+  }
+);
